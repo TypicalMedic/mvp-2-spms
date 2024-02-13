@@ -9,18 +9,24 @@ import (
 )
 
 type ProjectRepository struct {
-	DBContext database.Database
+	dbContext database.Database
+}
+
+func InitProjectRepository(dbcxt database.Database) *ProjectRepository {
+	return &ProjectRepository{
+		dbContext: dbcxt,
+	}
 }
 
 func (r *ProjectRepository) GetProfessorProjects(profId uint) []project.Project {
 	var projects []models.Project
-	r.DBContext.DB.Select("*").Where("supervisor_id = ?", profId).Find(&projects)
+	r.dbContext.DB.Select("*").Where("supervisor_id = ?", profId).Find(&projects)
 	result := []project.Project{}
 	for _, pj := range projects {
 		// вынести в маппер
 		result = append(result,
 			project.Project{
-				Id:    pj.ID,
+				Id:    pj.Id,
 				Theme: pj.Theme,
 				Supervisor: people.Professor{
 					Person: people.Person{
