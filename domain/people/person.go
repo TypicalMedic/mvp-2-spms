@@ -3,6 +3,7 @@ package people
 import "fmt"
 
 type Person struct {
+	Id         uint
 	Name       string
 	Surname    string
 	Middlename string

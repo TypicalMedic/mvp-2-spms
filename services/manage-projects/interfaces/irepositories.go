@@ -6,5 +6,7 @@ import (
 
 // transfers data in domain entities
 type IProjetRepository interface {
-	GetProfessorProjects(profId uint) []project.Project // возвращать вообще все здесь??? а что делать если там нет чего-то в дб? как понять?
+	GetProfessorProjects(profId uint) []project.Project
+	// возвращать вообще все здесь??? а что делать если там нет чего-то в дб? как понять?
+	// писать что будет возвращено в структуре
 }
