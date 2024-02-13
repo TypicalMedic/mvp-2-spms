@@ -1,11 +1,33 @@
 package main
 
 import (
+	"mvp-2-spms/database"
+	projectrepository "mvp-2-spms/database/project-repository"
+	studentrepository "mvp-2-spms/database/student-repository"
+	"mvp-2-spms/internal"
+	manageprojects "mvp-2-spms/services/manage-projects"
 	"mvp-2-spms/web_server/routes"
 	"net/http"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func main() {
-	router := routes.SetupRouter()
+	dsn := "root:root@tcp(127.0.0.1:3306)/student_project_management?parseTime=true"
+	gdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db := database.InitDatabade(gdb)
+	repos := internal.Repositories{
+		Project: projectrepository.InitProjectRepository(*db),
+		Student: studentrepository.InitStudentRepository(*db),
+	}
+
+	interactors := internal.Intercators{
+		Project: manageprojects.InitProjectInteractor(repos.Project, repos.Student),
+	}
+	app := internal.App{
+		Intercators: interactors,
+	}
+	router := routes.SetupRouter(&app)
 	http.ListenAndServe(":8080", router.Router())
 }
