@@ -34,7 +34,7 @@ type Project struct {
 	Grade            float32
 	Tasks            []Task
 	SupervisorReview SupervisorReview
-	Repsitory        repositoryhub.Repository
+	Repository       repositoryhub.Repository
 	Stage            ProjectStage
 	Status           ProjectStatus
 }
