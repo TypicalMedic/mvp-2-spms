@@ -11,7 +11,7 @@ type ProjectInteractor struct {
 }
 
 // returns all professor projects (basic information)
-func (p *ProjectInteractor) GetPfofessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetPfofessorProjects {
+func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetPfofessorProjects {
 	// get from database
 	projects := p.projectRepo.GetProfessorProjects(input.ProfessorId)
 	outputProjects := []outputdata.ProjectData{}
