@@ -1,5 +1,5 @@
 package inputdata
 
 type GetPfofessorProjects struct {
-	ProfessorId uint
+	ProfessorId uint `json:"professor_id"`
 }

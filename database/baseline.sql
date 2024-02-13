@@ -19,13 +19,13 @@ CREATE TABLE
         name VARCHAR(50) NOT NULL,
         surname VARCHAR(50) NOT NULL,
         middlename VARCHAR(50) NOT NULL,
-        enrollment_year UNSIGNED INT NOT NULL,
+        enrollment_year INT UNSIGNED NOT NULL,
         PRIMARY KEY(id)
     );
 
 CREATE TABLE
     project_status (
-        id INT NOT NULL auto_increment,
+        id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         PRIMARY KEY(id)
     );
@@ -40,7 +40,7 @@ CREATE TABLE
 
 CREATE TABLE
     project_stage (
-        id INT NOT NULL auto_increment,
+        id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         PRIMARY KEY(id)
     );
@@ -58,7 +58,7 @@ CREATE TABLE
         grade_weight FLOAT NOT NULL,
         supervisor_review_id INT NOT NULL,
         PRIMARY KEY(id),
-        FOREIGN KEY (supervisor_review_id) REFERENCES supervisor_review(id) ON DELETE UPDATE CASCADE,
+        FOREIGN KEY (supervisor_review_id) REFERENCES supervisor_review(id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 CREATE TABLE
@@ -74,12 +74,12 @@ CREATE TABLE
         grade FLOAT,
         supervisor_review_id INT,
         PRIMARY KEY(id),
-        FOREIGN KEY (supervisor_id) REFERENCES professor(id) ON DELETE UPDATE CASCADE,
-        FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE UPDATE CASCADE,
-        FOREIGN KEY (status_id) REFERENCES project_status(id) ON DELETE UPDATE CASCADE,
-        FOREIGN KEY (stage_id) REFERENCES project_stage(id) ON DELETE UPDATE CASCADE,
-        FOREIGN KEY (supervisor_review_id) REFERENCES supervisor_review(id) ON DELETE UPDATE CASCADE,
-        FOREIGN KEY (repo_id) REFERENCES repository(id) ON DELETE UPDATE CASCADE
+        FOREIGN KEY (supervisor_id) REFERENCES professor(id)ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (student_id) REFERENCES student(id)ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (status_id) REFERENCES project_status(id)ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (stage_id) REFERENCES project_stage(id)ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (supervisor_review_id) REFERENCES supervisor_review(id)ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (repo_id) REFERENCES repository(id)ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 CREATE TABLE
@@ -90,5 +90,5 @@ CREATE TABLE
         deadline DATETIME NOT NULL,
         project_id INT NOT NULL,
         PRIMARY KEY(id),
-        FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE UPDATE CASCADE,
+        FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE ON UPDATE CASCADE
     );

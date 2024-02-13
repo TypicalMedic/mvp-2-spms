@@ -8,6 +8,6 @@ type Database struct {
 	DB *gorm.DB
 }
 
-func InitDatabade(db *gorm.DB) Database {
-	return Database{DB: db}
+func InitDatabade(db *gorm.DB) *Database {
+	return &Database{DB: db}
 }

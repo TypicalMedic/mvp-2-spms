@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type Project struct {
-	gorm.Model
+	Id                 uint `gorm:"column:id"`
 	Theme              string
 	Year               uint
 	SupervisorId       uint
@@ -13,4 +11,8 @@ type Project struct {
 	RepoId             uint
 	StageId            uint
 	StatusId           uint
+}
+
+func (Project) TableName() string {
+	return "project"
 }

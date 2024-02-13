@@ -8,6 +8,14 @@ import (
 
 type ProjectInteractor struct {
 	projectRepo interfaces.IProjetRepository
+	studentRepo interfaces.IStudentRepository
+}
+
+func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository) *ProjectInteractor {
+	return &ProjectInteractor{
+		projectRepo: projRepo,
+		studentRepo: stRepo,
+	}
 }
 
 // returns all professor projects (basic information)
@@ -16,6 +24,7 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorPro
 	projects := p.projectRepo.GetProfessorProjects(input.ProfessorId)
 	outputProjects := []outputdata.ProjectData{}
 	for _, project := range projects {
+		project.Student = p.studentRepo.GetStudentById(project.Student.Id)
 		outputProjects = append(outputProjects,
 			outputdata.ProjectData{
 				Id:          project.Id,
