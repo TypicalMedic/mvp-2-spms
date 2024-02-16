@@ -12,7 +12,8 @@ type Project struct {
 	Year               uint    `gorm:"column:year"`
 	SupervisorId       uint    `gorm:"column:supervisor_id"`
 	StudentId          uint    `gorm:"column:student_id"`
-	Grade              float32 `gorm:"column:grade"`
+	DefenceGrade       float32 `gorm:"column:defence_grade"`
+	FinalGrade         float32 `gorm:"column:final_grade"`
 	SupervisorReviewId uint    `gorm:"column:supervisor_review_id"`
 	RepoId             uint    `gorm:"column:repo_id"`
 	StageId            uint    `gorm:"column:stage_id"`
@@ -37,8 +38,9 @@ func (pj Project) MapToEntity() projectEntites.Project {
 				Id: pj.StudentId,
 			},
 		},
-		Year:  pj.Year,
-		Grade: pj.Grade,
+		Year:         pj.Year,
+		DefenceGrade: pj.DefenceGrade,
+		FinalGrade:   pj.FinalGrade,
 		SupervisorReview: projectEntites.SupervisorReview{
 			Id: pj.SupervisorReviewId,
 		},
