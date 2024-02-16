@@ -19,25 +19,12 @@ func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfa
 }
 
 // returns all professor projects (basic information)
-func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetPfofessorProjects {
+func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetProfessorProjects {
 	// get from database
 	projects := p.projectRepo.GetProfessorProjects(input.ProfessorId)
-	outputProjects := []outputdata.ProjectData{}
 	for _, project := range projects {
 		project.Student = p.studentRepo.GetStudentById(project.Student.Id)
-		outputProjects = append(outputProjects,
-			outputdata.ProjectData{
-				Id:          project.Id,
-				Theme:       project.Theme,
-				Status:      project.Status.String(),
-				Stage:       project.Stage.String(),
-				Year:        project.Year,
-				StudentName: project.Student.FullNameToString(),
-				Cource:      project.Student.GetCource(),
-			})
 	}
-	output := outputdata.GetPfofessorProjects{
-		Projects: outputProjects,
-	}
+	output := outputdata.MapToGetProfessorProjects(projects)
 	return output
 }
