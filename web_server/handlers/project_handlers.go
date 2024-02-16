@@ -23,6 +23,7 @@ func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Reque
 	var input inputdata.GetPfofessorProjects
 	decoder.Decode(&input)
 	result := h.projectInteractor.GetProfessorProjects(input)
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
