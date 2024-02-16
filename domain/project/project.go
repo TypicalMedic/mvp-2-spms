@@ -25,13 +25,19 @@ const (
 	Deployment
 )
 
+const (
+	defenceGradeWeight    = 0.6
+	supervisorGradeWeight = 1 - defenceGradeWeight
+)
+
 type Project struct {
 	Id               uint
 	Theme            string
 	Supervisor       people.Professor
 	Student          people.Student
 	Year             uint
-	Grade            float32
+	DefenceGrade     float32
+	FinalGrade       float32
 	Tasks            []Task
 	SupervisorReview SupervisorReview
 	Repository       repositoryhub.Repository
@@ -39,12 +45,13 @@ type Project struct {
 	Status           ProjectStatus
 }
 
+// what if there're no grades yet?
 func (p *Project) CalculateGrade() {
-	var grade float32 = 0
+	var supGrade float32 = 0
 	for _, gr := range p.SupervisorReview.Criterias {
-		grade += gr.Grade * gr.Weight
+		supGrade += gr.Grade * gr.Weight
 	}
-	p.Grade = grade
+	p.FinalGrade = supGrade*supervisorGradeWeight + p.DefenceGrade*defenceGradeWeight
 }
 
 func (s ProjectStatus) String() string {
