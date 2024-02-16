@@ -6,5 +6,5 @@ import (
 )
 
 type IProjetInteractor interface {
-	GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetPfofessorProjects
+	GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetProfessorProjects
 }

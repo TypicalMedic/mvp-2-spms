@@ -11,14 +11,14 @@ import (
 
 type Router struct {
 	router *chi.Mux
-	app    *internal.App
+	app    *internal.StudentsProjectsManagementApp
 }
 
 func (r *Router) Router() *chi.Mux {
 	return r.router
 }
 
-func InitRouter(app *internal.App) Router {
+func InitRouter(app *internal.StudentsProjectsManagementApp) Router {
 	r := chi.NewRouter()
 	return Router{
 		router: r,
@@ -26,7 +26,7 @@ func InitRouter(app *internal.App) Router {
 	}
 }
 
-func SetupRouter(app *internal.App) Router {
+func SetupRouter(app *internal.StudentsProjectsManagementApp) Router {
 	r := InitRouter(app)
 	r.SetupMiddleware()
 	r.SetupRoutes()
@@ -45,7 +45,7 @@ func (r *Router) SetupRoutes() {
 }
 
 func (r *Router) setupProjectRoutes() {
-	projH := handlers.InitProjectHandler(r.app.Intercators.Project)
+	projH := handlers.InitProjectHandler(r.app.Intercators.ProjectManager)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/projects", func(r chi.Router) {

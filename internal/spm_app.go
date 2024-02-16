@@ -5,14 +5,14 @@ import (
 	hInterfaces "mvp-2-spms/web_server/handlers/interfaces"
 )
 
-type App struct {
+type StudentsProjectsManagementApp struct {
 	Intercators Intercators
 }
 
 type Intercators struct {
-	Project hInterfaces.IProjetInteractor
+	ProjectManager hInterfaces.IProjetInteractor
 }
 type Repositories struct {
-	Project mngInterfaces.IProjetRepository
-	Student mngInterfaces.IStudentRepository
+	Projects mngInterfaces.IProjetRepository
+	Students mngInterfaces.IStudentRepository
 }

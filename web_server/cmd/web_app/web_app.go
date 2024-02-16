@@ -18,14 +18,14 @@ func main() {
 	gdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	db := database.InitDatabade(gdb)
 	repos := internal.Repositories{
-		Project: projectrepository.InitProjectRepository(*db),
-		Student: studentrepository.InitStudentRepository(*db),
+		Projects: projectrepository.InitProjectRepository(*db),
+		Students: studentrepository.InitStudentRepository(*db),
 	}
 
 	interactors := internal.Intercators{
-		Project: manageprojects.InitProjectInteractor(repos.Project, repos.Student),
+		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students),
 	}
-	app := internal.App{
+	app := internal.StudentsProjectsManagementApp{
 		Intercators: interactors,
 	}
 	router := routes.SetupRouter(&app)
