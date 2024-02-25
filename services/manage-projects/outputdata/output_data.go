@@ -9,24 +9,29 @@ type GetProfessorProjects struct {
 	Projects []getProfProjProjectData `json:"projects"`
 }
 
-func MapToGetProfessorProjects(projectEntities map[*entites.Project]entites.Student) GetProfessorProjects {
+func MapToGetProfessorProjects(projectEntities []GetProfessorProjectsEntities) GetProfessorProjects {
 	outputProjects := []getProfProjProjectData{}
-	for project, student := range projectEntities {
-		id, _ := strconv.Atoi(project.Id)
+	for _, projectEntitiy := range projectEntities {
+		id, _ := strconv.Atoi(projectEntitiy.Project.Id)
 		outputProjects = append(outputProjects,
 			getProfProjProjectData{
 				Id:          id,
-				Theme:       project.Theme,
-				Status:      project.Status.String(),
-				Stage:       project.Stage.String(),
-				Year:        int(project.Year),
-				StudentName: student.FullNameToString(),
-				Cource:      int(student.GetCource()),
+				Theme:       projectEntitiy.Project.Theme,
+				Status:      projectEntitiy.Project.Status.String(),
+				Stage:       projectEntitiy.Project.Stage.String(),
+				Year:        int(projectEntitiy.Project.Year),
+				StudentName: projectEntitiy.Student.FullNameToString(),
+				Cource:      int(projectEntitiy.Student.GetCource()),
 			})
 	}
 	return GetProfessorProjects{
 		Projects: outputProjects,
 	}
+}
+
+type GetProfessorProjectsEntities struct {
+	Project entites.Project
+	Student entites.Student
 }
 
 type getProfProjProjectData struct {
