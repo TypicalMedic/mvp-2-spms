@@ -1,6 +1,8 @@
 package manageprojects
 
 import (
+	"fmt"
+	entites "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/manage-projects/interfaces"
 	"mvp-2-spms/services/manage-projects/outputdata"
@@ -21,10 +23,12 @@ func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfa
 // returns all professor projects (basic information)
 func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetProfessorProjects {
 	// get from database
-	projects := p.projectRepo.GetProfessorProjects(input.ProfessorId)
+	outputEntities := map[*entites.Project]entites.Student{}
+	projects := p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))
 	for _, project := range projects {
-		project.Student = p.studentRepo.GetStudentById(project.Student.Id)
+		student := p.studentRepo.GetStudentById(project.StudentId)
+		outputEntities[&project] = student
 	}
-	output := outputdata.MapToGetProfessorProjects(projects)
+	output := outputdata.MapToGetProfessorProjects(outputEntities)
 	return output
 }

@@ -1,9 +1,8 @@
-package project
+package domainaggregate
 
 import (
 	"fmt"
-	"mvp-2-spms/domain/people"
-	"mvp-2-spms/domain/repositoryhub"
+	"time"
 )
 
 type ProjectStatus int
@@ -25,33 +24,51 @@ const (
 	Deployment
 )
 
-const (
-	defenceGradeWeight    = 0.6
-	supervisorGradeWeight = 1 - defenceGradeWeight
-)
-
 type Project struct {
-	Id               uint
-	Theme            string
-	Supervisor       people.Professor
-	Student          people.Student
-	Year             uint
-	DefenceGrade     float32
-	FinalGrade       float32
-	Tasks            []Task
-	SupervisorReview SupervisorReview
-	Repository       repositoryhub.Repository
-	Stage            ProjectStage
-	Status           ProjectStatus
+	Id           string
+	Theme        string
+	SupervisorId string
+	StudentId    string
+	Year         uint
+	Stage        ProjectStage
+	Status       ProjectStatus
+	cloud        projectOnCloud
+	repo         projectInRepository
 }
 
-// what if there're no grades yet?
-func (p *Project) CalculateGrade() {
-	var supGrade float32 = 0
-	for _, gr := range p.SupervisorReview.Criterias {
-		supGrade += gr.Grade * gr.Weight
-	}
-	p.FinalGrade = supGrade*supervisorGradeWeight + p.DefenceGrade*defenceGradeWeight
+// in DDD this should be gotten through the repository (ala GetProjectInRepo(...))
+func (p *Project) Repo() projectInRepository {
+	return p.repo
+}
+
+// in DDD this should be gotten through the repository (ala GetProjectOnCloud(...))
+func (p *Project) Cloud() projectOnCloud {
+	return p.cloud
+}
+
+type projectOnCloud struct {
+	FolderId   string
+	FolderName string
+}
+
+type projectInRepository struct {
+	RepoId   string
+	RepoName string
+	Commits  []commit
+	Branches []branch
+}
+
+type branch struct {
+	Name string
+	Head commit
+}
+
+type commit struct {
+	SHA         string
+	Name        string
+	Description string
+	Date        time.Time
+	// id repo
 }
 
 func (s ProjectStatus) String() string {

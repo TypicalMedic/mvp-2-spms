@@ -1,23 +1,27 @@
 package outputdata
 
-import "mvp-2-spms/domain/project"
+import (
+	entites "mvp-2-spms/domain-aggregate"
+	"strconv"
+)
 
 type GetProfessorProjects struct {
 	Projects []getProfProjProjectData `json:"projects"`
 }
 
-func MapToGetProfessorProjects(projectEntities []project.Project) GetProfessorProjects {
+func MapToGetProfessorProjects(projectEntities map[*entites.Project]entites.Student) GetProfessorProjects {
 	outputProjects := []getProfProjProjectData{}
-	for _, project := range projectEntities {
+	for project, student := range projectEntities {
+		id, _ := strconv.Atoi(project.Id)
 		outputProjects = append(outputProjects,
 			getProfProjProjectData{
-				Id:          project.Id,
+				Id:          id,
 				Theme:       project.Theme,
 				Status:      project.Status.String(),
 				Stage:       project.Stage.String(),
-				Year:        project.Year,
-				StudentName: project.Student.FullNameToString(),
-				Cource:      project.Student.GetCource(),
+				Year:        int(project.Year),
+				StudentName: student.FullNameToString(),
+				Cource:      int(student.GetCource()),
 			})
 	}
 	return GetProfessorProjects{
@@ -26,11 +30,11 @@ func MapToGetProfessorProjects(projectEntities []project.Project) GetProfessorPr
 }
 
 type getProfProjProjectData struct {
-	Id          uint   `json:"id"`
+	Id          int    `json:"id"`
 	Theme       string `json:"theme"`
 	StudentName string `json:"student_name"`
-	Cource      uint   `json:"cource"`
+	Cource      int    `json:"cource"`
 	Status      string `json:"status"`
 	Stage       string `json:"stage"`
-	Year        uint   `json:"year"`
+	Year        int    `json:"year"`
 }

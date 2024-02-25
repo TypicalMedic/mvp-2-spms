@@ -1,9 +1,8 @@
 package models
 
 import (
-	"mvp-2-spms/domain/people"
-	projectEntites "mvp-2-spms/domain/project"
-	"mvp-2-spms/domain/repositoryhub"
+	"fmt"
+	entites "mvp-2-spms/domain-aggregate"
 )
 
 type Project struct {
@@ -24,30 +23,14 @@ func (Project) TableName() string {
 	return "project"
 }
 
-func (pj Project) MapToEntity() projectEntites.Project {
-	return projectEntites.Project{
-		Id:    pj.Id,
-		Theme: pj.Theme,
-		Supervisor: people.Professor{
-			Person: people.Person{
-				Id: pj.SupervisorId,
-			},
-		},
-		Student: people.Student{
-			Person: people.Person{
-				Id: pj.StudentId,
-			},
-		},
+func (pj Project) MapToEntity() entites.Project {
+	return entites.Project{
+		Id:           fmt.Sprint(pj.Id),
+		Theme:        pj.Theme,
+		SupervisorId: fmt.Sprint(pj.SupervisorId),
+		StudentId:    fmt.Sprint(pj.StudentId),
 		Year:         pj.Year,
-		DefenceGrade: pj.DefenceGrade,
-		FinalGrade:   pj.FinalGrade,
-		SupervisorReview: projectEntites.SupervisorReview{
-			Id: pj.SupervisorReviewId,
-		},
-		Repository: repositoryhub.Repository{
-			Id: pj.RepoId,
-		},
-		Stage:  projectEntites.ProjectStage(pj.StageId),
-		Status: projectEntites.ProjectStatus(pj.StatusId),
+		Stage:        entites.ProjectStage(pj.StageId),
+		Status:       entites.ProjectStatus(pj.StatusId),
 	}
 }
