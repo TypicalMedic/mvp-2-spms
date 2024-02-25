@@ -1,9 +1,9 @@
-package people
+package domainaggregate
 
 import "fmt"
 
 type Person struct {
-	Id         uint
+	Id         string
 	Name       string
 	Surname    string
 	Middlename string

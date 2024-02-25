@@ -1,7 +1,8 @@
 package models
 
 import (
-	"mvp-2-spms/domain/people"
+	"fmt"
+	entites "mvp-2-spms/domain-aggregate"
 )
 
 type Student struct {
@@ -15,14 +16,14 @@ type Student struct {
 func (Student) TableName() string {
 	return "student"
 }
-func (s Student) MapToEntity() people.Student {
-	return people.Student{
-		Person: people.Person{
-			Id:         s.Id,
+func (s Student) MapToEntity() entites.Student {
+	return entites.Student{
+		Person: entites.Person{
+			Id:         fmt.Sprint(s.Id),
 			Name:       s.Name,
 			Surname:    s.Surname,
 			Middlename: s.Middlename,
 		},
-		EnrollmentYear: s.EnrollmentYear,
+		//EnrollmentYear: s.EnrollmentYear,
 	}
 }
