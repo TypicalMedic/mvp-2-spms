@@ -10,6 +10,7 @@ type Student struct {
 	Name                   string `gorm:"column:name"`
 	Surname                string `gorm:"column:surname"`
 	Middlename             string `gorm:"column:middlename"`
+	EnrollmentYear         uint   `gorm:"column:enrollment_year"`
 	EducationalProgrammeId uint   `gorm:"column:ed_programme_id"`
 }
 
