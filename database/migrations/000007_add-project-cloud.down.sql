@@ -1,2 +1,2 @@
-ALTER TABLE professor
+ALTER TABLE project
 DROP COLUMN cloud_id;

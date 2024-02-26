@@ -1,2 +1,2 @@
-ALTER TABLE professor
+ALTER TABLE project
 ADD cloud_id INT;
