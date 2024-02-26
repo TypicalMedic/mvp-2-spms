@@ -33,11 +33,11 @@ type Project struct {
 	Stage        ProjectStage
 	Status       ProjectStatus
 	cloud        projectOnCloud
-	repo         projectInRepository
+	repo         ProjectInRepository
 }
 
 // in DDD this should be gotten through the repository (ala GetProjectInRepo(...))
-func (p *Project) Repo() projectInRepository {
+func (p *Project) Repo() ProjectInRepository {
 	return p.repo
 }
 
@@ -51,23 +51,23 @@ type projectOnCloud struct {
 	FolderName string
 }
 
-type projectInRepository struct {
-	RepoId   string
-	RepoName string
-	Commits  []commit
-	Branches []branch
+type ProjectInRepository struct {
+	RepoId    string
+	OwnerName string
+	commits   []Commit
+	branches  []branch
 }
 
 type branch struct {
 	Name string
-	Head commit
+	Head Commit
 }
 
-type commit struct {
+type Commit struct {
 	SHA         string
-	Name        string
 	Description string
 	Date        time.Time
+	Author      string
 	// id repo
 }
 
