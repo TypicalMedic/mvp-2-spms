@@ -7,7 +7,7 @@ type Student struct {
 	cource                 currentCource
 }
 
-// in DDD this should be gotten through the repository (ala GetStudCource(...))
+// in DDD this should be gotten through the repository (ala GetStudCource(...))?
 func (s *Student) Cource() currentCource {
 	return s.cource
 }

@@ -6,11 +6,12 @@ import (
 )
 
 type Student struct {
-	Id             uint   `gorm:"column:id"`
-	Name           string `gorm:"column:name"`
-	Surname        string `gorm:"column:surname"`
-	Middlename     string `gorm:"column:middlename"`
-	EnrollmentYear uint   `gorm:"column:enrollment_year"`
+	Id                     uint   `gorm:"column:id"`
+	Name                   string `gorm:"column:name"`
+	Surname                string `gorm:"column:surname"`
+	Middlename             string `gorm:"column:middlename"`
+	EnrollmentYear         uint   `gorm:"column:enrollment_year"`
+	EducationalProgrammeId uint   `gorm:"column:ed_programme_id"`
 }
 
 func (Student) TableName() string {
@@ -24,6 +25,7 @@ func (s Student) MapToEntity() entites.Student {
 			Surname:    s.Surname,
 			Middlename: s.Middlename,
 		},
+		EducationalProgrammeId: fmt.Sprint(s.EducationalProgrammeId),
 		//EnrollmentYear: s.EnrollmentYear,
 	}
 }

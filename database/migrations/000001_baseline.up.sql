@@ -1,9 +1,9 @@
-CREATE DATABASE student_project_management;
+CREATE DATABASE IF NOT EXISTS student_project_management;
 
 USE student_project_management;
 
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     professor (
         id INT NOT NULL auto_increment,
         name VARCHAR(50) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE
         PRIMARY KEY(id)
     );
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     student (
         id INT NOT NULL auto_increment,
         name VARCHAR(50) NOT NULL,
@@ -23,14 +23,14 @@ CREATE TABLE
         PRIMARY KEY(id)
     );
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     project_status (
         id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         PRIMARY KEY(id)
     );
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     repository (
         id INT NOT NULL auto_increment,
         name VARCHAR(100) NOT NULL,
@@ -38,19 +38,19 @@ CREATE TABLE
         PRIMARY KEY(id)
     );
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     project_stage (
         id INT NOT NULL,
         name VARCHAR(50) NOT NULL,
         PRIMARY KEY(id)
     );
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     supervisor_review (
         id INT NOT NULL auto_increment,
         creation_date DATETIME NOT NULL,
         PRIMARY KEY(id)
     );
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     review_criteria (
         id INT NOT NULL auto_increment,
         description VARCHAR(500) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE
         FOREIGN KEY (supervisor_review_id) REFERENCES supervisor_review(id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     project (
         id INT NOT NULL auto_increment,
         theme VARCHAR(100) NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE
         FOREIGN KEY (repo_id) REFERENCES repository(id)ON DELETE CASCADE ON UPDATE CASCADE
     );
 
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
     task (
         id INT NOT NULL auto_increment,
         name VARCHAR(50) NOT NULL,

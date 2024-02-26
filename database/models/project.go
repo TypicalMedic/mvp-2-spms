@@ -15,6 +15,7 @@ type Project struct {
 	FinalGrade         float32 `gorm:"column:final_grade"`
 	SupervisorReviewId uint    `gorm:"column:supervisor_review_id"`
 	RepoId             uint    `gorm:"column:repo_id"`
+	CloudId            uint    `gorm:"column:cloud_id"`
 	StageId            uint    `gorm:"column:stage_id"`
 	StatusId           uint    `gorm:"column:status_id"`
 }
