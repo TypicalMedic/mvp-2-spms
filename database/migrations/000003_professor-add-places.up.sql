@@ -1,4 +1,4 @@
-CREATE TABLE professor_available_places (
+CREATE TABLE IF NOT EXISTS professor_available_places (
     professor_id INT NOT NULL,
     ed_prog_id INT NOT NULL,
     cource INT NOT NULL,
