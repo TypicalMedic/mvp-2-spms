@@ -55,7 +55,7 @@ func (r *Router) setupProjectRoutes() {
 		// Subrouters:
 		r.Route("/{projectID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)
-			r.Get("/", dummyHandler)                   // GET /projects/123
+			r.Get("/", projH.GetProject)               // GET /projects/123
 			r.Put("/", dummyHandler)                   // PUT /projects/123
 			r.Delete("/", dummyHandler)                // DELETE /projects/123
 			r.Get("/commits", projH.GetProjectCommits) // GET /projects/123/commits

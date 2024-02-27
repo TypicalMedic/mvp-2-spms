@@ -4,6 +4,7 @@ import (
 	"mvp-2-spms/database"
 	projectrepository "mvp-2-spms/database/project-repository"
 	studentrepository "mvp-2-spms/database/student-repository"
+	unirepository "mvp-2-spms/database/university-repository"
 	"mvp-2-spms/integrations/git-repository-hub/github"
 	"mvp-2-spms/internal"
 	manageprojects "mvp-2-spms/services/manage-projects"
@@ -19,14 +20,15 @@ func main() {
 	gdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	db := database.InitDatabade(gdb)
 	repos := internal.Repositories{
-		Projects: projectrepository.InitProjectRepository(*db),
-		Students: studentrepository.InitStudentRepository(*db),
+		Projects:     projectrepository.InitProjectRepository(*db),
+		Students:     studentrepository.InitStudentRepository(*db),
+		Universities: unirepository.InitUniversityRepository(*db),
 	}
 
 	repoHub := github.InitGithub(github.InitGithubAPI())
 
 	interactors := internal.Intercators{
-		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub),
+		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities),
 	}
 	app := internal.StudentsProjectsManagementApp{
 		Intercators: interactors,

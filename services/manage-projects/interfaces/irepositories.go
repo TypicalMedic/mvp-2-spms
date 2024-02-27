@@ -16,9 +16,14 @@ type IProjetRepository interface {
 	// таски проекта будут получаться через обращение к бдшке
 	// наверно так изначально предполагается
 	GetProjectRepository(projId string) entities.ProjectInRepository
+	GetProjectById(projId string) entities.Project
 }
 
 // transfers data in domain entities
 type IStudentRepository interface {
 	GetStudentById(studId string) entities.Student
+}
+
+type IUniversityRepository interface {
+	GetEducationalProgrammeById(epId string) entities.EducationalProgramme
 }

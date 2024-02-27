@@ -48,3 +48,17 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
+
+func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
+	professorIdCookie, _ := r.Cookie("professor_id")
+	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	input := inputdata.GetProjectById{
+		ProfessorId: uint(professorId),
+		ProjectId:   uint(projectId),
+	}
+	result := h.projectInteractor.GetProjectById(input)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}

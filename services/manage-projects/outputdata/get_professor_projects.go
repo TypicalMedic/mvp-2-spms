@@ -21,7 +21,7 @@ func MapToGetProfessorProjects(projectEntities []GetProfessorProjectsEntities) G
 				Stage:       projectEntitiy.Project.Stage.String(),
 				Year:        int(projectEntitiy.Project.Year),
 				StudentName: projectEntitiy.Student.FullNameToString(),
-				Cource:      int(projectEntitiy.Student.GetCource()),
+				Cource:      int(projectEntitiy.Student.Cource),
 			})
 	}
 	return GetProfessorProjects{
