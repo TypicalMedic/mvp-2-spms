@@ -25,5 +25,5 @@ type IStudentRepository interface {
 }
 
 type IUniversityRepository interface {
-	GetEducationalProgrammeById(ep string) entities.EducationalProgramme
+	GetEducationalProgrammeById(epId string) entities.EducationalProgramme
 }
