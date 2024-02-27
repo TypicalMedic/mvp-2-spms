@@ -22,3 +22,10 @@ func (r *StudentRepository) GetStudentById(studId string) entities.Student {
 	result := student.MapToEntity()
 	return result
 }
+
+func (r *StudentRepository) CreateStudent(student entities.Student) entities.Student {
+	dbstudent := models.Student{}
+	dbstudent.MapEntityToThis(student)
+	r.dbContext.DB.Create(&dbstudent)
+	return dbstudent.MapToEntity()
+}
