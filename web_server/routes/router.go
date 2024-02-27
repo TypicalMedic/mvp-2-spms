@@ -42,6 +42,7 @@ func (r *Router) SetupRoutes() {
 	r.router.Get("/", handlers.Ping)
 	r.setupMeetingRoutes()
 	r.setupProjectRoutes()
+	r.setupStudentRoutes()
 }
 
 func (r *Router) setupProjectRoutes() {
@@ -66,6 +67,14 @@ func (r *Router) setupProjectRoutes() {
 				r.Delete("/", dummyHandler)  // DELETE /projects/123/tasks
 			})
 		})
+	})
+}
+func (r *Router) setupStudentRoutes() {
+	projH := handlers.InitStudentHandler(r.app.Intercators.StudentManager)
+
+	// setup middleware for checking if professor is authorized and it's his projects?
+	r.router.Route("/students", func(r chi.Router) {
+		r.Post("/add", projH.AddStudent) // POST /students/add
 	})
 }
 
