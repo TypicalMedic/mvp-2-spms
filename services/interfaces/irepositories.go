@@ -28,3 +28,8 @@ type IStudentRepository interface {
 type IUniversityRepository interface {
 	GetEducationalProgrammeById(epId string) entities.EducationalProgramme
 }
+
+// transfers data in domain entities
+type IMeetingRepository interface {
+	CreateMeeting(entities.Meeting) entities.Meeting
+}
