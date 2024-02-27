@@ -10,6 +10,7 @@ import (
 type ProjectInteractor struct {
 	projectRepo interfaces.IProjetRepository
 	studentRepo interfaces.IStudentRepository
+	uniRepo     interfaces.IUniversityRepository
 	repoHub     interfaces.IGitRepositoryHub
 }
 
@@ -37,11 +38,23 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorPro
 	return output
 }
 
+// returns all commits from all branches from specific time
 func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits) outputdata.GetProjectCommits {
 	// get project repo id
 	repo := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
 	// get from repo
 	commits := p.repoHub.GetRepositoryCommitsFromTime(repo, input.From)
 	output := outputdata.MapToGetProjectCommits(commits)
+	return output
+}
+
+// returns detailed project data (with student data and ed programme)
+func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outputdata.GetProjectById {
+	// get project by id
+	project := p.projectRepo.GetProjectById(fmt.Sprint(input.ProjectId))
+	// getting student info
+	student := p.studentRepo.GetStudentById(project.StudentId)
+	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
+	output := outputdata.MapToGetProjectsById(project, student, edProg)
 	return output
 }

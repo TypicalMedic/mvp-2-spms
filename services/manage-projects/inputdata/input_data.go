@@ -11,3 +11,8 @@ type GetProjectCommits struct {
 	ProjectId   uint
 	From        time.Time
 }
+
+type GetProjectById struct {
+	ProfessorId uint
+	ProjectId   uint
+}

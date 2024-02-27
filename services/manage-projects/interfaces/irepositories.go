@@ -23,3 +23,7 @@ type IProjetRepository interface {
 type IStudentRepository interface {
 	GetStudentById(studId string) entities.Student
 }
+
+type IUniversityRepository interface {
+	GetEducationalProgrammeById(ep string) entities.EducationalProgramme
+}
