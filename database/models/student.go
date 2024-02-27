@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
+	"strconv"
 	"time"
 )
 
@@ -33,10 +34,29 @@ func (s Student) MapToEntity() entities.Student {
 	}
 }
 
+func (s *Student) MapEntityToThis(entity entities.Student) {
+	sId, _ := strconv.Atoi(entity.Id)
+	epId, _ := strconv.Atoi(entity.EducationalProgrammeId)
+	s.Id = uint(sId)
+	s.Name = entity.Name
+	s.Surname = entity.Surname
+	s.Middlename = entity.Middlename
+	s.EnrollmentYear = getStudentEnrollmentYear(entity.Cource)
+	s.EducationalProgrammeId = uint(epId)
+}
+
 func (s *Student) GetCource() uint {
 	currentDate := time.Now()
 	if currentDate.Month() > 9 {
 		return uint(currentDate.Year()) - s.EnrollmentYear + 1
 	}
 	return uint(currentDate.Year()) - s.EnrollmentYear
+}
+
+func getStudentEnrollmentYear(cource uint) uint {
+	currentDate := time.Now()
+	if currentDate.Month() > 9 {
+		return uint(currentDate.Year()) - cource + 1
+	}
+	return uint(currentDate.Year()) - cource
 }

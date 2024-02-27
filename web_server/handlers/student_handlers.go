@@ -45,7 +45,7 @@ func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 		Name:                   reqB.Name,
 		Surname:                reqB.Surname,
 		Middlename:             reqB.Middlename,
-		EducationalProgrammeId: reqB.EducationalProgrammeId,
+		EducationalProgrammeId: uint(reqB.EducationalProgrammeId),
 		Cource:                 uint(reqB.Cource),
 	}
 
