@@ -7,4 +7,5 @@ import (
 
 type IProjetInteractor interface {
 	GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetProfessorProjects
+	GetProjectCommits(input inputdata.GetProjectCommits) outputdata.GetProjectCommits
 }
