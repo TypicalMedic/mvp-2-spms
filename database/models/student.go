@@ -16,11 +16,11 @@ type Student struct {
 	EducationalProgrammeId uint   `gorm:"column:educational_programme_id"`
 }
 
-func (Student) TableName() string {
+func (*Student) TableName() string {
 	return "student"
 }
 
-func (s Student) MapToEntity() entities.Student {
+func (s *Student) MapToEntity() entities.Student {
 	return entities.Student{
 		Person: entities.Person{
 			Id:         fmt.Sprint(s.Id),

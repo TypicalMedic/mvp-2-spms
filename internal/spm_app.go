@@ -12,6 +12,7 @@ type StudentsProjectsManagementApp struct {
 type Intercators struct {
 	ProjectManager hInterfaces.IProjetInteractor
 	StudentManager hInterfaces.IStudentInteractor
+	MeetingManager hInterfaces.IMeetingInteractor
 }
 type Repositories struct {
 	Projects     mngInterfaces.IProjetRepository

@@ -70,21 +70,22 @@ func (r *Router) setupProjectRoutes() {
 	})
 }
 func (r *Router) setupStudentRoutes() {
-	projH := handlers.InitStudentHandler(r.app.Intercators.StudentManager)
+	studH := handlers.InitStudentHandler(r.app.Intercators.StudentManager)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/students", func(r chi.Router) {
-		r.Post("/add", projH.AddStudent) // POST /students/add
+		r.Post("/add", studH.AddStudent) // POST /students/add
 	})
 }
 
 func (r *Router) setupMeetingRoutes() {
+	meetH := handlers.InitMeetingHandler(r.app.Intercators.MeetingManager)
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
 	r.router.Route("/meetings", func(r chi.Router) {
-		r.With().Get("/", dummyHandler) // GET /meetings with middleware (currently empty)
-		r.Get("/filter", dummyHandler)  // GET /meetings/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
-		r.Post("/add", dummyHandler)    // POST /meetings/add
+		r.With().Get("/", dummyHandler)  // GET /meetings with middleware (currently empty)
+		r.Get("/filter", dummyHandler)   // GET /meetings/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
+		r.Post("/add", meetH.AddMeeting) // POST /meetings/add
 		// Subrouters:
 		r.Route("/{meetingID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)
