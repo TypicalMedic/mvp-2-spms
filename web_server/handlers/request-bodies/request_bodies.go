@@ -5,5 +5,5 @@ type AddStudent struct {
 	Surname                string `json:"surname"`
 	Middlename             string `json:"middlename"`
 	Cource                 int    `json:"cource"`
-	EducationalProgrammeId string `json:"education_programme_id"`
+	EducationalProgrammeId int    `json:"education_programme_id"`
 }

@@ -2,8 +2,8 @@ package manageprojects
 
 import (
 	"fmt"
+	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-projects/inputdata"
-	"mvp-2-spms/services/manage-projects/interfaces"
 	"mvp-2-spms/services/manage-projects/outputdata"
 )
 

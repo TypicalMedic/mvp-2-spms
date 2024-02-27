@@ -1,7 +1,7 @@
 package internal
 
 import (
-	mngInterfaces "mvp-2-spms/services/manage-projects/interfaces"
+	mngInterfaces "mvp-2-spms/services/interfaces"
 	hInterfaces "mvp-2-spms/web_server/handlers/interfaces"
 )
 
