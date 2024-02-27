@@ -12,7 +12,7 @@ type Student struct {
 	Surname                string `gorm:"column:surname"`
 	Middlename             string `gorm:"column:middlename"`
 	EnrollmentYear         uint   `gorm:"column:enrollment_year"`
-	EducationalProgrammeId uint   `gorm:"column:ed_programme_id"`
+	EducationalProgrammeId uint   `gorm:"column:educational_programme_id"`
 }
 
 func (Student) TableName() string {
