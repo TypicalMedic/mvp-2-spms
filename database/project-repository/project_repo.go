@@ -34,3 +34,9 @@ func (r *ProjectRepository) GetProjectRepository(projId string) entities.Project
 	r.dbContext.DB.Select("*").Where("id = ?", project.RepoId).Find(&repo)
 	return repo.MapToEntity()
 }
+
+func (r *ProjectRepository) GetProjectById(projId string) entities.Project {
+	var project models.Project
+	r.dbContext.DB.Select("*").Where("id = ?", projId).Find(&project)
+	return project.MapToEntity()
+}
