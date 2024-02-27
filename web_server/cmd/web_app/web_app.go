@@ -2,11 +2,13 @@ package main
 
 import (
 	"mvp-2-spms/database"
+	meetingrepository "mvp-2-spms/database/meeting-repository"
 	projectrepository "mvp-2-spms/database/project-repository"
 	studentrepository "mvp-2-spms/database/student-repository"
 	unirepository "mvp-2-spms/database/university-repository"
 	"mvp-2-spms/integrations/git-repository-hub/github"
 	"mvp-2-spms/internal"
+	managemeetings "mvp-2-spms/services/manage-meetings"
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
 	"mvp-2-spms/web_server/routes"
@@ -29,6 +31,7 @@ func main() {
 		Projects:     projectrepository.InitProjectRepository(*db),
 		Students:     studentrepository.InitStudentRepository(*db),
 		Universities: unirepository.InitUniversityRepository(*db),
+		Meetings:     meetingrepository.InitMeetingRepository(*db),
 	}
 
 	repoHub := github.InitGithub(github.InitGithubAPI())
@@ -36,6 +39,7 @@ func main() {
 	interactors := internal.Intercators{
 		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities),
 		StudentManager: managestudents.InitStudentInteractor(repos.Students),
+		MeetingManager: managemeetings.InitMeetingInteractor(repos.Meetings, nil), /////////////////////////////////////////
 	}
 	app := internal.StudentsProjectsManagementApp{
 		Intercators: interactors,

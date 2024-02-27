@@ -18,4 +18,5 @@ type Repositories struct {
 	Projects     mngInterfaces.IProjetRepository
 	Students     mngInterfaces.IStudentRepository
 	Universities mngInterfaces.IUniversityRepository
+	Meetings     mngInterfaces.IMeetingRepository
 }
