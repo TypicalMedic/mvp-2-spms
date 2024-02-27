@@ -1,7 +1,7 @@
 package outputdata
 
 import (
-	entites "mvp-2-spms/domain-aggregate"
+	entities "mvp-2-spms/domain-aggregate"
 	"strconv"
 )
 
@@ -30,8 +30,8 @@ func MapToGetProfessorProjects(projectEntities []GetProfessorProjectsEntities) G
 }
 
 type GetProfessorProjectsEntities struct {
-	Project entites.Project
-	Student entites.Student
+	Project entities.Project
+	Student entities.Student
 }
 
 type getProfProjProjectData struct {
