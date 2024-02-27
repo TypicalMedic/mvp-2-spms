@@ -1,12 +1,12 @@
 package interfaces
 
 import (
-	entites "mvp-2-spms/domain-aggregate"
+	entities "mvp-2-spms/domain-aggregate"
 )
 
 // transfers data in domain entities
 type IProjetRepository interface {
-	GetProfessorProjects(profId string) []entites.Project
+	GetProfessorProjects(profId string) []entities.Project
 	// возвращать вообще все здесь??? а что делать если там нет чего-то в дб? как понять?
 	// писать что будет возвращено в структуре
 	// но тогда будет неявное раскрытие деталей реализации
@@ -15,9 +15,10 @@ type IProjetRepository interface {
 	// т.е. сущность проекта не будет содержать список тасок
 	// таски проекта будут получаться через обращение к бдшке
 	// наверно так изначально предполагается
+	GetProjectRepository(projId string) entities.ProjectInRepository
 }
 
 // transfers data in domain entities
 type IStudentRepository interface {
-	GetStudentById(studId string) entites.Student
+	GetStudentById(studId string) entities.Student
 }

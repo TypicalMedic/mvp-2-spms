@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	entites "mvp-2-spms/domain-aggregate"
+	entities "mvp-2-spms/domain-aggregate"
 )
 
 type Project struct {
@@ -24,14 +24,14 @@ func (Project) TableName() string {
 	return "project"
 }
 
-func (pj Project) MapToEntity() entites.Project {
-	return entites.Project{
+func (pj Project) MapToEntity() entities.Project {
+	return entities.Project{
 		Id:           fmt.Sprint(pj.Id),
 		Theme:        pj.Theme,
 		SupervisorId: fmt.Sprint(pj.SupervisorId),
 		StudentId:    fmt.Sprint(pj.StudentId),
 		Year:         pj.Year,
-		Stage:        entites.ProjectStage(pj.StageId),
-		Status:       entites.ProjectStatus(pj.StatusId),
+		Stage:        entities.ProjectStage(pj.StageId),
+		Status:       entities.ProjectStatus(pj.StatusId),
 	}
 }

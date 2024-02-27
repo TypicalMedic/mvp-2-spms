@@ -3,7 +3,7 @@ package projectrepository
 import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
-	entites "mvp-2-spms/domain-aggregate"
+	entities "mvp-2-spms/domain-aggregate"
 )
 
 type ProjectRepository struct {
@@ -16,13 +16,21 @@ func InitProjectRepository(dbcxt database.Database) *ProjectRepository {
 	}
 }
 
-func (r *ProjectRepository) GetProfessorProjects(profId string) []entites.Project {
+func (r *ProjectRepository) GetProfessorProjects(profId string) []entities.Project {
 	var projects []models.Project
 	r.dbContext.DB.Select("*").Where("supervisor_id = ?", profId).Find(&projects)
-	result := []entites.Project{}
+	result := []entities.Project{}
 	for _, pj := range projects {
 		// вынести в маппер
 		result = append(result, pj.MapToEntity())
 	}
 	return result
+}
+
+func (r *ProjectRepository) GetProjectRepository(projId string) entities.ProjectInRepository {
+	var project models.Project
+	r.dbContext.DB.Select("repo_id").Where("id = ?", projId).Find(&project)
+	var repo models.Repository
+	r.dbContext.DB.Select("*").Where("id = ?", project.RepoId).Find(&repo)
+	return repo.MapToEntity()
 }

@@ -10,12 +10,14 @@ import (
 type ProjectInteractor struct {
 	projectRepo interfaces.IProjetRepository
 	studentRepo interfaces.IStudentRepository
+	repoHub     interfaces.IGitRepositoryHub
 }
 
-func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository) *ProjectInteractor {
+func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository, repo interfaces.IGitRepositoryHub) *ProjectInteractor {
 	return &ProjectInteractor{
 		projectRepo: projRepo,
 		studentRepo: stRepo,
+		repoHub:     repo,
 	}
 }
 
@@ -32,5 +34,14 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorPro
 		})
 	}
 	output := outputdata.MapToGetProfessorProjects(projEntities)
+	return output
+}
+
+func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits) outputdata.GetProjectCommits {
+	// get project repo id
+	repo := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
+	// get from repo
+	commits := p.repoHub.GetRepositoryCommitsFromTime(repo, input.From)
+	output := outputdata.MapToGetProjectCommits(commits)
 	return output
 }
