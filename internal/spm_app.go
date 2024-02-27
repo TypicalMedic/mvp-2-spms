@@ -13,6 +13,7 @@ type Intercators struct {
 	ProjectManager hInterfaces.IProjetInteractor
 }
 type Repositories struct {
-	Projects mngInterfaces.IProjetRepository
-	Students mngInterfaces.IStudentRepository
+	Projects     mngInterfaces.IProjetRepository
+	Students     mngInterfaces.IStudentRepository
+	Universities mngInterfaces.IUniversityRepository
 }

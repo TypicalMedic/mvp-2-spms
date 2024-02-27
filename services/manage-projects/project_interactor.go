@@ -14,11 +14,13 @@ type ProjectInteractor struct {
 	repoHub     interfaces.IGitRepositoryHub
 }
 
-func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository, repo interfaces.IGitRepositoryHub) *ProjectInteractor {
+func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository,
+	repo interfaces.IGitRepositoryHub, uniRepo interfaces.IUniversityRepository) *ProjectInteractor {
 	return &ProjectInteractor{
 		projectRepo: projRepo,
 		studentRepo: stRepo,
 		repoHub:     repo,
+		uniRepo:     uniRepo,
 	}
 }
 
