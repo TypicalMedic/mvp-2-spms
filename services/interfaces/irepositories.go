@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	entities "mvp-2-spms/domain-aggregate"
+	"mvp-2-spms/services/manage-meetings/models"
 )
 
 // transfers data in domain entities
@@ -32,4 +33,9 @@ type IUniversityRepository interface {
 // transfers data in domain entities
 type IMeetingRepository interface {
 	CreateMeeting(entities.Meeting) entities.Meeting
+	AssignPlannerMeeting(models.PlannerMeeting)
+}
+
+type IAccountRepository interface {
+	GetAccountPlannerData(id string) models.PlannerIntegration // returns planner integration for later usage of api key???
 }
