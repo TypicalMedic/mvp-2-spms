@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	entities "mvp-2-spms/domain-aggregate"
-	"mvp-2-spms/services/manage-meetings/models"
+	"mvp-2-spms/services/models"
 )
 
 // transfers data in domain entities
@@ -18,6 +18,8 @@ type IProjetRepository interface {
 	// наверно так изначально предполагается
 	GetProjectRepository(projId string) entities.ProjectInRepository
 	GetProjectById(projId string) entities.Project
+	CreateProject(entities.Project) entities.Project
+	AssignDriveFolder(models.DriveProject)
 }
 
 // transfers data in domain entities
@@ -37,5 +39,6 @@ type IMeetingRepository interface {
 }
 
 type IAccountRepository interface {
-	GetAccountPlannerData(id string) models.PlannerIntegration // returns planner integration for later usage of api key???
+	GetAccountPlannerData(id string) models.PlannerIntegration  // returns planner integration for later usage of api key???
+	GetAccountDriveData(id string) models.CloudDriveIntegration // returns planner integration for later usage of api key???
 }

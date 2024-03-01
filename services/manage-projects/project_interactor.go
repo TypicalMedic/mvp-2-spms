@@ -12,6 +12,8 @@ type ProjectInteractor struct {
 	studentRepo interfaces.IStudentRepository
 	uniRepo     interfaces.IUniversityRepository
 	repoHub     interfaces.IGitRepositoryHub
+	cloudDrive  interfaces.ICloudDrive
+	accountRepo interfaces.IAccountRepository
 }
 
 func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository,
@@ -58,5 +60,19 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outpu
 	student := p.studentRepo.GetStudentById(project.StudentId)
 	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
 	output := outputdata.MapToGetProjectsById(project, student, edProg)
+	return output
+}
+
+func (p *ProjectInteractor) AddProject(input inputdata.AddProject) outputdata.AddProject {
+	// add to db
+	proj := p.projectRepo.CreateProject(input.MapToProjectEntity())
+	// getting drive info, should be checked for existance later
+	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
+	// add folder to cloud
+	driveProject := p.cloudDrive.AddProjectFolder(proj, driveInfo)
+	// add folder id from drive
+	p.projectRepo.AssignDriveFolder(driveProject)
+	// returning id
+	output := outputdata.MapToAddProject(proj)
 	return output
 }

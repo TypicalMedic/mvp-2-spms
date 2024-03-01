@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	entities "mvp-2-spms/domain-aggregate"
-	"mvp-2-spms/services/manage-meetings/models"
+	"mvp-2-spms/services/models"
 )
 
 type IPlannerService interface {

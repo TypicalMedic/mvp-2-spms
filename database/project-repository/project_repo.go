@@ -4,6 +4,7 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
+	usecaseModels "mvp-2-spms/services/models"
 )
 
 type ProjectRepository struct {
@@ -40,3 +41,7 @@ func (r *ProjectRepository) GetProjectById(projId string) entities.Project {
 	r.dbContext.DB.Select("*").Where("id = ?", projId).Find(&project)
 	return project.MapToEntity()
 }
+
+func (r *ProjectRepository) CreateProject(entities.Project) entities.Project
+
+func (r *ProjectRepository) AssignDriveFolder(usecaseModels.DriveProject) {}

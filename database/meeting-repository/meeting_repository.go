@@ -4,7 +4,7 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
-	usecasemodels "mvp-2-spms/services/manage-meetings/models"
+	usecasemodels "mvp-2-spms/services/models"
 )
 
 type MeetingRepository struct {
