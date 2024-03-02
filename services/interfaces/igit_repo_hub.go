@@ -1,10 +1,10 @@
 package interfaces
 
 import (
-	entities "mvp-2-spms/domain-aggregate"
+	"mvp-2-spms/services/models"
 	"time"
 )
 
 type IGitRepositoryHub interface {
-	GetRepositoryCommitsFromTime(repo entities.ProjectInRepository, fromTime time.Time) []entities.Commit
+	GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit
 }

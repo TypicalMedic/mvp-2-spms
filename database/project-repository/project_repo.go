@@ -28,7 +28,7 @@ func (r *ProjectRepository) GetProfessorProjects(profId string) []entities.Proje
 	return result
 }
 
-func (r *ProjectRepository) GetProjectRepository(projId string) entities.ProjectInRepository {
+func (r *ProjectRepository) GetProjectRepository(projId string) usecaseModels.Repository {
 	var project models.Project
 	r.dbContext.DB.Select("repo_id").Where("id = ?", projId).Find(&project)
 	var repo models.Repository

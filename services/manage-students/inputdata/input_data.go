@@ -14,7 +14,7 @@ type AddStudent struct {
 	Cource                 uint
 }
 
-func (as *AddStudent) MapToStudentEntity() entities.Student {
+func (as AddStudent) MapToStudentEntity() entities.Student {
 	return entities.Student{
 		Person: entities.Person{
 			Name:       as.Name,

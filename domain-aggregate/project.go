@@ -2,7 +2,6 @@ package domainaggregate
 
 import (
 	"fmt"
-	"time"
 )
 
 type ProjectStatus int
@@ -32,43 +31,6 @@ type Project struct {
 	Year         uint
 	Stage        ProjectStage
 	Status       ProjectStatus
-	cloud        projectOnCloud
-	repo         ProjectInRepository
-}
-
-// in DDD this should be gotten through the repository (ala GetProjectInRepo(...))
-func (p *Project) Repo() ProjectInRepository {
-	return p.repo
-}
-
-// in DDD this should be gotten through the repository (ala GetProjectOnCloud(...))
-func (p *Project) Cloud() projectOnCloud {
-	return p.cloud
-}
-
-type projectOnCloud struct {
-	FolderId   string
-	FolderName string
-}
-
-type ProjectInRepository struct {
-	RepoId    string
-	OwnerName string
-	commits   []Commit
-	branches  []branch
-}
-
-type branch struct {
-	Name string
-	Head Commit
-}
-
-type Commit struct {
-	SHA         string
-	Description string
-	Date        time.Time
-	Author      string
-	// id repo
 }
 
 func (s ProjectStatus) String() string {

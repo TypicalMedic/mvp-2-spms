@@ -2,6 +2,7 @@ package outputdata
 
 import (
 	entities "mvp-2-spms/domain-aggregate"
+	"mvp-2-spms/services/models"
 	"time"
 )
 
@@ -9,7 +10,7 @@ type GetProjectCommits struct {
 	Commits []getProjCommCommitData `json:"commits"`
 }
 
-func MapToGetProjectCommits(commits []entities.Commit) GetProjectCommits {
+func MapToGetProjectCommits(commits []models.Commit) GetProjectCommits {
 	outputCommits := []getProjCommCommitData{}
 	for _, commit := range commits {
 		outputCommits = append(outputCommits,

@@ -16,9 +16,10 @@ type IProjetRepository interface {
 	// т.е. сущность проекта не будет содержать список тасок
 	// таски проекта будут получаться через обращение к бдшке
 	// наверно так изначально предполагается
-	GetProjectRepository(projId string) entities.ProjectInRepository
+	GetProjectRepository(projId string) models.Repository
 	GetProjectById(projId string) entities.Project
 	CreateProject(entities.Project) entities.Project
+	CreateProjectWithRepository(entities.Project, models.Repository) models.ProjectInRepository
 	AssignDriveFolder(models.DriveProject)
 }
 
@@ -40,5 +41,5 @@ type IMeetingRepository interface {
 
 type IAccountRepository interface {
 	GetAccountPlannerData(id string) models.PlannerIntegration  // returns planner integration for later usage of api key???
-	GetAccountDriveData(id string) models.CloudDriveIntegration // returns planner integration for later usage of api key???
+	GetAccountDriveData(id string) models.CloudDriveIntegration // returns drive integration for later usage of api key???
 }
