@@ -42,6 +42,27 @@ func (r *ProjectRepository) GetProjectById(projId string) entities.Project {
 	return project.MapToEntity()
 }
 
-func (r *ProjectRepository) CreateProject(entities.Project) entities.Project
+func (r *ProjectRepository) CreateProject(project entities.Project) entities.Project {
+	dbProject := models.Project{}
+	dbProject.MapEntityToThis(project)
+	r.dbContext.DB.Create(&dbProject)
+	return dbProject.MapToEntity()
+}
 
-func (r *ProjectRepository) AssignDriveFolder(usecaseModels.DriveProject) {}
+func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project, repo usecaseModels.Repository) usecaseModels.ProjectInRepository {
+	dbRepo := models.Repository{}
+	dbRepo.MapModelToThis(repo)
+	r.dbContext.DB.Create(&dbRepo)
+
+	dbProject := models.Project{}
+	dbProject.MapEntityToThis(project)
+	dbProject.RepoId = dbRepo.Id
+	r.dbContext.DB.Create(&dbProject)
+	return usecaseModels.ProjectInRepository{
+		Project: dbProject.MapToEntity(),
+	}
+}
+
+func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) {
+	r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.ProjectFolderId)
+}

@@ -22,4 +22,8 @@ func (r *AccountRepository) GetAccountPlannerData(id string) usecasemodels.Plann
 	return dbPlanner.MapToUseCaseModel()
 }
 
-func (r *AccountRepository) GetAccountDriveData(id string) usecasemodels.CloudDriveIntegration
+func (r *AccountRepository) GetAccountDriveData(id string) usecasemodels.CloudDriveIntegration {
+	dbDrive := models.DriveIntegration{}
+	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbDrive)
+	return dbDrive.MapToUseCaseModel()
+}
