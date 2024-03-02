@@ -52,7 +52,7 @@ func (r *Router) setupProjectRoutes() {
 	r.router.Route("/projects", func(r chi.Router) {
 		r.With().Get("/", projH.GetAllProfProjects) // GET /projects with middleware (currently empty)
 		r.Get("/filter", dummyHandler)              // GET /projects/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
-		r.Post("/add", dummyHandler)                // POST /projects/add
+		r.Post("/add", projH.AddProject)            // POST /projects/add
 		// Subrouters:
 		r.Route("/{projectID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)

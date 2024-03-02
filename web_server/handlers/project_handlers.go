@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
+	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
 	"strconv"
 	"time"
@@ -61,4 +62,40 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
+}
+
+func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
+	professorIdCookie, _ := r.Cookie("professor_id")
+	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+
+	headerContentTtype := r.Header.Get("Content-Type")
+	// проверяем соответсвтвие типа содержимого запроса
+	if headerContentTtype != "application/json" {
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return
+	}
+
+	// декодируем тело запроса
+	var reqB requestbodies.AddProject
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&reqB)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	input := inputdata.AddProject{
+		ProfessorId:         uint(professorId),
+		Theme:               reqB.Theme,
+		StudentId:           uint(reqB.StudentId),
+		Year:                uint(reqB.Year),
+		RepositoryOwnerName: reqB.RepoOwner,
+		RepositoryName:      reqB.RepositoryName,
+	}
+
+	student_id := h.projectInteractor.AddProject(input)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(student_id)
 }

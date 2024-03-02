@@ -17,3 +17,11 @@ type AddMeeting struct {
 	StudentId   int       `json:"student_participant_id"`
 	IsOnline    bool      `json:"is_online"`
 }
+
+type AddProject struct {
+	Theme          string `json:"theme"`
+	StudentId      int    `json:"student_id"`
+	Year           int    `json:"year"`
+	RepoOwner      string `json:"repository_owner_login"`
+	RepositoryName string `json:"repository_name"`
+}
