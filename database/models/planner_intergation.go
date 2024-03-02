@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"mvp-2-spms/services/manage-meetings/models"
+	"mvp-2-spms/services/models"
 	"strconv"
 )
 

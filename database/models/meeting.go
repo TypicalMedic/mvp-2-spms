@@ -16,7 +16,7 @@ type Meeting struct {
 	ProfessorId          uint      `gorm:"column:professor_id"`
 	IsOnline             bool      `gorm:"column:is_online"`
 	Status               uint      `gorm:"column:status"`
-	PlannerId            string    `gorm:"column:planner_id"`
+	PlannerId            string    `gorm:"column:planner_id;default:null"`
 }
 
 func (*Meeting) TableName() string {

@@ -6,12 +6,17 @@ type Account struct {
 	Hash  string //?
 }
 
+type BaseIntegration struct {
+	AccountId string
+	ApiKey    string
+}
+
 type PlannerIntegration struct {
 	BaseIntegration
 	PlannerData
 }
 
-type BaseIntegration struct {
-	AccountId string
-	ApiKey    string
+type CloudDriveIntegration struct {
+	BaseIntegration
+	DriveData
 }

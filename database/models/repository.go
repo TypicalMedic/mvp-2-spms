@@ -1,7 +1,7 @@
 package models
 
 import (
-	entities "mvp-2-spms/domain-aggregate"
+	"mvp-2-spms/services/models"
 )
 
 type Repository struct {
@@ -15,9 +15,15 @@ func (Repository) TableName() string {
 	return "repository"
 }
 
-func (r Repository) MapToEntity() entities.ProjectInRepository {
-	return entities.ProjectInRepository{
+func (r Repository) MapToEntity() models.Repository {
+	return models.Repository{
 		RepoId:    r.Name,
 		OwnerName: r.OwnerName,
 	}
+}
+
+func (r *Repository) MapModelToThis(model models.Repository) {
+	r.Name = model.RepoId
+	r.OwnerName = model.OwnerName
+	r.IsPublic = true
 }

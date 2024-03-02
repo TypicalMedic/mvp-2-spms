@@ -2,8 +2,9 @@ package github
 
 import (
 	"log"
-	entities "mvp-2-spms/domain-aggregate"
 	"time"
+
+	"mvp-2-spms/services/models"
 
 	"github.com/google/go-github/v56/github"
 )
@@ -16,7 +17,7 @@ func InitGithub(api githubAPI) Github {
 	return Github{api: api}
 }
 
-func (g *Github) GetRepositoryCommitsFromTime(repo entities.ProjectInRepository, fromTime time.Time) []entities.Commit {
+func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit {
 	// to get all commits we need to check all the branches
 	ghbranches, err := g.api.GetRepoBranches(repo.OwnerName, repo.RepoId)
 	if err != nil {
@@ -40,7 +41,7 @@ func (g *Github) GetRepositoryCommitsFromTime(repo entities.ProjectInRepository,
 	}
 
 	// transforming to entity
-	commits := []entities.Commit{}
+	commits := []models.Commit{}
 	for _, ghcommit := range ghCommitsUnique {
 		cm := mapCommitToEntity(*ghcommit)
 		commits = append(commits, cm)
@@ -48,8 +49,8 @@ func (g *Github) GetRepositoryCommitsFromTime(repo entities.ProjectInRepository,
 	return commits
 }
 
-func mapCommitToEntity(commit github.RepositoryCommit) entities.Commit {
-	return entities.Commit{
+func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {
+	return models.Commit{
 		SHA:         *commit.SHA,
 		Description: *commit.Commit.Message,
 		Date:        commit.Commit.Committer.Date.Time,

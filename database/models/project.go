@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
+	"strconv"
 )
 
 type Project struct {
@@ -11,11 +12,11 @@ type Project struct {
 	Year               uint    `gorm:"column:year"`
 	SupervisorId       uint    `gorm:"column:supervisor_id"`
 	StudentId          uint    `gorm:"column:student_id"`
-	DefenceGrade       float32 `gorm:"column:defence_grade"`
-	FinalGrade         float32 `gorm:"column:final_grade"`
-	SupervisorReviewId uint    `gorm:"column:supervisor_review_id"`
-	RepoId             uint    `gorm:"column:repo_id"`
-	CloudId            uint    `gorm:"column:cloud_id"`
+	DefenceGrade       float32 `gorm:"column:defence_grade;default:null"`
+	FinalGrade         float32 `gorm:"column:final_grade;default:null"`
+	SupervisorReviewId uint    `gorm:"column:supervisor_review_id;default:null"`
+	RepoId             uint    `gorm:"column:repo_id;default:null"`
+	CloudId            uint    `gorm:"column:cloud_id;default:null"`
 	StageId            uint    `gorm:"column:stage_id"`
 	StatusId           uint    `gorm:"column:status_id"`
 }
@@ -34,4 +35,17 @@ func (pj Project) MapToEntity() entities.Project {
 		Stage:        entities.ProjectStage(pj.StageId),
 		Status:       entities.ProjectStatus(pj.StatusId),
 	}
+}
+
+func (p *Project) MapEntityToThis(entity entities.Project) {
+	prId, _ := strconv.Atoi(entity.Id)
+	pId, _ := strconv.Atoi(entity.SupervisorId)
+	sId, _ := strconv.Atoi(entity.StudentId)
+	p.Id = uint(prId)
+	p.Theme = entity.Theme
+	p.Year = entity.Year
+	p.SupervisorId = uint(pId)
+	p.StudentId = uint(sId)
+	p.StageId = uint(entity.Stage)
+	p.StatusId = uint(entity.Status)
 }

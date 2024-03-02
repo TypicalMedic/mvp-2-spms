@@ -3,7 +3,7 @@ package accountrepository
 import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
-	usecasemodels "mvp-2-spms/services/manage-meetings/models"
+	usecasemodels "mvp-2-spms/services/models"
 )
 
 type AccountRepository struct {
@@ -20,4 +20,10 @@ func (r *AccountRepository) GetAccountPlannerData(id string) usecasemodels.Plann
 	dbPlanner := models.PlannerIntegration{}
 	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbPlanner)
 	return dbPlanner.MapToUseCaseModel()
+}
+
+func (r *AccountRepository) GetAccountDriveData(id string) usecasemodels.CloudDriveIntegration {
+	dbDrive := models.DriveIntegration{}
+	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbDrive)
+	return dbDrive.MapToUseCaseModel()
 }

@@ -12,15 +12,19 @@ type ProjectInteractor struct {
 	studentRepo interfaces.IStudentRepository
 	uniRepo     interfaces.IUniversityRepository
 	repoHub     interfaces.IGitRepositoryHub
+	cloudDrive  interfaces.ICloudDrive
+	accountRepo interfaces.IAccountRepository
 }
 
 func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository,
-	repo interfaces.IGitRepositoryHub, uniRepo interfaces.IUniversityRepository) *ProjectInteractor {
+	repo interfaces.IGitRepositoryHub, uniRepo interfaces.IUniversityRepository, cloudDrive interfaces.ICloudDrive, accRepo interfaces.IAccountRepository) *ProjectInteractor {
 	return &ProjectInteractor{
 		projectRepo: projRepo,
 		studentRepo: stRepo,
 		repoHub:     repo,
 		uniRepo:     uniRepo,
+		cloudDrive:  cloudDrive,
+		accountRepo: accRepo,
 	}
 }
 
@@ -58,5 +62,19 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outpu
 	student := p.studentRepo.GetStudentById(project.StudentId)
 	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
 	output := outputdata.MapToGetProjectsById(project, student, edProg)
+	return output
+}
+
+func (p *ProjectInteractor) AddProject(input inputdata.AddProject) outputdata.AddProject {
+	// add to db with repository
+	proj := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
+	// getting professor drive info, should be checked for existance later
+	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
+	// add folder to cloud
+	driveProject := p.cloudDrive.AddProjectFolder(proj.Project, driveInfo)
+	// add folder id from drive
+	p.projectRepo.AssignDriveFolder(driveProject)
+	// returning id
+	output := outputdata.MapToAddProject(proj.Project)
 	return output
 }
