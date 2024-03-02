@@ -7,6 +7,7 @@ import (
 	projectrepository "mvp-2-spms/database/project-repository"
 	studentrepository "mvp-2-spms/database/student-repository"
 	unirepository "mvp-2-spms/database/university-repository"
+	googleDrive "mvp-2-spms/integrations/cloud-drive/google-drive"
 	"mvp-2-spms/integrations/git-repository-hub/github"
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
@@ -18,6 +19,7 @@ import (
 	"net/http"
 
 	"google.golang.org/api/calendar/v3"
+	"google.golang.org/api/drive/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -40,11 +42,16 @@ func main() {
 	}
 
 	repoHub := github.InitGithub(github.InitGithubAPI())
-	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(calendar.CalendarScope))
+
+	scopes := []string{calendar.CalendarScope, drive.DriveScope}
+
+	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(scopes...))
 	gCalendar := googleCalendar.InitGoogleCalendar(gCalendarApi)
+	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(scopes...))
+	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
-		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities),
+		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
 		StudentManager: managestudents.InitStudentInteractor(repos.Students),
 		MeetingManager: managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts),
 	}

@@ -17,12 +17,14 @@ type ProjectInteractor struct {
 }
 
 func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository,
-	repo interfaces.IGitRepositoryHub, uniRepo interfaces.IUniversityRepository) *ProjectInteractor {
+	repo interfaces.IGitRepositoryHub, uniRepo interfaces.IUniversityRepository, cloudDrive interfaces.ICloudDrive, accRepo interfaces.IAccountRepository) *ProjectInteractor {
 	return &ProjectInteractor{
 		projectRepo: projRepo,
 		studentRepo: stRepo,
 		repoHub:     repo,
 		uniRepo:     uniRepo,
+		cloudDrive:  cloudDrive,
+		accountRepo: accRepo,
 	}
 }
 
