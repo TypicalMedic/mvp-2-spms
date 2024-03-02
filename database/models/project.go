@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
+	"strconv"
 )
 
 type Project struct {
@@ -34,4 +35,17 @@ func (pj Project) MapToEntity() entities.Project {
 		Stage:        entities.ProjectStage(pj.StageId),
 		Status:       entities.ProjectStatus(pj.StatusId),
 	}
+}
+
+func (p *Project) MapEntityToThis(entity entities.Project) {
+	prId, _ := strconv.Atoi(entity.Id)
+	pId, _ := strconv.Atoi(entity.SupervisorId)
+	sId, _ := strconv.Atoi(entity.StudentId)
+	p.Id = uint(prId)
+	p.Theme = entity.Theme
+	p.Year = entity.Year
+	p.SupervisorId = uint(pId)
+	p.StudentId = uint(sId)
+	p.StageId = uint(entity.Stage)
+	p.StatusId = uint(entity.Status)
 }

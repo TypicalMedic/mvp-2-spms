@@ -64,15 +64,15 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outpu
 }
 
 func (p *ProjectInteractor) AddProject(input inputdata.AddProject) outputdata.AddProject {
-	// add to db
-	proj := p.projectRepo.CreateProject(input.MapToProjectEntity())
-	// getting drive info, should be checked for existance later
+	// add to db with repository
+	proj := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
+	// getting professor drive info, should be checked for existance later
 	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
 	// add folder to cloud
-	driveProject := p.cloudDrive.AddProjectFolder(proj, driveInfo)
+	driveProject := p.cloudDrive.AddProjectFolder(proj.Project, driveInfo)
 	// add folder id from drive
 	p.projectRepo.AssignDriveFolder(driveProject)
 	// returning id
-	output := outputdata.MapToAddProject(proj)
+	output := outputdata.MapToAddProject(proj.Project)
 	return output
 }
