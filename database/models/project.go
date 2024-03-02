@@ -12,11 +12,11 @@ type Project struct {
 	Year               uint    `gorm:"column:year"`
 	SupervisorId       uint    `gorm:"column:supervisor_id"`
 	StudentId          uint    `gorm:"column:student_id"`
-	DefenceGrade       float32 `gorm:"column:defence_grade"`
-	FinalGrade         float32 `gorm:"column:final_grade"`
-	SupervisorReviewId uint    `gorm:"column:supervisor_review_id"`
-	RepoId             uint    `gorm:"column:repo_id"`
-	CloudId            uint    `gorm:"column:cloud_id"`
+	DefenceGrade       float32 `gorm:"column:defence_grade;default:null"`
+	FinalGrade         float32 `gorm:"column:final_grade;default:null"`
+	SupervisorReviewId uint    `gorm:"column:supervisor_review_id;default:null"`
+	RepoId             uint    `gorm:"column:repo_id;default:null"`
+	CloudId            uint    `gorm:"column:cloud_id;default:null"`
 	StageId            uint    `gorm:"column:stage_id"`
 	StatusId           uint    `gorm:"column:status_id"`
 }
