@@ -26,6 +26,7 @@ func MapToGetProfesorMeetings(meetings []GetProfesorMeetingsEntities) GetProfeso
 					ProjectTheme: meet.ProjectTheme,
 				},
 				HasPlannerMeeting: meet.HasPlannerMeeting,
+				Status:            meet.Meeting.Status.String(),
 			})
 	}
 	return GetProfesorMeetings{
@@ -47,6 +48,7 @@ type getProfMeetingsData struct {
 	MeetingTime       time.Time                      `json:"time"`
 	Participant       getProfMeetingsParticipantData `json:"student"`
 	IsOnline          bool                           `json:"is_online"`
+	Status            string                         `json:"status"`
 	HasPlannerMeeting bool                           `json:"has_planner_meeting"`
 }
 
