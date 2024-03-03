@@ -11,6 +11,8 @@ type MeetingInteractor struct {
 	meetingRepo    interfaces.IMeetingRepository
 	plannerService interfaces.IPlannerService
 	accountRepo    interfaces.IAccountRepository
+	projectRepo    interfaces.IProjetRepository
+	studentRepo    interfaces.IStudentRepository
 }
 
 func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, planner interfaces.IPlannerService, accRepo interfaces.IAccountRepository) *MeetingInteractor {
@@ -32,5 +34,22 @@ func (p *MeetingInteractor) AddMeeting(input inputdata.AddMeeting) outputdata.Ad
 	p.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
 	// returning id
 	output := outputdata.MapToAddMeeting(meeting)
+	return output
+}
+
+func (p *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings) outputdata.GetProfesorMeetings {
+	// get from db
+	meetings := p.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From)
+	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
+	for _, meet := range meetings {
+		student := p.studentRepo.GetStudentById(meet.ParticipantId)
+		projTheme := p.projectRepo.GetStudentCurrentProjectTheme(meet.ParticipantId)
+		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{
+			Meeting:      meet,
+			Student:      student,
+			ProjectTheme: projTheme,
+		})
+	}
+	output := outputdata.MapToGetProfesorMeetings(meetEntities)
 	return output
 }

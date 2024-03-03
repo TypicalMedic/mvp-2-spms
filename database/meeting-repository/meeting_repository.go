@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
 	usecasemodels "mvp-2-spms/services/models"
+	"time"
 )
 
 type MeetingRepository struct {
@@ -27,3 +28,4 @@ func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) entities.Mee
 func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) {
 	r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.PlannerId)
 }
+func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time) []entities.Meeting

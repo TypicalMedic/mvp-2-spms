@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type GetProfessorMeetings struct {
+	ProfessorId uint
+	From        time.Time
+}
+
 type AddMeeting struct {
 	ProfessorId uint
 	Name        string

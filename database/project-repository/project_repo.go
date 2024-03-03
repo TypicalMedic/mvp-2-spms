@@ -73,3 +73,5 @@ func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string {
 	r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Find(&proj)
 	return fmt.Sprint(proj.CloudId)
 }
+
+func (r *ProjectRepository) GetStudentCurrentProjectTheme(studId string) string

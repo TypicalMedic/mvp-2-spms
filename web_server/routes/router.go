@@ -83,7 +83,7 @@ func (r *Router) setupMeetingRoutes() {
 	// setup middleware for checking professor?
 	r.router.Route("/meetings", func(r chi.Router) {
 		r.With().Get("/", dummyHandler)  // GET /meetings with middleware (currently empty)
-		r.Get("/filter", dummyHandler)   // GET /meetings/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
+		r.Get("/filter", dummyHandler)   // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
 		r.Post("/add", meetH.AddMeeting) // POST /meetings/add
 		// Subrouters:
 		r.Route("/{meetingID}", func(r chi.Router) {
