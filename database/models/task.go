@@ -13,6 +13,7 @@ type Task struct {
 	Description string    `gorm:"column:description"`
 	Deadline    time.Time `gorm:"column:deadline"`
 	ProjectId   uint      `gorm:"column:project_id"`
+	Status      uint      `gorm:"column:status"`
 	FolderId    string    `gorm:"column:folder_id;default:null"`
 	TaskFileId  string    `gorm:"column:task_file_id;default:null"`
 }
@@ -28,6 +29,7 @@ func (t *Task) MapToEntity() entities.Task {
 		Description: t.Description,
 		Deadline:    t.Deadline,
 		ProjectId:   fmt.Sprint(t.ProjectId),
+		Status:      entities.TaskStatus(t.Status),
 	}
 }
 
@@ -39,4 +41,5 @@ func (t *Task) MapEntityToThis(entity entities.Task) {
 	t.Description = entity.Description
 	t.ProjectId = uint(prId)
 	t.Deadline = entity.Deadline
+	t.Status = uint(entity.Status)
 }
