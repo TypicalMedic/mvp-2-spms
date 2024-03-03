@@ -22,3 +22,5 @@ func (c *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo model
 		ProjectFolderId: folder.Id,
 	}
 }
+
+func (c *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask

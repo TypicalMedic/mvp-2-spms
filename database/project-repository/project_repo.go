@@ -66,3 +66,5 @@ func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project
 func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) {
 	r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.ProjectFolderId)
 }
+
+func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string
