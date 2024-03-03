@@ -25,7 +25,7 @@ func InitProjectHandler(projInteractor interfaces.IProjetInteractor) ProjectHand
 func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Request) {
 	professorIdCookie, _ := r.Cookie("professor_id")
 	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
-	input := inputdata.GetPfofessorProjects{
+	input := inputdata.GetProfessorProjects{
 		ProfessorId: uint(professorId),
 	}
 	result := h.projectInteractor.GetProfessorProjects(input)
