@@ -13,6 +13,7 @@ type Intercators struct {
 	ProjectManager hInterfaces.IProjetInteractor
 	StudentManager hInterfaces.IStudentInteractor
 	MeetingManager hInterfaces.IMeetingInteractor
+	TaskManager    hInterfaces.ITaskInteractor
 }
 type Repositories struct {
 	Projects     mngInterfaces.IProjetRepository
@@ -20,4 +21,5 @@ type Repositories struct {
 	Universities mngInterfaces.IUniversityRepository
 	Meetings     mngInterfaces.IMeetingRepository
 	Accounts     mngInterfaces.IAccountRepository
+	Tasks        mngInterfaces.ITaskRepository
 }

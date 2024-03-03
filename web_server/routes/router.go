@@ -47,6 +47,7 @@ func (r *Router) SetupRoutes() {
 
 func (r *Router) setupProjectRoutes() {
 	projH := handlers.InitProjectHandler(r.app.Intercators.ProjectManager)
+	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/projects", func(r chi.Router) {
@@ -61,10 +62,8 @@ func (r *Router) setupProjectRoutes() {
 			r.Delete("/", dummyHandler)                // DELETE /projects/123
 			r.Get("/commits", projH.GetProjectCommits) // GET /projects/123/commits
 			r.Route("/tasks", func(r chi.Router) {
-				r.Get("/", dummyHandler)     // GET /projects/123/tasks
-				r.Post("/add", dummyHandler) // POST /projects/123/tasks/add
-				r.Put("/", dummyHandler)     // PUT /projects/123/tasks
-				r.Delete("/", dummyHandler)  // DELETE /projects/123/tasks
+				r.Get("/", dummyHandler)      // GET /projects/123/tasks
+				r.Post("/add", taskH.AddTask) // POST /projects/123/tasks/add
 			})
 		})
 	})

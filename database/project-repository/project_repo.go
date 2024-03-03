@@ -70,6 +70,6 @@ func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject
 
 func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string {
 	proj := models.Project{}
-	r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Find(proj)
+	r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Find(&proj)
 	return fmt.Sprint(proj.CloudId)
 }

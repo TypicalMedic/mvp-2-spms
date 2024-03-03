@@ -10,14 +10,14 @@ import (
 type TaskInteractor struct {
 	projectRepo interfaces.IProjetRepository
 	cloudDrive  interfaces.ICloudDrive
-	//accountRepo interfaces.IAccountRepository
-	taskRepo interfaces.ITaskRepository
+	taskRepo    interfaces.ITaskRepository
 }
 
-func InitTaskInteractor(projRepo interfaces.IProjetRepository, cloudDrive interfaces.ICloudDrive) *TaskInteractor {
+func InitTaskInteractor(projRepo interfaces.IProjetRepository, cloudDrive interfaces.ICloudDrive, taskRepo interfaces.ITaskRepository) *TaskInteractor {
 	return &TaskInteractor{
 		projectRepo: projRepo,
 		cloudDrive:  cloudDrive,
+		taskRepo:    taskRepo,
 	}
 }
 
