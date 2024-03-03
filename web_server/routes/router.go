@@ -62,8 +62,8 @@ func (r *Router) setupProjectRoutes() {
 			r.Delete("/", dummyHandler)                // DELETE /projects/123
 			r.Get("/commits", projH.GetProjectCommits) // GET /projects/123/commits
 			r.Route("/tasks", func(r chi.Router) {
-				r.Get("/", dummyHandler)      // GET /projects/123/tasks
-				r.Post("/add", taskH.AddTask) // POST /projects/123/tasks/add
+				r.Get("/", taskH.GetAllProjectTasks) // GET /projects/123/tasks
+				r.Post("/add", taskH.AddTask)        // POST /projects/123/tasks/add
 			})
 		})
 	})

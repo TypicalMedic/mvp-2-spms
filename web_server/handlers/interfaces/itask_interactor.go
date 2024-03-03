@@ -7,4 +7,5 @@ import (
 
 type ITaskInteractor interface {
 	AddTask(input inputdata.AddTask) outputdata.AddTask
+	GetProjectTasks(input inputdata.GetProjectTasks) outputdata.GetProjectTasks
 }

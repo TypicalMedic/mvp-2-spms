@@ -48,4 +48,5 @@ type IAccountRepository interface {
 type ITaskRepository interface {
 	CreateTask(entities.Task) entities.Task
 	AssignDriveTask(models.DriveTask)
+	GetProjectTasks(projId string) []entities.Task
 }

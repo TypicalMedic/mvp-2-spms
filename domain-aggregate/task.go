@@ -16,9 +16,9 @@ const (
 func (s TaskStatus) String() string {
 	switch s {
 	case TaskStatus(NotStarted):
-		return "NotStarted"
+		return "Not Started"
 	case TaskStatus(InProgress):
-		return "InProgress"
+		return "In Progress"
 	case TaskStatus(Finished):
 		return "Finished"
 	default:

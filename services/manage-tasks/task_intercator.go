@@ -34,3 +34,10 @@ func (p *TaskInteractor) AddTask(input inputdata.AddTask) outputdata.AddTask {
 	output := outputdata.MapToAddTask(task)
 	return output
 }
+
+func (p *TaskInteractor) GetProjectTasks(input inputdata.GetProjectTasks) outputdata.GetProjectTasks {
+	// get tasks from db
+	tasks := p.taskRepo.GetProjectTasks(fmt.Sprint(input.ProjectId))
+	output := outputdata.MapToGetProjectTasks(tasks)
+	return output
+}

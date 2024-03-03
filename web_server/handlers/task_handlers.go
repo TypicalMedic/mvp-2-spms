@@ -56,3 +56,17 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task_id)
 }
+
+func (h *TaskHandler) GetAllProjectTasks(w http.ResponseWriter, r *http.Request) {
+	professorIdCookie, _ := r.Cookie("professor_id")
+	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	input := inputdata.GetProjectTasks{
+		ProfessorId: uint(professorId),
+		ProjectId:   uint(projectId),
+	}
+	result := h.taskInteractor.GetProjectTasks(input)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}

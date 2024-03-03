@@ -31,3 +31,13 @@ func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) {
 			TaskFileId: task.TaskFileId,
 		})
 }
+
+func (r *TaskRepository) GetProjectTasks(projId string) []entities.Task {
+	var tasks []models.Task
+	r.dbContext.DB.Select("*").Where("project_id = ?", projId).Find(&tasks)
+	result := []entities.Task{}
+	for _, t := range tasks {
+		result = append(result, t.MapToEntity())
+	}
+	return result
+}
