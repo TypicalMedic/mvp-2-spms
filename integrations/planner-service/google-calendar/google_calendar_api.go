@@ -56,3 +56,11 @@ func (c *googleCalendarApi) GetEventById(eventId string, calendarId string) (*ca
 	}
 	return nil, err
 }
+
+func (c *googleCalendarApi) GetSchedule(startTime time.Time, calendarId string) (*calendar.Events, error) {
+	events, err := c.api.Events.List("marusya.pletneva2012@gmail.com").ShowDeleted(false).SingleEvents(true).TimeMin(startTime.Format(time.RFC3339)).OrderBy("startTime").Do()
+	if err == nil {
+		return events, nil
+	}
+	return nil, err
+}
