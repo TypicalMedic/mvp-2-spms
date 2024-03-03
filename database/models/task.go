@@ -13,8 +13,8 @@ type Task struct {
 	Description string    `gorm:"column:description"`
 	Deadline    time.Time `gorm:"column:deadline"`
 	ProjectId   uint      `gorm:"column:project_id"`
-	FolderId    uint      `gorm:"column:folder_id;default:null"`
-	TaskFileId  uint      `gorm:"column:task_file_id;default:null"`
+	FolderId    string    `gorm:"column:folder_id;default:null"`
+	TaskFileId  string    `gorm:"column:task_file_id;default:null"`
 }
 
 func (*Task) TableName() string {
