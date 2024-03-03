@@ -12,3 +12,9 @@ type DriveProject struct {
 	entities.Project
 	ProjectFolderId string
 }
+
+type DriveTask struct {
+	entities.Task
+	FolderId   string
+	TaskFileId string
+}

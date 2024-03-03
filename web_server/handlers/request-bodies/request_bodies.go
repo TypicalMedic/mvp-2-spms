@@ -25,3 +25,9 @@ type AddProject struct {
 	RepoOwner      string `json:"repository_owner_login"`
 	RepositoryName string `json:"repository_name"`
 }
+
+type AddTask struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Deadline    time.Time `json:"deadline"`
+}

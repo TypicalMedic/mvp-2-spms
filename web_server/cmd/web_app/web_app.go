@@ -6,6 +6,7 @@ import (
 	meetingrepository "mvp-2-spms/database/meeting-repository"
 	projectrepository "mvp-2-spms/database/project-repository"
 	studentrepository "mvp-2-spms/database/student-repository"
+	taskrepository "mvp-2-spms/database/task-repository"
 	unirepository "mvp-2-spms/database/university-repository"
 	googleDrive "mvp-2-spms/integrations/cloud-drive/google-drive"
 	"mvp-2-spms/integrations/git-repository-hub/github"
@@ -15,6 +16,7 @@ import (
 	managemeetings "mvp-2-spms/services/manage-meetings"
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
+	managetasks "mvp-2-spms/services/manage-tasks"
 	"mvp-2-spms/web_server/routes"
 	"net/http"
 
@@ -39,6 +41,7 @@ func main() {
 		Universities: unirepository.InitUniversityRepository(*db),
 		Meetings:     meetingrepository.InitMeetingRepository(*db),
 		Accounts:     accountepository.InitAccountRepository(*db),
+		Tasks:        taskrepository.InitTaskRepository(*db),
 	}
 
 	repoHub := github.InitGithub(github.InitGithubAPI())
@@ -54,6 +57,7 @@ func main() {
 		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
 		StudentManager: managestudents.InitStudentInteractor(repos.Students),
 		MeetingManager: managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts),
+		TaskManager:    managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
 	}
 	app := internal.StudentsProjectsManagementApp{
 		Intercators: interactors,

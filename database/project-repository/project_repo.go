@@ -1,6 +1,7 @@
 package projectrepository
 
 import (
+	"fmt"
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
@@ -65,4 +66,10 @@ func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project
 
 func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) {
 	r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.ProjectFolderId)
+}
+
+func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string {
+	proj := models.Project{}
+	r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Find(&proj)
+	return fmt.Sprint(proj.CloudId)
 }

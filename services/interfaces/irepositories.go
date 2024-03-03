@@ -21,6 +21,7 @@ type IProjetRepository interface {
 	CreateProject(entities.Project) entities.Project
 	CreateProjectWithRepository(entities.Project, models.Repository) models.ProjectInRepository
 	AssignDriveFolder(models.DriveProject)
+	GetProjectCloudFolderId(projId string) string
 }
 
 // transfers data in domain entities
@@ -42,4 +43,9 @@ type IMeetingRepository interface {
 type IAccountRepository interface {
 	GetAccountPlannerData(id string) models.PlannerIntegration  // returns planner integration for later usage of api key???
 	GetAccountDriveData(id string) models.CloudDriveIntegration // returns drive integration for later usage of api key???
+}
+
+type ITaskRepository interface {
+	CreateTask(entities.Task) entities.Task
+	AssignDriveTask(models.DriveTask)
 }
