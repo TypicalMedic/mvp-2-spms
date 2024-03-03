@@ -23,31 +23,35 @@ func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, planner interfa
 	}
 }
 
-func (p *MeetingInteractor) AddMeeting(input inputdata.AddMeeting) outputdata.AddMeeting {
+func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting) outputdata.AddMeeting {
 	// adding meeting to db, returns created meeting (with id)
-	meeting := p.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
+	meeting := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
 	// getting calendar info, should be checked for existance later
-	plannerInfo := p.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	// add meeting to calendar
-	meeitngPlanner := p.plannerService.AddMeeting(meeting, plannerInfo)
+	meeitngPlanner := m.plannerService.AddMeeting(meeting, plannerInfo)
 	// add meeting id from planner
-	p.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
+	m.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
 	// returning id
 	output := outputdata.MapToAddMeeting(meeting)
 	return output
 }
 
-func (p *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings) outputdata.GetProfesorMeetings {
+func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings) outputdata.GetProfesorMeetings {
 	// get from db
-	meetings := p.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From)
+	meetings := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From)
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	for _, meet := range meetings {
-		student := p.studentRepo.GetStudentById(meet.ParticipantId)
-		projTheme := p.projectRepo.GetStudentCurrentProjectTheme(meet.ParticipantId)
+		student := m.studentRepo.GetStudentById(meet.ParticipantId)
+		projTheme := m.projectRepo.GetStudentCurrentProjectTheme(meet.ParticipantId)
+		// find meeting in cloud
+		plannerId := m.meetingRepo.GetMeetingPlannerId(meet.Id)
+		hasPlanner := m.plannerService.FindMeetingById(plannerId)
 		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{
-			Meeting:      meet,
-			Student:      student,
-			ProjectTheme: projTheme,
+			Meeting:           meet,
+			Student:           student,
+			ProjectTheme:      projTheme,
+			HasPlannerMeeting: hasPlanner,
 		})
 	}
 	output := outputdata.MapToGetProfesorMeetings(meetEntities)
