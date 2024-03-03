@@ -7,4 +7,5 @@ import (
 
 type IMeetingInteractor interface {
 	AddMeeting(input inputdata.AddMeeting) outputdata.AddMeeting
+	GetProfessorMeetings(input inputdata.GetProfessorMeetings) outputdata.GetProfesorMeetings
 }

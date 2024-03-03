@@ -29,7 +29,7 @@ func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfa
 }
 
 // returns all professor projects (basic information)
-func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetPfofessorProjects) outputdata.GetProfessorProjects {
+func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorProjects) outputdata.GetProfessorProjects {
 	// get from database
 	projEntities := []outputdata.GetProfessorProjectsEntities{}
 	projects := p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))

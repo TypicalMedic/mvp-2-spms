@@ -3,6 +3,7 @@ package interfaces
 import (
 	entities "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/models"
+	"time"
 )
 
 // transfers data in domain entities
@@ -22,6 +23,7 @@ type IProjetRepository interface {
 	CreateProjectWithRepository(entities.Project, models.Repository) models.ProjectInRepository
 	AssignDriveFolder(models.DriveProject)
 	GetProjectCloudFolderId(projId string) string
+	GetStudentCurrentProjectTheme(studId string) string
 }
 
 // transfers data in domain entities
@@ -38,6 +40,8 @@ type IUniversityRepository interface {
 type IMeetingRepository interface {
 	CreateMeeting(entities.Meeting) entities.Meeting
 	AssignPlannerMeeting(models.PlannerMeeting)
+	GetProfessorMeetings(profId string, from time.Time) []entities.Meeting
+	GetMeetingPlannerId(meetId string) string
 }
 
 type IAccountRepository interface {

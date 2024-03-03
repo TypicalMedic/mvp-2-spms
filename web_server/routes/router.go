@@ -60,7 +60,7 @@ func (r *Router) setupProjectRoutes() {
 			r.Get("/", projH.GetProject)               // GET /projects/123
 			r.Put("/", dummyHandler)                   // PUT /projects/123
 			r.Delete("/", dummyHandler)                // DELETE /projects/123
-			r.Get("/commits", projH.GetProjectCommits) // GET /projects/123/commits
+			r.Get("/commits", projH.GetProjectCommits) // GET /projects/123/commits?from=2006-01-02T15:04:05.000Z
 			r.Route("/tasks", func(r chi.Router) {
 				r.Get("/", taskH.GetAllProjectTasks) // GET /projects/123/tasks
 				r.Post("/add", taskH.AddTask)        // POST /projects/123/tasks/add
@@ -82,9 +82,9 @@ func (r *Router) setupMeetingRoutes() {
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
 	r.router.Route("/meetings", func(r chi.Router) {
-		r.With().Get("/", dummyHandler)  // GET /meetings with middleware (currently empty)
-		r.Get("/filter", dummyHandler)   // GET /meetings/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
-		r.Post("/add", meetH.AddMeeting) // POST /meetings/add
+		r.With().Get("/", meetH.GetProjectMeetings) // GET /meetings?from=2006-01-02T15:04:05.000Z with middleware (currently empty)
+		r.Get("/filter", dummyHandler)              // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
+		r.Post("/add", meetH.AddMeeting)            // POST /meetings/add
 		// Subrouters:
 		r.Route("/{meetingID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)

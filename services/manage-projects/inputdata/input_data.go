@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type GetPfofessorProjects struct {
+type GetProfessorProjects struct {
 	ProfessorId uint
 }
 
