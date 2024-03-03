@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type GetProjectTasks struct {
+	ProfessorId uint
+	ProjectId   uint
+}
+
 type AddTask struct {
 	ProfessorId uint
 	ProjectId   uint
