@@ -23,4 +23,17 @@ func (c *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo model
 	}
 }
 
-func (c *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask
+func (c *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask {
+	// add task folder
+	folderName := fmt.Sprint("Task ", task.Id, "_", task.Name, " until: ", task.Deadline.Format("02.01.2006"))
+	folder, _ := c.api.CreateFolder(folderName, projectFolderId)
+	// add task file
+	fileName := fmt.Sprint("Task '", task.Name, "' desctiprion")
+	text := fmt.Sprint(task.Name, "\n\n", task.Description)
+	file, _ := c.api.AddTextFileToFOlder(fileName, text, folder.Id)
+	return models.DriveTask{
+		Task:       task,
+		FolderId:   folder.Id,
+		TaskFileId: file.Id,
+	}
+}

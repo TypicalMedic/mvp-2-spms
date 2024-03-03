@@ -3,6 +3,7 @@ package clouddrive
 import (
 	"log"
 	googleapi "mvp-2-spms/integrations/google-api"
+	"strings"
 
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
@@ -32,6 +33,21 @@ func (d *googleDriveApi) CreateFolder(folderName string, parentFolder string) (*
 		Parents:  []string{parentFolder},
 	}
 	file, err := d.api.Files.Create(fileMetadata).Fields("id").Do()
+	if err == nil {
+		return file, nil
+	}
+	return nil, err
+}
+
+func (d *googleDriveApi) AddTextFileToFOlder(fileName string, fileText string, parentFolderId string) (*drive.File, error) {
+	fileMetadata := &drive.File{
+		Name:     fileName,
+		MimeType: "application/vnd.google-apps.document", // google document type
+		Parents:  []string{parentFolderId},
+	}
+
+	r := strings.NewReader(fileText)
+	file, err := d.api.Files.Create(fileMetadata).Media(r).Fields("id").Do()
 	if err == nil {
 		return file, nil
 	}
