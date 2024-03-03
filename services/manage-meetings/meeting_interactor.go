@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-meetings/inputdata"
 	"mvp-2-spms/services/manage-meetings/outputdata"
+	"slices"
 )
 
 type MeetingInteractor struct {
@@ -15,11 +16,14 @@ type MeetingInteractor struct {
 	studentRepo    interfaces.IStudentRepository
 }
 
-func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, planner interfaces.IPlannerService, accRepo interfaces.IAccountRepository) *MeetingInteractor {
+func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, planner interfaces.IPlannerService, accRepo interfaces.IAccountRepository,
+	sRepo interfaces.IStudentRepository, projRepo interfaces.IProjetRepository) *MeetingInteractor {
 	return &MeetingInteractor{
 		meetingRepo:    mtRepo,
 		plannerService: planner,
 		accountRepo:    accRepo,
+		studentRepo:    sRepo,
+		projectRepo:    projRepo,
 	}
 }
 
@@ -41,15 +45,16 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	// get from db
 	meetings := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From)
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
+	// getting calendar info, should be checked for existance later
+	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	plannerMetingsIds := m.plannerService.GetScheduleMeetinIds(input.From, plannerInfo)
 	for _, meet := range meetings {
 		student := m.studentRepo.GetStudentById(meet.ParticipantId)
 		projTheme := m.projectRepo.GetStudentCurrentProjectTheme(meet.ParticipantId)
 		// getting planner meeting id
 		plannerId := m.meetingRepo.GetMeetingPlannerId(meet.Id)
-		// getting calendar info, should be checked for existance later
-		plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
-		// find meeting in cloud
-		hasPlanner := m.plannerService.FindMeetingById(plannerId, plannerInfo)
+		// check if meeting exists in planner
+		hasPlanner := slices.Contains(plannerMetingsIds, plannerId)
 		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{
 			Meeting:           meet,
 			Student:           student,

@@ -41,17 +41,17 @@ type GetProfesorMeetingsEntities struct {
 }
 
 type getProfMeetingsData struct {
-	Id                int    `json:"id"`
-	Name              string `json:"name"`
-	Description       string `json:"description"`
-	MeetingTime       time.Time
-	Participant       getProfMeetingsParticipantData
-	IsOnline          bool
-	HasPlannerMeeting bool
+	Id                int                            `json:"id"`
+	Name              string                         `json:"name"`
+	Description       string                         `json:"description"`
+	MeetingTime       time.Time                      `json:"time"`
+	Participant       getProfMeetingsParticipantData `json:"student"`
+	IsOnline          bool                           `json:"is_online"`
+	HasPlannerMeeting bool                           `json:"has_planner_meeting"`
 }
 
 type getProfMeetingsParticipantData struct {
-	FullName     string
-	Cource       uint
-	ProjectTheme string
+	FullName     string `json:"name"`
+	Cource       uint   `json:"cource"`
+	ProjectTheme string `json:"project_theme"`
 }
