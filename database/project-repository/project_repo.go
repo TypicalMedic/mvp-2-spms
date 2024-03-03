@@ -74,4 +74,10 @@ func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string {
 	return fmt.Sprint(proj.CloudId)
 }
 
-func (r *ProjectRepository) GetStudentCurrentProjectTheme(studId string) string
+func (r *ProjectRepository) GetStudentCurrentProjectTheme(studId string) string {
+	proj := models.Project{}
+	r.dbContext.DB.Select("theme").Where("student_id = ? AND status_id IN(?, ?)",
+		studId, entities.ProjectInProgress,
+		entities.ProjectNotConfirmed).Order("year desc").Limit(1).Find(&proj)
+	return proj.Theme
+}

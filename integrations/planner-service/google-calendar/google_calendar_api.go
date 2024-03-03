@@ -48,3 +48,11 @@ func (c *googleCalendarApi) AddEvent(startTime time.Time, summary string, desc s
 	}
 	return nil, err
 }
+
+func (c *googleCalendarApi) GetEventById(eventId string, calendarId string) (*calendar.Event, error) {
+	event, err := c.api.Events.Get(calendarId, eventId).Do()
+	if err == nil {
+		return event, nil
+	}
+	return nil, err
+}

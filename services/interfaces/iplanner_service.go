@@ -7,5 +7,5 @@ import (
 
 type IPlannerService interface {
 	AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) models.PlannerMeeting
-	FindMeetingById(meetId string) bool
+	FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) bool
 }

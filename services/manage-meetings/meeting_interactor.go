@@ -44,9 +44,12 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	for _, meet := range meetings {
 		student := m.studentRepo.GetStudentById(meet.ParticipantId)
 		projTheme := m.projectRepo.GetStudentCurrentProjectTheme(meet.ParticipantId)
-		// find meeting in cloud
+		// getting planner meeting id
 		plannerId := m.meetingRepo.GetMeetingPlannerId(meet.Id)
-		hasPlanner := m.plannerService.FindMeetingById(plannerId)
+		// getting calendar info, should be checked for existance later
+		plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+		// find meeting in cloud
+		hasPlanner := m.plannerService.FindMeetingById(plannerId, plannerInfo)
 		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{
 			Meeting:           meet,
 			Student:           student,

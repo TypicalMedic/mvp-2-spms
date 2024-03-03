@@ -20,3 +20,8 @@ func (c *GoogleCalendar) AddMeeting(meeting entities.Meeting, plannerInfo models
 		PlannerId: event.Id,
 	}
 }
+
+func (c *GoogleCalendar) FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) bool {
+	_, err := c.api.GetEventById(meetId, plannerInfo.PlannerData.Id)
+	return err == nil
+}
