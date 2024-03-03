@@ -20,5 +20,6 @@ func (at AddTask) MapToTaskEntity() entities.Task {
 		Name:        at.Name,
 		Description: at.Description,
 		Deadline:    at.Deadline,
+		Status:      entities.NotStarted,
 	}
 }
