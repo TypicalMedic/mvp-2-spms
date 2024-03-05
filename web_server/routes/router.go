@@ -84,7 +84,8 @@ func (r *Router) setupStudentRoutes() {
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/students", func(r chi.Router) {
-		r.Post("/add", studH.AddStudent) // POST /students/add
+		r.With().Get("/", studH.GetStudents) // GET /students with middleware (currently empty)
+		r.Post("/add", studH.AddStudent)     // POST /students/add
 	})
 }
 
