@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 type Router struct {
@@ -36,6 +37,16 @@ func SetupRouter(app *internal.StudentsProjectsManagementApp) Router {
 // middleware for all routes
 func (r *Router) SetupMiddleware() {
 	r.router.Use(middleware.Logger)
+	r.router.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"https://*", "http://*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Professor-Id"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 }
 
 func (r *Router) SetupRoutes() {
@@ -82,9 +93,9 @@ func (r *Router) setupMeetingRoutes() {
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
 	r.router.Route("/meetings", func(r chi.Router) {
-		r.With().Get("/", meetH.GetProjectMeetings) // GET /meetings?from=2006-01-02T15:04:05.000Z with middleware (currently empty)
-		r.Get("/filter", dummyHandler)              // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
-		r.Post("/add", meetH.AddMeeting)            // POST /meetings/add
+		r.With().Get("/", meetH.GetProfessorMeetings) // GET /meetings?from=2006-01-02T15:04:05.000Z with middleware (currently empty)
+		r.Get("/filter", dummyHandler)                // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
+		r.Post("/add", meetH.AddMeeting)              // POST /meetings/add
 		// Subrouters:
 		r.Route("/{meetingID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)

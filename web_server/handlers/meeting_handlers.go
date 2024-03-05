@@ -54,7 +54,7 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(meeting_id)
 }
 
-func (h *MeetingHandler) GetProjectMeetings(w http.ResponseWriter, r *http.Request) {
+func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Request) {
 	cred := GetCredentials(r)
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
 	input := inputdata.GetProfessorMeetings{
