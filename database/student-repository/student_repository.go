@@ -29,3 +29,13 @@ func (r *StudentRepository) CreateStudent(student entities.Student) entities.Stu
 	r.dbContext.DB.Create(&dbstudent)
 	return dbstudent.MapToEntity()
 }
+
+func (r *StudentRepository) GetStudents() []entities.Student {
+	var students []models.Student
+	r.dbContext.DB.Select("*").Find(&students)
+	result := []entities.Student{}
+	for _, s := range students {
+		result = append(result, s.MapToEntity())
+	}
+	return result
+}

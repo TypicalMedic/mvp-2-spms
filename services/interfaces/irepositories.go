@@ -29,6 +29,7 @@ type IProjetRepository interface {
 // transfers data in domain entities
 type IStudentRepository interface {
 	GetStudentById(studId string) entities.Student
+	GetStudents() []entities.Student
 	CreateStudent(entities.Student) entities.Student
 }
 

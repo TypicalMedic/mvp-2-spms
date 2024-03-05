@@ -5,6 +5,10 @@ import (
 	entities "mvp-2-spms/domain-aggregate"
 )
 
+type GetStudents struct {
+	ProfessorId uint
+}
+
 type AddStudent struct {
 	ProfessorId            uint
 	Name                   string

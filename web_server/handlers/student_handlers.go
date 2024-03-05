@@ -52,3 +52,14 @@ func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)
 }
+
+func (h *StudentHandler) GetStudents(w http.ResponseWriter, r *http.Request) {
+	cred := GetCredentials(r)
+	input := inputdata.GetStudents{
+		ProfessorId: cred.ProfessorId,
+	}
+	result := h.studentInteractor.GetStudents(input)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
