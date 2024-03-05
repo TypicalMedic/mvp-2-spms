@@ -8,7 +8,7 @@ import (
 )
 
 // думаю есть возможность сделать как у гугла генерацию токена
-const AUTH_TOKEN = "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"
+const AUTH_TOKEN = "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"
 
 type githubAPI struct {
 	Context context.Context
