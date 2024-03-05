@@ -6,7 +6,6 @@ import (
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -21,8 +20,7 @@ func InitMeetingHandler(meetInteractor interfaces.IMeetingInteractor) MeetingHan
 }
 
 func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -42,7 +40,7 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := inputdata.AddMeeting{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 		Name:        reqB.Name,
 		Description: reqB.Description,
 		MeetingTime: reqB.MeetingTime,
@@ -57,11 +55,10 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *MeetingHandler) GetProjectMeetings(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
 	input := inputdata.GetProfessorMeetings{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 		From:        from,
 	}
 	result := h.meetingInteractor.GetProfessorMeetings(input)

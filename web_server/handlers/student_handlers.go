@@ -6,7 +6,6 @@ import (
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
-	"strconv"
 )
 
 type StudentHandler struct {
@@ -20,8 +19,7 @@ func InitStudentHandler(studInteractor interfaces.IStudentInteractor) StudentHan
 }
 
 func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -41,7 +39,7 @@ func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := inputdata.AddStudent{
-		ProfessorId:            uint(professorId),
+		ProfessorId:            cred.ProfessorId,
 		Name:                   reqB.Name,
 		Surname:                reqB.Surname,
 		Middlename:             reqB.Middlename,

@@ -22,8 +22,7 @@ func InitTaskHandler(taskInteractor interfaces.ITaskInteractor) TaskHandler {
 }
 
 func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 
 	headerContentTtype := r.Header.Get("Content-Type")
@@ -44,7 +43,7 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := inputdata.AddTask{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 		Name:        reqB.Name,
 		Description: reqB.Description,
 		Deadline:    reqB.Deadline,
@@ -58,11 +57,10 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TaskHandler) GetAllProjectTasks(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	input := inputdata.GetProjectTasks{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 		ProjectId:   uint(projectId),
 	}
 	result := h.taskInteractor.GetProjectTasks(input)

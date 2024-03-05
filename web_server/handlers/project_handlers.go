@@ -23,10 +23,9 @@ func InitProjectHandler(projInteractor interfaces.IProjetInteractor) ProjectHand
 }
 
 func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 	input := inputdata.GetProfessorProjects{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 	}
 	result := h.projectInteractor.GetProfessorProjects(input)
 	w.Header().Add("Content-Type", "application/json")
@@ -35,12 +34,11 @@ func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
 	input := inputdata.GetProjectCommits{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 		ProjectId:   uint(projectId),
 		From:        from,
 	}
@@ -51,11 +49,10 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	input := inputdata.GetProjectById{
-		ProfessorId: uint(professorId),
+		ProfessorId: cred.ProfessorId,
 		ProjectId:   uint(projectId),
 	}
 	result := h.projectInteractor.GetProjectById(input)
@@ -65,8 +62,7 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	cred := GetCredentials(r)
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -86,7 +82,7 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := inputdata.AddProject{
-		ProfessorId:         uint(professorId),
+		ProfessorId:         cred.ProfessorId,
 		Theme:               reqB.Theme,
 		StudentId:           uint(reqB.StudentId),
 		Year:                uint(reqB.Year),
