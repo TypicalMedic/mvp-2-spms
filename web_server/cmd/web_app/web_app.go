@@ -55,7 +55,7 @@ func main() {
 
 	interactors := internal.Intercators{
 		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
-		StudentManager: managestudents.InitStudentInteractor(repos.Students),
+		StudentManager: managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
 		MeetingManager: managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts, repos.Students, repos.Projects),
 		TaskManager:    managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
 	}

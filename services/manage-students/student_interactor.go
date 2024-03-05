@@ -8,11 +8,15 @@ import (
 
 type StudentInteractor struct {
 	studentRepo interfaces.IStudentRepository
+	projetRepo  interfaces.IProjetRepository
+	uniRepo     interfaces.IUniversityRepository
 }
 
-func InitStudentInteractor(stRepo interfaces.IStudentRepository) *StudentInteractor {
+func InitStudentInteractor(stRepo interfaces.IStudentRepository, pjRepo interfaces.IProjetRepository, uRepo interfaces.IUniversityRepository) *StudentInteractor {
 	return &StudentInteractor{
 		studentRepo: stRepo,
+		projetRepo:  pjRepo,
+		uniRepo:     uRepo,
 	}
 }
 
@@ -21,5 +25,22 @@ func (p *StudentInteractor) AddStudent(input inputdata.AddStudent) outputdata.Ad
 	student := p.studentRepo.CreateStudent(input.MapToStudentEntity())
 	// returning id
 	output := outputdata.MapToAddStudent(student)
+	return output
+}
+
+func (p *StudentInteractor) GetStudents(input inputdata.GetStudents) outputdata.GetStudents {
+	// get from database
+	stEntities := []outputdata.GetStudentsEntities{}
+	students := p.studentRepo.GetStudents()
+	for _, student := range students {
+		project := p.projetRepo.GetStudentCurrentProjectTheme(student.Id)
+		edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
+		stEntities = append(stEntities, outputdata.GetStudentsEntities{
+			ProjectTheme:         project,
+			Student:              student,
+			EducationalProgramme: edProg.Name,
+		})
+	}
+	output := outputdata.MapToGetStudents(stEntities)
 	return output
 }
