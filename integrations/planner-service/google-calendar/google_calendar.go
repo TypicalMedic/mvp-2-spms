@@ -3,6 +3,7 @@ package googlecalendar
 import (
 	entities "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/models"
+	"strings"
 	"time"
 )
 
@@ -26,7 +27,7 @@ func (c *GoogleCalendar) GetScheduleMeetinIds(from time.Time, plannerInfo models
 	events, _ := c.api.GetSchedule(from, plannerInfo.PlannerData.Id)
 	result := []string{}
 	for _, event := range events.Items {
-		result = append(result, event.Id)
+		result = append(result, strings.Split(event.Id, "_")[0])
 	}
 	return result
 }
