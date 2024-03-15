@@ -27,6 +27,7 @@ func MapToGetProfesorMeetings(meetings []GetProfesorMeetingsEntities) GetProfeso
 				},
 				HasPlannerMeeting: meet.HasPlannerMeeting,
 				Status:            meet.Meeting.Status.String(),
+				IsOnline:          meet.Meeting.IsOnline,
 			})
 	}
 	return GetProfesorMeetings{
