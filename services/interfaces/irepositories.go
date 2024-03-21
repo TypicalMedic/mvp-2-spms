@@ -36,6 +36,7 @@ type IStudentRepository interface {
 
 type IUniversityRepository interface {
 	GetEducationalProgrammeById(epId string) entities.EducationalProgramme
+	GetUniversityEducationalProgrammes(uniId string) []entities.EducationalProgramme
 }
 
 // transfers data in domain entities
