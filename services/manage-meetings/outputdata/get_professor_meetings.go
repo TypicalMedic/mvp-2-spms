@@ -14,6 +14,7 @@ func MapToGetProfesorMeetings(meetings []GetProfesorMeetingsEntities) GetProfeso
 	outputProjects := []getProfMeetingsData{}
 	for _, meet := range meetings {
 		id, _ := strconv.Atoi(meet.Meeting.Id)
+		projId, _ := strconv.Atoi(meet.Project.Id)
 		outputProjects = append(outputProjects,
 			getProfMeetingsData{
 				Id:          id,
@@ -23,7 +24,8 @@ func MapToGetProfesorMeetings(meetings []GetProfesorMeetingsEntities) GetProfeso
 				Participant: getProfMeetingsParticipantData{
 					FullName:     meet.Student.FullNameToString(),
 					Cource:       meet.Student.Cource,
-					ProjectTheme: meet.ProjectTheme,
+					ProjectTheme: meet.Project.Theme,
+					ProjectId:    projId,
 				},
 				HasPlannerMeeting: meet.HasPlannerMeeting,
 				Status:            meet.Meeting.Status.String(),
@@ -38,7 +40,7 @@ func MapToGetProfesorMeetings(meetings []GetProfesorMeetingsEntities) GetProfeso
 type GetProfesorMeetingsEntities struct {
 	Meeting           entities.Meeting
 	Student           entities.Student
-	ProjectTheme      string
+	Project           entities.Project
 	HasPlannerMeeting bool
 }
 
@@ -56,5 +58,6 @@ type getProfMeetingsData struct {
 type getProfMeetingsParticipantData struct {
 	FullName     string `json:"name"`
 	Cource       uint   `json:"cource"`
+	ProjectId    int    `json:"project_id"`
 	ProjectTheme string `json:"project_theme"`
 }
