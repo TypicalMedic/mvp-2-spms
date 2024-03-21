@@ -54,6 +54,7 @@ func (r *Router) SetupRoutes() {
 	r.setupMeetingRoutes()
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
+	r.setupUniversityRoutes()
 }
 
 func (r *Router) setupProjectRoutes() {
@@ -79,6 +80,7 @@ func (r *Router) setupProjectRoutes() {
 		})
 	})
 }
+
 func (r *Router) setupStudentRoutes() {
 	studH := handlers.InitStudentHandler(r.app.Intercators.StudentManager)
 
@@ -86,6 +88,22 @@ func (r *Router) setupStudentRoutes() {
 	r.router.Route("/students", func(r chi.Router) {
 		r.With().Get("/", studH.GetStudents) // GET /students with middleware (currently empty)
 		r.Post("/add", studH.AddStudent)     // POST /students/add
+	})
+}
+
+func (r *Router) setupUniversityRoutes() {
+	uniH := handlers.InitUniversityHandler(r.app.Intercators.UnversityManager)
+
+	// setup middleware for checking if professor is authorized and it's his projects?
+	r.router.Route("/universities", func(r chi.Router) {
+		r.With().Get("/", dummyHandler) // GET /universities with middleware (currently empty)
+		r.Route("/{uniID}", func(r chi.Router) {
+			r.Get("/", dummyHandler) // GET /universities/123
+			r.Route("/edprogrammes", func(r chi.Router) {
+				r.Get("/", uniH.GetAllUniEdProgrammes) // GET /universities/123/edprogrammes
+				r.Post("/add", dummyHandler)           // POST /universities/123/edprogrammes/add
+			})
+		})
 	})
 }
 

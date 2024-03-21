@@ -17,6 +17,7 @@ import (
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
 	managetasks "mvp-2-spms/services/manage-tasks"
+	manageuniversities "mvp-2-spms/services/manage-universities"
 	"mvp-2-spms/web_server/routes"
 	"net/http"
 
@@ -54,10 +55,11 @@ func main() {
 	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
-		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
-		StudentManager: managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
-		MeetingManager: managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts, repos.Students, repos.Projects),
-		TaskManager:    managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
+		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
+		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
+		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts, repos.Students, repos.Projects),
+		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
+		UnversityManager: manageuniversities.InitUniversityInteractor(repos.Universities),
 	}
 	app := internal.StudentsProjectsManagementApp{
 		Intercators: interactors,
