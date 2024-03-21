@@ -54,4 +54,5 @@ type ITaskRepository interface {
 	CreateTask(entities.Task) entities.Task
 	AssignDriveTask(models.DriveTask)
 	GetProjectTasks(projId string) []entities.Task
+	GetProjectTasksWithCloud(projId string) []models.DriveTask
 }

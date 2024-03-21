@@ -37,7 +37,7 @@ func (p *TaskInteractor) AddTask(input inputdata.AddTask) outputdata.AddTask {
 
 func (p *TaskInteractor) GetProjectTasks(input inputdata.GetProjectTasks) outputdata.GetProjectTasks {
 	// get tasks from db
-	tasks := p.taskRepo.GetProjectTasks(fmt.Sprint(input.ProjectId))
+	tasks := p.taskRepo.GetProjectTasksWithCloud(fmt.Sprint(input.ProjectId))
 	output := outputdata.MapToGetProjectTasks(tasks)
 	return output
 }

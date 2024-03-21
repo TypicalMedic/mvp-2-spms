@@ -44,3 +44,23 @@ func (r *TaskRepository) GetProjectTasks(projId string) []entities.Task {
 	}
 	return result
 }
+
+func (r *TaskRepository) GetProjectTasksWithCloud(projId string) []usecaseModels.DriveTask {
+	joinedResults := []struct {
+		models.Task
+		models.CloudFolder
+	}{}
+
+	r.dbContext.DB.Model(models.Task{}).Select("*").Joins("left join cloud_folder on cloud_folder.id=task.folder_id").Where("project_id = ?", projId).Find(&joinedResults)
+
+	result := []usecaseModels.DriveTask{}
+	for _, t := range joinedResults {
+		result = append(result,
+			usecaseModels.DriveTask{
+				Task:        t.Task.MapToEntity(),
+				DriveFolder: t.CloudFolder.MapToUseCaseModel(),
+			},
+		)
+	}
+	return result
+}
