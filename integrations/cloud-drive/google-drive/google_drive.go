@@ -18,8 +18,11 @@ func (c *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo model
 	folderName := fmt.Sprint("Project ", project.Id, "_", project.Theme)
 	folder, _ := c.api.CreateFolder(folderName, driveInfo.BaseFolderId)
 	return models.DriveProject{
-		Project:         project,
-		ProjectFolderId: folder.Id,
+		Project: project,
+		DriveFolder: models.DriveFolder{
+			Id:   folder.Id,
+			Link: folder.WebViewLink,
+		},
 	}
 }
 
@@ -30,10 +33,13 @@ func (c *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string)
 	// add task file
 	fileName := fmt.Sprint("Task '", task.Name, "' desctiprion")
 	text := fmt.Sprint(task.Name, "\n\n", task.Description)
-	file, _ := c.api.AddTextFileToFOlder(fileName, text, folder.Id)
+	file, _ := c.api.AddTextFileToFolder(fileName, text, folder.Id)
 	return models.DriveTask{
-		Task:       task,
-		FolderId:   folder.Id,
+		Task: task,
+		DriveFolder: models.DriveFolder{
+			Id:   folder.Id,
+			Link: folder.WebViewLink,
+		},
 		TaskFileId: file.Id,
 	}
 }

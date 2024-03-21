@@ -10,11 +10,16 @@ type DriveData struct {
 
 type DriveProject struct {
 	entities.Project
-	ProjectFolderId string
+	DriveFolder
 }
 
 type DriveTask struct {
 	entities.Task
-	FolderId   string
+	DriveFolder
 	TaskFileId string
+}
+
+type DriveFolder struct {
+	Id   string
+	Link string
 }

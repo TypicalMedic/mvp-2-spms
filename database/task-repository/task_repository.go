@@ -25,9 +25,12 @@ func (r *TaskRepository) CreateTask(task entities.Task) entities.Task {
 }
 
 func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) {
+	dbCloudFolder := models.CloudFolder{}
+	dbCloudFolder.MapUseCaseModelToThis(task.DriveFolder)
+	r.dbContext.DB.Create(&dbCloudFolder)
 	r.dbContext.DB.Model(&models.Task{}).Select("folder_id", "task_file_id").Where("id = ?", task.Task.Id).Updates(
 		models.Task{
-			FolderId:   task.FolderId,
+			FolderId:   task.DriveFolder.Id,
 			TaskFileId: task.TaskFileId,
 		})
 }
