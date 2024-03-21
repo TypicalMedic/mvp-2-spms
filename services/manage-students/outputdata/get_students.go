@@ -36,11 +36,11 @@ type GetStudentsEntities struct {
 }
 
 type getStudentsData struct {
-	Id                   int `json:"id"`
-	Name                 string
-	Surname              string
-	Middlename           string
-	EducationalProgramme string
-	Cource               int
-	PtojectTheme         string
+	Id                   int    `json:"id"`
+	Name                 string `json:"name"`
+	Surname              string `json:"surname"`
+	Middlename           string `json:"middlename"`
+	EducationalProgramme string `json:"education_programme"`
+	Cource               int    `json:"cource"`
+	PtojectTheme         string `json:"project_theme"`
 }
