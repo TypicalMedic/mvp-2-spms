@@ -10,7 +10,7 @@ type Person struct {
 }
 
 func (p *Person) FullNameToString() string {
-	fullname := fmt.Sprint(p.Name, " ", p.Surname)
+	fullname := fmt.Sprint(p.Surname, " ", p.Name)
 	if p.Middlename != "" {
 		fullname += fmt.Sprint(" ", p.Middlename)
 	}
