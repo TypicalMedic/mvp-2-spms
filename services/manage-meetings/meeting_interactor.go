@@ -50,7 +50,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	plannerMetingsIds := m.plannerService.GetScheduleMeetinIds(input.From, plannerInfo)
 	for _, meet := range meetings {
 		student := m.studentRepo.GetStudentById(meet.ParticipantId)
-		projTheme := m.projectRepo.GetStudentCurrentProjectTheme(meet.ParticipantId)
+		proj := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
 		// getting planner meeting id
 		plannerId := m.meetingRepo.GetMeetingPlannerId(meet.Id)
 		// check if meeting exists in planner
@@ -58,7 +58,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{
 			Meeting:           meet,
 			Student:           student,
-			ProjectTheme:      projTheme,
+			Project:           proj,
 			HasPlannerMeeting: hasPlanner,
 		})
 	}

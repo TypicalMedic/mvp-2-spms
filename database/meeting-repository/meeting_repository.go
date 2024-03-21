@@ -32,7 +32,7 @@ func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMe
 
 func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time) []entities.Meeting {
 	var meetings []models.Meeting
-	r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time >= ?", profId, from).Find(&meetings)
+	r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time >= ?", profId, from).Order("meeting_time asc").Find(&meetings)
 	result := []entities.Meeting{}
 	for _, m := range meetings {
 		result = append(result, m.MapToEntity())

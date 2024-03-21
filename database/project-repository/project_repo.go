@@ -83,10 +83,10 @@ func (r *ProjectRepository) GetProjectFolderLink(projId string) string {
 	return result.Link
 }
 
-func (r *ProjectRepository) GetStudentCurrentProjectTheme(studId string) string {
+func (r *ProjectRepository) GetStudentCurrentProject(studId string) entities.Project {
 	proj := models.Project{}
-	r.dbContext.DB.Select("theme").Where("student_id = ? AND status_id IN(?, ?)",
+	r.dbContext.DB.Select("*").Where("student_id = ? AND status_id IN(?, ?)",
 		studId, entities.ProjectInProgress,
 		entities.ProjectNotConfirmed).Order("year desc").Limit(1).Find(&proj)
-	return proj.Theme
+	return proj.MapToEntity()
 }

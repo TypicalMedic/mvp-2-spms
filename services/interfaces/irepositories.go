@@ -23,7 +23,7 @@ type IProjetRepository interface {
 	CreateProjectWithRepository(entities.Project, models.Repository) models.ProjectInRepository
 	AssignDriveFolder(models.DriveProject)
 	GetProjectCloudFolderId(projId string) string
-	GetStudentCurrentProjectTheme(studId string) string
+	GetStudentCurrentProject(studId string) entities.Project
 	GetProjectFolderLink(projId string) string
 }
 
