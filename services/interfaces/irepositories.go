@@ -24,6 +24,7 @@ type IProjetRepository interface {
 	AssignDriveFolder(models.DriveProject)
 	GetProjectCloudFolderId(projId string) string
 	GetStudentCurrentProjectTheme(studId string) string
+	GetProjectFolderLink(projId string) string
 }
 
 // transfers data in domain entities

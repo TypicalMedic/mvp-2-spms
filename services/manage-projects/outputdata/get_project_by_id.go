@@ -6,15 +6,16 @@ import (
 )
 
 type GetProjectById struct {
-	Id      int                       `json:"id"`
-	Theme   string                    `json:"theme"`
-	Student GetProjectByIdStudentData `json:"student"`
-	Status  string                    `json:"status"`
-	Stage   string                    `json:"stage"`
-	Year    int                       `json:"year"`
+	Id              int                       `json:"id"`
+	Theme           string                    `json:"theme"`
+	Student         GetProjectByIdStudentData `json:"student"`
+	Status          string                    `json:"status"`
+	Stage           string                    `json:"stage"`
+	Year            int                       `json:"year"`
+	CloudFolderLink string                    `json:"cloud_folder_link"`
 }
 
-func MapToGetProjectsById(project entities.Project, student entities.Student, edProgramme entities.EducationalProgramme) GetProjectById {
+func MapToGetProjectsById(project entities.Project, student entities.Student, edProgramme entities.EducationalProgramme, folderLink string) GetProjectById {
 	pId, _ := strconv.Atoi(project.Id)
 	sId, _ := strconv.Atoi(student.Id)
 	return GetProjectById{
@@ -28,9 +29,10 @@ func MapToGetProjectsById(project entities.Project, student entities.Student, ed
 			Cource:      int(student.Cource),
 			EdProgramme: edProgramme.Name,
 		},
-		Status: project.Status.String(),
-		Stage:  project.Stage.String(),
-		Year:   int(project.Year),
+		Status:          project.Status.String(),
+		Stage:           project.Stage.String(),
+		Year:            int(project.Year),
+		CloudFolderLink: folderLink,
 	}
 }
 
