@@ -65,13 +65,22 @@ func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project
 }
 
 func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) {
-	r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.ProjectFolderId)
+	dbCloudFolder := models.CloudFolder{}
+	dbCloudFolder.MapUseCaseModelToThis(project.DriveFolder)
+	r.dbContext.DB.Create(&dbCloudFolder)
+	r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.DriveFolder.Id)
 }
 
 func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string {
 	proj := models.Project{}
 	r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Find(&proj)
 	return fmt.Sprint(proj.CloudId)
+}
+
+func (r *ProjectRepository) GetProjectFolderLink(projId string) string {
+	result := models.CloudFolder{}
+	r.dbContext.DB.Select("link").Where("id = ?", r.GetProjectCloudFolderId(projId)).Find(&result)
+	return result.Link
 }
 
 func (r *ProjectRepository) GetStudentCurrentProjectTheme(studId string) string {

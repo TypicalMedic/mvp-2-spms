@@ -58,10 +58,11 @@ func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits)
 func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outputdata.GetProjectById {
 	// get project by id
 	project := p.projectRepo.GetProjectById(fmt.Sprint(input.ProjectId))
+	cloudFolder := p.projectRepo.GetProjectFolderLink(fmt.Sprint(input.ProjectId))
 	// getting student info
 	student := p.studentRepo.GetStudentById(project.StudentId)
 	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
-	output := outputdata.MapToGetProjectsById(project, student, edProg)
+	output := outputdata.MapToGetProjectsById(project, student, edProg, cloudFolder)
 	return output
 }
 

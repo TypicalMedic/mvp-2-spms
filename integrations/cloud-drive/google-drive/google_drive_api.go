@@ -32,14 +32,14 @@ func (d *googleDriveApi) CreateFolder(folderName string, parentFolder string) (*
 		MimeType: "application/vnd.google-apps.folder",
 		Parents:  []string{parentFolder},
 	}
-	file, err := d.api.Files.Create(fileMetadata).Fields("id").Do()
+	file, err := d.api.Files.Create(fileMetadata).Fields("id", "webViewLink").Do()
 	if err == nil {
 		return file, nil
 	}
 	return nil, err
 }
 
-func (d *googleDriveApi) AddTextFileToFOlder(fileName string, fileText string, parentFolderId string) (*drive.File, error) {
+func (d *googleDriveApi) AddTextFileToFolder(fileName string, fileText string, parentFolderId string) (*drive.File, error) {
 	fileMetadata := &drive.File{
 		Name:     fileName,
 		MimeType: "application/vnd.google-apps.document", // google document type

@@ -24,6 +24,7 @@ type IProjetRepository interface {
 	AssignDriveFolder(models.DriveProject)
 	GetProjectCloudFolderId(projId string) string
 	GetStudentCurrentProjectTheme(studId string) string
+	GetProjectFolderLink(projId string) string
 }
 
 // transfers data in domain entities
@@ -54,4 +55,5 @@ type ITaskRepository interface {
 	CreateTask(entities.Task) entities.Task
 	AssignDriveTask(models.DriveTask)
 	GetProjectTasks(projId string) []entities.Task
+	GetProjectTasksWithCloud(projId string) []models.DriveTask
 }

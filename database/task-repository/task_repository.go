@@ -25,9 +25,12 @@ func (r *TaskRepository) CreateTask(task entities.Task) entities.Task {
 }
 
 func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) {
+	dbCloudFolder := models.CloudFolder{}
+	dbCloudFolder.MapUseCaseModelToThis(task.DriveFolder)
+	r.dbContext.DB.Create(&dbCloudFolder)
 	r.dbContext.DB.Model(&models.Task{}).Select("folder_id", "task_file_id").Where("id = ?", task.Task.Id).Updates(
 		models.Task{
-			FolderId:   task.FolderId,
+			FolderId:   task.DriveFolder.Id,
 			TaskFileId: task.TaskFileId,
 		})
 }
@@ -38,6 +41,26 @@ func (r *TaskRepository) GetProjectTasks(projId string) []entities.Task {
 	result := []entities.Task{}
 	for _, t := range tasks {
 		result = append(result, t.MapToEntity())
+	}
+	return result
+}
+
+func (r *TaskRepository) GetProjectTasksWithCloud(projId string) []usecaseModels.DriveTask {
+	joinedResults := []struct {
+		models.Task
+		models.CloudFolder
+	}{}
+
+	r.dbContext.DB.Model(models.Task{}).Select("*").Joins("left join cloud_folder on cloud_folder.id=task.folder_id").Where("project_id = ?", projId).Find(&joinedResults)
+
+	result := []usecaseModels.DriveTask{}
+	for _, t := range joinedResults {
+		result = append(result,
+			usecaseModels.DriveTask{
+				Task:        t.Task.MapToEntity(),
+				DriveFolder: t.CloudFolder.MapToUseCaseModel(),
+			},
+		)
 	}
 	return result
 }
