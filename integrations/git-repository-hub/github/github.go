@@ -2,6 +2,7 @@ package github
 
 import (
 	"log"
+	"sort"
 	"time"
 
 	"mvp-2-spms/services/models"
@@ -46,6 +47,12 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 		cm := mapCommitToEntity(*ghcommit)
 		commits = append(commits, cm)
 	}
+
+	// sorting by publication date
+	sort.Slice(commits, func(i, j int) bool {
+		return commits[i].Date.Unix() > commits[j].Date.Unix()
+	})
+
 	return commits
 }
 
@@ -54,6 +61,6 @@ func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {
 		SHA:         *commit.SHA,
 		Description: *commit.Commit.Message,
 		Date:        commit.Commit.Committer.Date.Time,
-		Author:      *commit.Commit.Committer.Name,
+		Author:      *commit.Commit.Author.Name,
 	}
 }
