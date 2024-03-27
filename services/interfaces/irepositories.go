@@ -53,6 +53,7 @@ type IMeetingRepository interface {
 type IAccountRepository interface {
 	GetAccountPlannerData(id string) models.PlannerIntegration  // returns planner integration for later usage of api key???
 	GetAccountDriveData(id string) models.CloudDriveIntegration // returns drive integration for later usage of api key???
+	GetAccountRepoHubData(id string) models.BaseIntegration     // returns repo hub integration for later usage of api key???
 }
 
 type ITaskRepository interface {

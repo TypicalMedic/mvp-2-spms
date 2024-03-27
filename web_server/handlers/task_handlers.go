@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"mvp-2-spms/internal"
+	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-tasks/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
@@ -12,7 +14,9 @@ import (
 )
 
 type TaskHandler struct {
-	taskInteractor interfaces.ITaskInteractor
+	taskInteractor    interfaces.ITaskInteractor
+	accountInteractor interfaces.IAccountInteractor
+	cloudDrives       internal.CloudDrives
 }
 
 func InitTaskHandler(taskInteractor interfaces.ITaskInteractor) TaskHandler {
@@ -42,6 +46,10 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	integInput := ainputdata.GetDriveIntegration{
+		AccountId: cred.ProfessorId,
+	}
+	driveInfo := h.accountInteractor.GetDriveIntegration(integInput)
 	input := inputdata.AddTask{
 		ProfessorId: cred.ProfessorId,
 		Name:        reqB.Name,
@@ -50,7 +58,9 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 		ProjectId:   uint(projectId),
 	}
 
-	task_id := h.taskInteractor.AddTask(input)
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
+	task_id := h.taskInteractor.AddTask(input, *h.cloudDrives[internal.CloudDriveName(driveInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task_id)

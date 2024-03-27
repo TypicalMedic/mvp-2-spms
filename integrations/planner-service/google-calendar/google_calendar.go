@@ -11,8 +11,8 @@ type GoogleCalendar struct {
 	api googleCalendarApi
 }
 
-func InitGoogleCalendar(api googleCalendarApi) GoogleCalendar {
-	return GoogleCalendar{api: api}
+func InitGoogleCalendar(api googleCalendarApi) *GoogleCalendar {
+	return &GoogleCalendar{api: api}
 }
 
 func (c *GoogleCalendar) AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) models.PlannerMeeting {
@@ -36,3 +36,7 @@ func (c *GoogleCalendar) FindMeetingById(meetId string, plannerInfo models.Plann
 	event, _ := c.api.GetEventById(meetId, plannerInfo.PlannerData.Id)
 	return event.Id != ""
 }
+
+func (g *GoogleCalendar) GetAuthLink(redirectURI string) string
+
+func (g *GoogleCalendar) Authentificate(token string)

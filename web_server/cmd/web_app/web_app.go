@@ -13,6 +13,7 @@ import (
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
 	"mvp-2-spms/internal"
+	serviceinterfaces "mvp-2-spms/services/interfaces"
 	managemeetings "mvp-2-spms/services/manage-meetings"
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
@@ -22,7 +23,7 @@ import (
 	"net/http"
 
 	"google.golang.org/api/calendar/v3"
-	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/drive/v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -55,14 +56,26 @@ func main() {
 	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
-		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
+		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, repos.Universities, repos.Accounts),
 		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
-		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts, repos.Students, repos.Projects),
-		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
+		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, repos.Accounts, repos.Students, repos.Projects),
+		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, repos.Tasks),
 		UnversityManager: manageuniversities.InitUniversityInteractor(repos.Universities),
 	}
+
+	integrations := internal.Integrations{
+		GitRepositoryHubs: map[internal.GetRepoHubName]*serviceinterfaces.IGitRepositoryHub{},
+		CloudDrives:       map[internal.CloudDriveName]*serviceinterfaces.ICloudDrive{},
+		Planners:          map[internal.PlannerName]*serviceinterfaces.IPlannerService{},
+	}
+
+	*integrations.Planners[internal.GoogleCalendar] = gCalendar
+	*integrations.CloudDrives[internal.GoogleDrive] = gDrive
+	*integrations.GitRepositoryHubs[internal.GitHub] = repoHub
+
 	app := internal.StudentsProjectsManagementApp{
-		Intercators: interactors,
+		Intercators:  interactors,
+		Integrations: integrations,
 	}
 	router := routes.SetupRouter(&app)
 	http.ListenAndServe(":8080", router.Router())

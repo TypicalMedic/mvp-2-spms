@@ -55,6 +55,7 @@ func (r *Router) SetupRoutes() {
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
 	r.setupUniversityRoutes()
+	r.setupAuthentificationRoutes()
 }
 
 func (r *Router) setupProjectRoutes() {
@@ -103,6 +104,25 @@ func (r *Router) setupUniversityRoutes() {
 			r.Route("/edprogrammes", func(r chi.Router) {
 				r.Get("/", uniH.GetAllUniEdProgrammes) // GET /universities/123/edprogrammes
 				r.Post("/add", dummyHandler)           // POST /universities/123/edprogrammes/add
+			})
+		})
+	})
+}
+
+func (r *Router) setupAuthentificationRoutes() {
+	googleCalendarH := handlers.InitGoogleCalendarHandler(r.app.Integrations.Planners)
+
+	r.router.Route("/auth", func(r chi.Router) {
+		r.Route("/integration", func(r chi.Router) {
+			r.Route("/authlink", func(r chi.Router) {
+				r.Get("/googlecalendar", googleCalendarH.GetLink) // GET /auth/integration/authlink/googlecalendar
+				r.Get("/googledrive", googleCalendarH.GetLink)    // GET /auth/integration/authlink/googledrive
+				r.Get("/github", googleCalendarH.GetLink)         // GET /auth/integration/authlink/github
+			})
+			r.Route("/access", func(r chi.Router) {
+				r.Post("/googlecalendar", googleCalendarH.Auth) // POST /auth/integration/access/googlecalendar
+				r.Post("/googledrive", googleCalendarH.Auth)    // POST /auth/integration/access/googledrive
+				r.Post("/github", googleCalendarH.Auth)         // POST /auth/integration/access/github
 			})
 		})
 	})

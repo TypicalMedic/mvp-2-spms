@@ -10,8 +10,8 @@ type GoogleDrive struct {
 	api googleDriveApi
 }
 
-func InitGoogleDrive(api googleDriveApi) GoogleDrive {
-	return GoogleDrive{api: api}
+func InitGoogleDrive(api googleDriveApi) *GoogleDrive {
+	return &GoogleDrive{api: api}
 }
 
 func (c *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo models.CloudDriveIntegration) models.DriveProject {
@@ -43,3 +43,7 @@ func (c *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string)
 		TaskFileId: file.Id,
 	}
 }
+
+func (g *GoogleDrive) GetAuthLink(redirectURI string) string
+
+func (g *GoogleDrive) Authentificate(token string)

@@ -12,19 +12,15 @@ type ProjectInteractor struct {
 	projectRepo interfaces.IProjetRepository
 	studentRepo interfaces.IStudentRepository
 	uniRepo     interfaces.IUniversityRepository
-	repoHub     interfaces.IGitRepositoryHub
-	cloudDrive  interfaces.ICloudDrive
 	accountRepo interfaces.IAccountRepository
 }
 
 func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfaces.IStudentRepository,
-	repo interfaces.IGitRepositoryHub, uniRepo interfaces.IUniversityRepository, cloudDrive interfaces.ICloudDrive, accRepo interfaces.IAccountRepository) *ProjectInteractor {
+	uniRepo interfaces.IUniversityRepository, accRepo interfaces.IAccountRepository) *ProjectInteractor {
 	return &ProjectInteractor{
 		projectRepo: projRepo,
 		studentRepo: stRepo,
-		repoHub:     repo,
 		uniRepo:     uniRepo,
-		cloudDrive:  cloudDrive,
 		accountRepo: accRepo,
 	}
 }
@@ -46,11 +42,11 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorPro
 }
 
 // returns all commits from all branches from specific time
-func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits) outputdata.GetProjectCommits {
+func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits, gitRepositoryHub interfaces.IGitRepositoryHub) outputdata.GetProjectCommits {
 	// get project repo id
 	repo := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
 	// get from repo
-	commits := p.repoHub.GetRepositoryCommitsFromTime(repo, input.From)
+	commits := gitRepositoryHub.GetRepositoryCommitsFromTime(repo, input.From)
 	output := outputdata.MapToGetProjectCommits(commits)
 	return output
 }
@@ -79,13 +75,13 @@ func (p *ProjectInteractor) GetProjectStatsById(input inputdata.GetProjectStatsB
 	return output
 }
 
-func (p *ProjectInteractor) AddProject(input inputdata.AddProject) outputdata.AddProject {
+func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) outputdata.AddProject {
 	// add to db with repository
 	proj := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
 	// getting professor drive info, should be checked for existance later
 	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
 	// add folder to cloud
-	driveProject := p.cloudDrive.AddProjectFolder(proj.Project, driveInfo)
+	driveProject := cloudDrive.AddProjectFolder(proj.Project, driveInfo)
 	// add folder id from drive
 	p.projectRepo.AssignDriveFolder(driveProject)
 	// returning id

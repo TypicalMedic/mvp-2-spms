@@ -9,25 +9,23 @@ import (
 
 type TaskInteractor struct {
 	projectRepo interfaces.IProjetRepository
-	cloudDrive  interfaces.ICloudDrive
 	taskRepo    interfaces.ITaskRepository
 }
 
-func InitTaskInteractor(projRepo interfaces.IProjetRepository, cloudDrive interfaces.ICloudDrive, taskRepo interfaces.ITaskRepository) *TaskInteractor {
+func InitTaskInteractor(projRepo interfaces.IProjetRepository, taskRepo interfaces.ITaskRepository) *TaskInteractor {
 	return &TaskInteractor{
 		projectRepo: projRepo,
-		cloudDrive:  cloudDrive,
 		taskRepo:    taskRepo,
 	}
 }
 
-func (p *TaskInteractor) AddTask(input inputdata.AddTask) outputdata.AddTask {
+func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) outputdata.AddTask {
 	// add to db
 	task := p.taskRepo.CreateTask(input.MapToTaskEntity())
 	// get project folder id
 	projFolder := p.projectRepo.GetProjectCloudFolderId(fmt.Sprint(input.ProjectId))
 	// add folder to cloud (create folder and task file)
-	driveTask := p.cloudDrive.AddTaskToDrive(task, projFolder)
+	driveTask := cloudDrive.AddTaskToDrive(task, projFolder)
 	// add folder id and file id from drive
 	p.taskRepo.AssignDriveTask(driveTask)
 	// returning id

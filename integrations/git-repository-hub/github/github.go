@@ -14,8 +14,8 @@ type Github struct {
 	api githubAPI
 }
 
-func InitGithub(api githubAPI) Github {
-	return Github{api: api}
+func InitGithub(api githubAPI) *Github {
+	return &Github{api: api}
 }
 
 func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit {
@@ -55,6 +55,10 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 
 	return commits
 }
+
+func (g *Github) GetAuthLink(redirectURI string) string
+
+func (g *Github) Authentificate(token string)
 
 func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {
 	return models.Commit{

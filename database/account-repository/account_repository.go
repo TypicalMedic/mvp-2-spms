@@ -27,3 +27,10 @@ func (r *AccountRepository) GetAccountDriveData(id string) usecasemodels.CloudDr
 	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbDrive)
 	return dbDrive.MapToUseCaseModel()
 }
+
+// can return multiple for 1 account, should consider this
+func (r *AccountRepository) GetAccountRepoHubData(id string) usecasemodels.BaseIntegration {
+	dbRHub := models.GitRepositoryIntegration{}
+	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbRHub)
+	return dbRHub.MapToUseCaseModel()
+}

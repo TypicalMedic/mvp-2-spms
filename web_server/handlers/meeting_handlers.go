@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"mvp-2-spms/services/manage-meetings/inputdata"
+	"mvp-2-spms/internal"
+	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
+	minputdata "mvp-2-spms/services/manage-meetings/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
@@ -11,6 +13,8 @@ import (
 
 type MeetingHandler struct {
 	meetingInteractor interfaces.IMeetingInteractor
+	accountInteractor interfaces.IAccountInteractor
+	planners          internal.Planners
 }
 
 func InitMeetingHandler(meetInteractor interfaces.IMeetingInteractor) MeetingHandler {
@@ -39,7 +43,11 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	input := inputdata.AddMeeting{
+	integInput := ainputdata.GetPlannerIntegration{
+		AccountId: cred.ProfessorId,
+	}
+	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
+	meetingInput := minputdata.AddMeeting{
 		ProfessorId: cred.ProfessorId,
 		Name:        reqB.Name,
 		Description: reqB.Description,
@@ -48,7 +56,9 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 		IsOnline:    reqB.IsOnline,
 	}
 
-	meeting_id := h.meetingInteractor.AddMeeting(input)
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
+	meeting_id := h.meetingInteractor.AddMeeting(meetingInput, *h.planners[internal.PlannerName(calendarInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(meeting_id)
@@ -57,11 +67,18 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Request) {
 	cred := GetCredentials(r)
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
-	input := inputdata.GetProfessorMeetings{
+	input := minputdata.GetProfessorMeetings{
 		ProfessorId: cred.ProfessorId,
 		From:        from,
 	}
-	result := h.meetingInteractor.GetProfessorMeetings(input)
+
+	integInput := ainputdata.GetPlannerIntegration{
+		AccountId: cred.ProfessorId,
+	}
+	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
+	result := h.meetingInteractor.GetProfessorMeetings(input, *h.planners[internal.PlannerName(calendarInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
