@@ -69,10 +69,11 @@ func (r *Router) setupProjectRoutes() {
 		// Subrouters:
 		r.Route("/{projectID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)
-			r.Get("/", projH.GetProject)               // GET /projects/123
-			r.Put("/", dummyHandler)                   // PUT /projects/123
-			r.Delete("/", dummyHandler)                // DELETE /projects/123
-			r.Get("/commits", projH.GetProjectCommits) // GET /projects/123/commits?from=2006-01-02T15:04:05.000Z
+			r.Get("/", projH.GetProject)                     // GET /projects/123
+			r.Get("/statistics", projH.GetProjectStatistics) // GET /projects/123/statistics
+			r.Put("/", dummyHandler)                         // PUT /projects/123
+			r.Delete("/", dummyHandler)                      // DELETE /projects/123
+			r.Get("/commits", projH.GetProjectCommits)       // GET /projects/123/commits?from=2006-01-02T15:04:05.000Z
 			r.Route("/tasks", func(r chi.Router) {
 				r.Get("/", taskH.GetAllProjectTasks) // GET /projects/123/tasks
 				r.Post("/add", taskH.AddTask)        // POST /projects/123/tasks/add

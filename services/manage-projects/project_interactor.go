@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/manage-projects/outputdata"
+	"mvp-2-spms/services/models"
 )
 
 type ProjectInteractor struct {
@@ -63,6 +64,18 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outpu
 	student := p.studentRepo.GetStudentById(project.StudentId)
 	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
 	output := outputdata.MapToGetProjectsById(project, student, edProg, cloudFolder)
+	return output
+}
+
+// returns project statistics
+func (p *ProjectInteractor) GetProjectStatsById(input inputdata.GetProjectStatsById) outputdata.GetProjectStatsById {
+	stats := models.ProjectStats{}
+	projId := fmt.Sprint(input.ProjectId)
+
+	stats.ProjectGrading = p.projectRepo.GetProjectGradingById(projId)
+	stats.MeetingInfo = p.projectRepo.GetProjectMeetingInfoById(projId)
+	stats.TasksInfo = p.projectRepo.GetProjectTaskInfoById(projId)
+	output := outputdata.MapToGetProjectStatsById(stats)
 	return output
 }
 

@@ -25,6 +25,9 @@ type IProjetRepository interface {
 	GetProjectCloudFolderId(projId string) string
 	GetStudentCurrentProject(studId string) entities.Project
 	GetProjectFolderLink(projId string) string
+	GetProjectGradingById(projId string) entities.ProjectGrading
+	GetProjectTaskInfoById(projId string) models.TasksInfo
+	GetProjectMeetingInfoById(projId string) models.MeetingInfo
 }
 
 // transfers data in domain entities

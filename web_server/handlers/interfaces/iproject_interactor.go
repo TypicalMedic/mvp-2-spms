@@ -10,4 +10,5 @@ type IProjetInteractor interface {
 	GetProjectCommits(input inputdata.GetProjectCommits) outputdata.GetProjectCommits
 	GetProjectById(input inputdata.GetProjectById) outputdata.GetProjectById
 	AddProject(input inputdata.AddProject) outputdata.AddProject
+	GetProjectStatsById(input inputdata.GetProjectStatsById) outputdata.GetProjectStatsById
 }
