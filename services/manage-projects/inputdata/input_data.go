@@ -22,6 +22,11 @@ type GetProjectById struct {
 	ProjectId   uint
 }
 
+type GetProjectStatsById struct {
+	ProfessorId uint
+	ProjectId   uint
+}
+
 type AddProject struct {
 	ProfessorId         uint
 	Theme               string

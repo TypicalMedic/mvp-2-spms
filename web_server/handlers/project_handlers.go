@@ -61,6 +61,19 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+func (h *ProjectHandler) GetProjectStatistics(w http.ResponseWriter, r *http.Request) {
+	cred := GetCredentials(r)
+	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	input := inputdata.GetProjectStatsById{
+		ProfessorId: cred.ProfessorId,
+		ProjectId:   uint(projectId),
+	}
+	result := h.projectInteractor.GetProjectStatsById(input)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
 func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 	cred := GetCredentials(r)
 

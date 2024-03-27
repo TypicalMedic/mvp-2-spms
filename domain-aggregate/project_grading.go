@@ -10,24 +10,24 @@ const (
 type ProjectGrading struct {
 	ProjectId        string
 	DefenceGrade     float32
-	supervisorReview supervisorReview
+	SupervisorReview SupervisorReview
 }
 
 // what if there're no grades yet?
 func (pg ProjectGrading) CalculateGrade() float32 {
-	return pg.supervisorReview.GetGrade()*supervisorGradeWeight + pg.DefenceGrade*defenceGradeWeight
+	return pg.SupervisorReview.GetGrade()*supervisorGradeWeight + pg.DefenceGrade*defenceGradeWeight
 }
 
-type supervisorReview struct {
+type SupervisorReview struct {
 	Id           uint
 	CreationDate time.Time
-	criterias    []Criteria
+	Criterias    []Criteria
 }
 
 // what if there're no grades yet?
-func (s *supervisorReview) GetGrade() float32 {
+func (s *SupervisorReview) GetGrade() float32 {
 	var supGrade float32 = 0
-	for _, gr := range s.criterias {
+	for _, gr := range s.Criterias {
 		supGrade += gr.Grade * gr.Weight
 	}
 	return supGrade
