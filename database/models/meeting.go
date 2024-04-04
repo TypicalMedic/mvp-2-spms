@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"strconv"
@@ -8,16 +9,16 @@ import (
 )
 
 type Meeting struct {
-	Id                   uint      `gorm:"column:id"`
-	Name                 string    `gorm:"column:name"`
-	Description          string    `gorm:"column:description"`
-	MeetingTime          time.Time `gorm:"column:meeting_time"`
-	StudentParticipantId uint      `gorm:"column:student_id"`
-	ProfessorId          uint      `gorm:"column:professor_id"`
-	ProjectId            uint      `gorm:"column:project_id"`
-	IsOnline             bool      `gorm:"column:is_online"`
-	Status               uint      `gorm:"column:status"`
-	PlannerId            string    `gorm:"column:planner_id;default:null"`
+	Id                   uint          `gorm:"column:id"`
+	Name                 string        `gorm:"column:name"`
+	Description          string        `gorm:"column:description"`
+	MeetingTime          time.Time     `gorm:"column:meeting_time"`
+	StudentParticipantId uint          `gorm:"column:student_id"`
+	ProfessorId          uint          `gorm:"column:professor_id"`
+	ProjectId            sql.NullInt64 `gorm:"column:project_id"`
+	IsOnline             bool          `gorm:"column:is_online"`
+	Status               uint          `gorm:"column:status"`
+	PlannerId            string        `gorm:"column:planner_id;default:null"`
 }
 
 func (*Meeting) TableName() string {
@@ -49,4 +50,9 @@ func (pj *Meeting) MapEntityToThis(entity entities.Meeting) {
 	pj.ProfessorId = uint(prId)
 	pj.IsOnline = entity.IsOnline
 	pj.Status = uint(entity.Status)
+	pid, _ := strconv.Atoi(entity.ProjectId)
+	if pid != 0 {
+		pj.ProjectId.Valid = true
+		pj.ProjectId.Int64 = int64(pid)
+	}
 }
