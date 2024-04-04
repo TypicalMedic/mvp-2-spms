@@ -11,3 +11,9 @@ type GetDriveIntegration struct {
 type GetRepoHubIntegration struct {
 	AccountId uint
 }
+
+type SetPlannerIntegration struct {
+	AccountId uint
+	AuthCode  string
+	Type      int
+}

@@ -11,9 +11,9 @@ type AccountInteractor struct {
 	accountRepo interfaces.IAccountRepository
 }
 
-func InitAccountInteractor(stRepo interfaces.IAccountRepository) *AccountInteractor {
+func InitAccountInteractor(accRepo interfaces.IAccountRepository) *AccountInteractor {
 	return &AccountInteractor{
-		accountRepo: stRepo,
+		accountRepo: accRepo,
 	}
 }
 
@@ -33,4 +33,17 @@ func (a *AccountInteractor) GetRepoHubIntegration(input inputdata.GetRepoHubInte
 	repoHub := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
 	output := outputdata.MapToGetRepoHubIntegration(repoHub)
 	return output
+}
+
+func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) outputdata.SetPlannerIntegration {
+	token := planner.GetToken(input.AuthCode)
+	refreshTok := token.RefreshToken
+	accessTok := token.AccessToken
+	expires := token.Expiry
+	a.accountRepo.AddAccountPlannerIntegration(fmt.Sprint(input.AccountId), refreshTok, input.Type)
+
+	return outputdata.SetPlannerIntegration{
+		AccessToken: accessTok,
+		Expiry:      expires,
+	}
 }
