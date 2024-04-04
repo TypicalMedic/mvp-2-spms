@@ -17,3 +17,9 @@ type SetPlannerIntegration struct {
 	AuthCode  string
 	Type      int
 }
+
+type SetDriveIntegration struct {
+	AccountId uint
+	AuthCode  string
+	Type      int
+}
