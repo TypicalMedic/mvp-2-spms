@@ -15,8 +15,8 @@ const HOURS_IN_DAY = 24
 const EVENT_DURATION_HOURS = 1
 
 type googleCalendarApi struct {
-	api *calendar.Service
 	googleapi.Google
+	api *calendar.Service
 }
 
 func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {

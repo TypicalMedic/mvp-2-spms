@@ -5,6 +5,7 @@ import (
 	googleapi "mvp-2-spms/integrations/google-api"
 	"strings"
 
+	"golang.org/x/oauth2"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 )
@@ -14,16 +15,24 @@ const HOURS_IN_DAY = 24
 const EVENT_DURATION_HOURS = 1
 
 type googleDriveApi struct {
+	googleapi.Google
 	api *drive.Service
 }
 
 func InitDriveApi(googleAPI googleapi.GoogleAPI) googleDriveApi {
-	api, err := drive.NewService(googleAPI.Context, option.WithHTTPClient(googleAPI.Client))
-	c := googleDriveApi{api}
-	if err != nil {
-		log.Fatalf("Unable to retrieve Drive client: %v", err)
+	d := googleDriveApi{
+		Google: googleapi.InintGoogle(googleAPI),
 	}
-	return c
+	return d
+}
+
+func (d *googleDriveApi) AuthentificateService(token oauth2.Token) {
+	d.Authentificate(token)
+	api, err := drive.NewService(d.GetContext(), option.WithHTTPClient(d.GetClient()))
+	if err != nil {
+		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+	}
+	d.api = api
 }
 
 func (d *googleDriveApi) CreateFolder(folderName string, parentFolder string) (*drive.File, error) {
