@@ -25,7 +25,7 @@ func InitPlannerIntegrationHandler(planners internal.Planners, acc interfaces.IA
 func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter, r *http.Request) {
 	returnURL := r.URL.Query().Get("redirect")
 	accountId, _ := strconv.Atoi(r.URL.Query().Get("account"))
-	redirectURI := "http://127.0.0.1:8080//auth/integration/access/googlecalendar"
+	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googlecalendar"
 	result := (h.planners[internal.GoogleCalendar]).GetAuthLink(redirectURI, accountId, returnURL)
 	http.Redirect(w, r, result, http.StatusTemporaryRedirect)
 }

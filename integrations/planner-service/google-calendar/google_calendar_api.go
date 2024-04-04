@@ -15,28 +15,18 @@ const HOURS_IN_DAY = 24
 const EVENT_DURATION_HOURS = 1
 
 type googleCalendarApi struct {
-	api    *calendar.Service
-	google googleapi.GoogleAPI
+	api *calendar.Service
+	googleapi.Google
 }
 
 func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {
-	c := googleCalendarApi{google: googleAPI}
+	c := googleCalendarApi{Google: googleapi.InintGoogle(googleAPI)}
 	return c
 }
 
-func (c *googleCalendarApi) GetAuthLink(redirectURI string, state string) string {
-	url := c.google.GetAuthLink(redirectURI, state)
-	return url
-}
-
-func (c *googleCalendarApi) GetToken(code string) oauth2.Token {
-	token := c.google.GetToken(code)
-	return token
-}
-
 func (c *googleCalendarApi) AuthentificateService(token oauth2.Token) {
-	c.google.SetupClient(token)
-	api, err := calendar.NewService(c.google.Context, option.WithHTTPClient(c.google.Client))
+	c.Authentificate(token)
+	api, err := calendar.NewService(c.GetContext(), option.WithHTTPClient(c.GetClient()))
 	if err != nil {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
