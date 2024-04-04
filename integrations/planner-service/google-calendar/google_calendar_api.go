@@ -5,6 +5,7 @@ import (
 	googleapi "mvp-2-spms/integrations/google-api"
 	"time"
 
+	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
@@ -14,16 +15,32 @@ const HOURS_IN_DAY = 24
 const EVENT_DURATION_HOURS = 1
 
 type googleCalendarApi struct {
-	api *calendar.Service
+	api    *calendar.Service
+	google googleapi.GoogleAPI
 }
 
 func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {
-	api, err := calendar.NewService(googleAPI.Context, option.WithHTTPClient(googleAPI.Client))
-	c := googleCalendarApi{api}
+	c := googleCalendarApi{google: googleAPI}
+	return c
+}
+
+func (c *googleCalendarApi) GetAuthLink(redirectURI string, state string) string {
+	url := c.google.GetAuthLink(redirectURI, state)
+	return url
+}
+
+func (c *googleCalendarApi) GetToken(code string) oauth2.Token {
+	token := c.google.GetToken(code)
+	return token
+}
+
+func (c *googleCalendarApi) AuthentificateService(token oauth2.Token) {
+	c.google.SetupClient(token)
+	api, err := calendar.NewService(c.google.Context, option.WithHTTPClient(c.google.Client))
 	if err != nil {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
-	return c
+	c.api = api
 }
 
 // startTime should be UTC+0!!!

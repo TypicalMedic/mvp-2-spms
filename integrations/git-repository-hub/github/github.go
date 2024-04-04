@@ -8,6 +8,7 @@ import (
 	"mvp-2-spms/services/models"
 
 	"github.com/google/go-github/v56/github"
+	"golang.org/x/oauth2"
 )
 
 type Github struct {
@@ -56,9 +57,11 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 	return commits
 }
 
-func (g *Github) GetAuthLink(redirectURI string) string
+func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) string { return "" }
 
-func (g *Github) Authentificate(token string)
+func (g *Github) Authentificate(token oauth2.Token) {}
+
+func (g *Github) GetToken(code string) oauth2.Token { return oauth2.Token{} }
 
 func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {
 	return models.Commit{

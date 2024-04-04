@@ -4,6 +4,8 @@ import (
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/models"
+
+	"golang.org/x/oauth2"
 )
 
 type GoogleDrive struct {
@@ -44,6 +46,10 @@ func (c *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string)
 	}
 }
 
-func (g *GoogleDrive) GetAuthLink(redirectURI string) string
+func (g *GoogleDrive) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+	return ""
+}
 
-func (g *GoogleDrive) Authentificate(token string)
+func (g *GoogleDrive) Authentificate(token oauth2.Token) {}
+
+func (g *GoogleDrive) GetToken(code string) oauth2.Token { return oauth2.Token{} }

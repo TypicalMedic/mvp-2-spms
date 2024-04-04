@@ -1,10 +1,14 @@
 package googlecalendar
 
 import (
+	"encoding/base64"
+	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/models"
 	"strings"
 	"time"
+
+	"golang.org/x/oauth2"
 )
 
 type GoogleCalendar struct {
@@ -37,6 +41,19 @@ func (c *GoogleCalendar) FindMeetingById(meetId string, plannerInfo models.Plann
 	return event.Id != ""
 }
 
-func (g *GoogleCalendar) GetAuthLink(redirectURI string) string
+func (c *GoogleCalendar) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// encode as JSON!
+	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
+	url := c.api.GetAuthLink(redirectURI, statestr)
+	return url
+}
 
-func (g *GoogleCalendar) Authentificate(token string)
+func (c *GoogleCalendar) GetToken(code string) oauth2.Token {
+	token := c.api.GetToken(code)
+	return token
+}
+
+func (c *GoogleCalendar) Authentificate(token oauth2.Token) {
+	c.api.AuthentificateService(token)
+}
