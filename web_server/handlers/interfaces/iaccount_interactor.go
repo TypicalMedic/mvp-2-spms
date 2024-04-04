@@ -11,4 +11,5 @@ type IAccountInteractor interface {
 	GetDriveIntegration(input inputdata.GetDriveIntegration) outputdata.GetDriveIntegration
 	GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) outputdata.GetRepoHubIntegration
 	SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) outputdata.SetPlannerIntegration
+	SetDriveIntegration(input inputdata.SetDriveIntegration, planner interfaces.ICloudDrive) outputdata.SetDriveIntegration
 }

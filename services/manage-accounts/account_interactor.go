@@ -47,3 +47,16 @@ func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerInte
 		Expiry:      expires,
 	}
 }
+
+func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegration, drive interfaces.ICloudDrive) outputdata.SetDriveIntegration {
+	token := drive.GetToken(input.AuthCode)
+	refreshTok := token.RefreshToken
+	accessTok := token.AccessToken
+	expires := token.Expiry
+	a.accountRepo.AddAccountDriveIntegration(fmt.Sprint(input.AccountId), refreshTok, input.Type)
+
+	return outputdata.SetDriveIntegration{
+		AccessToken: accessTok,
+		Expiry:      expires,
+	}
+}
