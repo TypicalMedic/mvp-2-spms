@@ -60,7 +60,7 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	task_id := h.taskInteractor.AddTask(input, *h.cloudDrives[internal.CloudDriveName(driveInfo.Type)])
+	task_id := h.taskInteractor.AddTask(input, h.cloudDrives[internal.CloudDriveName(driveInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task_id)
