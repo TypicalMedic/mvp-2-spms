@@ -39,6 +39,7 @@ func (p *StudentInteractor) GetStudents(input inputdata.GetStudents) outputdata.
 			ProjectTheme:         project.Theme,
 			Student:              student,
 			EducationalProgramme: edProg.Name,
+			PtojectId:            project.Id,
 		})
 	}
 	output := outputdata.MapToGetStudents(stEntities)

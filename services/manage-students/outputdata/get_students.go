@@ -13,6 +13,7 @@ func MapToGetStudents(studentEntities []GetStudentsEntities) GetStudents {
 	outputStudents := []getStudentsData{}
 	for _, studenttEntitiy := range studentEntities {
 		id, _ := strconv.Atoi(studenttEntitiy.Student.Id)
+		pid, _ := strconv.Atoi(studenttEntitiy.PtojectId)
 		outputStudents = append(outputStudents,
 			getStudentsData{
 				Id:                   id,
@@ -22,6 +23,7 @@ func MapToGetStudents(studentEntities []GetStudentsEntities) GetStudents {
 				EducationalProgramme: studenttEntitiy.EducationalProgramme,
 				Cource:               int(studenttEntitiy.Student.Cource),
 				PtojectTheme:         studenttEntitiy.ProjectTheme,
+				PtojectId:            pid,
 			})
 	}
 	return GetStudents{
@@ -30,6 +32,7 @@ func MapToGetStudents(studentEntities []GetStudentsEntities) GetStudents {
 }
 
 type GetStudentsEntities struct {
+	PtojectId            string
 	ProjectTheme         string
 	Student              entities.Student
 	EducationalProgramme string
@@ -43,4 +46,5 @@ type getStudentsData struct {
 	EducationalProgramme string `json:"education_programme"`
 	Cource               int    `json:"cource"`
 	PtojectTheme         string `json:"project_theme"`
+	PtojectId            int    `json:"project_id"`
 }
