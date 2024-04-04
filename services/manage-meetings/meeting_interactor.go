@@ -6,6 +6,8 @@ import (
 	"mvp-2-spms/services/manage-meetings/inputdata"
 	"mvp-2-spms/services/manage-meetings/outputdata"
 	"slices"
+
+	"golang.org/x/oauth2"
 )
 
 type MeetingInteractor struct {
@@ -30,6 +32,12 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 	meeting := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
 	// getting calendar info, should be checked for existance later
 	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// check for access token first????????????????????????????????????????????
+	token := oauth2.Token{
+		RefreshToken: plannerInfo.ApiKey,
+	}
+	planner.Authentificate(token)
 	// add meeting to calendar
 	meeitngPlanner := planner.AddMeeting(meeting, plannerInfo)
 	// add meeting id from planner
@@ -45,6 +53,12 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	// getting calendar info, should be checked for existance later
 	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// check for access token first????????????????????????????????????????????
+	token := oauth2.Token{
+		RefreshToken: plannerInfo.ApiKey,
+	}
+	planner.Authentificate(token)
 	plannerMetingsIds := planner.GetScheduleMeetinIds(input.From, plannerInfo)
 	for _, meet := range meetings {
 		student := m.studentRepo.GetStudentById(meet.ParticipantId)
