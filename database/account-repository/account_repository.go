@@ -4,6 +4,7 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	usecasemodels "mvp-2-spms/services/models"
+	"strconv"
 )
 
 type AccountRepository struct {
@@ -33,4 +34,18 @@ func (r *AccountRepository) GetAccountRepoHubData(id string) usecasemodels.BaseI
 	dbRHub := models.GitRepositoryIntegration{}
 	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbRHub)
 	return dbRHub.MapToUseCaseModel()
+}
+
+func (r *AccountRepository) AddAccountPlannerIntegration(accId string, refreshToken string, setvice_type int) {
+	id, _ := strconv.Atoi(accId)
+	dbPlanner := models.PlannerIntegration{
+		AccountId: uint(id),
+		ApiKey:    refreshToken,
+		Type:      setvice_type,
+	}
+	r.dbContext.DB.Create(&dbPlanner)
+}
+func (r *AccountRepository) AddAccountDriveIntegration(accId string, refreshToken string, setvice_type int) {
+}
+func (r *AccountRepository) AddAccountRepoHubIntegration(accId string, refreshToken string, setvice_type int) {
 }
