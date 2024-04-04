@@ -8,6 +8,7 @@ import (
 	studentrepository "mvp-2-spms/database/student-repository"
 	taskrepository "mvp-2-spms/database/task-repository"
 	unirepository "mvp-2-spms/database/university-repository"
+	googleDrive "mvp-2-spms/integrations/cloud-drive/google-drive"
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
 	"mvp-2-spms/internal"
@@ -21,6 +22,7 @@ import (
 	"net/http"
 
 	"google.golang.org/api/calendar/v3"
+	"google.golang.org/api/drive/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -49,8 +51,8 @@ func main() {
 
 	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(calendar.CalendarScope))
 	gCalendar := googleCalendar.InitGoogleCalendar(gCalendarApi)
-	// gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(scopes...))
-	// gDrive := googleDrive.InitGoogleDrive(gDriveApi)
+	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(drive.DriveScope))
+	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
 		AccountManager:   manageaccounts.InitAccountInteractor(repos.Accounts),
@@ -68,7 +70,7 @@ func main() {
 	}
 
 	integrations.Planners[internal.GoogleCalendar] = gCalendar
-	// *integrations.CloudDrives[internal.GoogleDrive] = gDrive
+	integrations.CloudDrives[internal.GoogleDrive] = gDrive
 	// *integrations.GitRepositoryHubs[internal.GitHub] = repoHub
 
 	app := internal.StudentsProjectsManagementApp{
