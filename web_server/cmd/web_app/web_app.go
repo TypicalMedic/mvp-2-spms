@@ -59,7 +59,7 @@ func main() {
 		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, repos.Universities, repos.Accounts),
 		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
 		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, repos.Accounts, repos.Students, repos.Projects),
-		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, repos.Tasks),
+		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, repos.Tasks, repos.Accounts),
 		UnversityManager: manageuniversities.InitUniversityInteractor(repos.Universities),
 	}
 

@@ -59,8 +59,8 @@ func (r *Router) SetupRoutes() {
 }
 
 func (r *Router) setupProjectRoutes() {
-	projH := handlers.InitProjectHandler(r.app.Intercators.ProjectManager)
-	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager)
+	projH := handlers.InitProjectHandler(r.app.Intercators.ProjectManager, r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
+	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager, r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/projects", func(r chi.Router) {

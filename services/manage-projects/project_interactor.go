@@ -6,6 +6,8 @@ import (
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/manage-projects/outputdata"
 	"mvp-2-spms/services/models"
+
+	"golang.org/x/oauth2"
 )
 
 type ProjectInteractor struct {
@@ -80,6 +82,14 @@ func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive in
 	proj := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
 	// getting professor drive info, should be checked for existance later
 	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// check for access token first????????????????????????????????????????????
+	token := oauth2.Token{
+		RefreshToken: driveInfo.ApiKey,
+	}
+	cloudDrive.Authentificate(token)
+
 	// add folder to cloud
 	driveProject := cloudDrive.AddProjectFolder(proj.Project, driveInfo)
 	// add folder id from drive

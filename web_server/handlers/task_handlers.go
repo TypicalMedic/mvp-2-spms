@@ -19,9 +19,11 @@ type TaskHandler struct {
 	cloudDrives       internal.CloudDrives
 }
 
-func InitTaskHandler(taskInteractor interfaces.ITaskInteractor) TaskHandler {
+func InitTaskHandler(taskInteractor interfaces.ITaskInteractor, acc interfaces.IAccountInteractor, cd internal.CloudDrives) TaskHandler {
 	return TaskHandler{
-		taskInteractor: taskInteractor,
+		taskInteractor:    taskInteractor,
+		accountInteractor: acc,
+		cloudDrives:       cd,
 	}
 }
 
