@@ -110,26 +110,29 @@ func (r *Router) setupUniversityRoutes() {
 }
 
 func (r *Router) setupAuthentificationRoutes() {
-	googleCalendarH := handlers.InitGoogleCalendarHandler(r.app.Integrations.Planners)
+	googleCalendarH := handlers.InitPlannerIntegrationHandler(r.app.Integrations.Planners, r.app.Intercators.AccountManager)
+	// googleDriveH := handlers.InitGoogleDriveHandler(r.app.Integrations.CloudDrives)
+	// githubH := handlers.InitGitHubHandler(r.app.Integrations.GitRepositoryHubs)
 
 	r.router.Route("/auth", func(r chi.Router) {
 		r.Route("/integration", func(r chi.Router) {
 			r.Route("/authlink", func(r chi.Router) {
-				r.Get("/googlecalendar", googleCalendarH.GetLink) // GET /auth/integration/authlink/googlecalendar
-				r.Get("/googledrive", googleCalendarH.GetLink)    // GET /auth/integration/authlink/googledrive
-				r.Get("/github", googleCalendarH.GetLink)         // GET /auth/integration/authlink/github
+				r.Get("/googlecalendar", googleCalendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar
+				r.Get("/googledrive", googleCalendarH.GetGoogleCalendarLink)    // GET /auth/integration/authlink/googledrive
+				r.Get("/github", googleCalendarH.GetGoogleCalendarLink)         // GET /auth/integration/authlink/github
 			})
 			r.Route("/access", func(r chi.Router) {
-				r.Post("/googlecalendar", googleCalendarH.Auth) // POST /auth/integration/access/googlecalendar
-				r.Post("/googledrive", googleCalendarH.Auth)    // POST /auth/integration/access/googledrive
-				r.Post("/github", googleCalendarH.Auth)         // POST /auth/integration/access/github
+				r.Get("/", googleCalendarH.OAuthCallbackGoogleCalendar)               // POST /auth/integration/access
+				r.Get("/googlecalendar", googleCalendarH.OAuthCallbackGoogleCalendar) // POST /auth/integration/access/googlecalendar
+				r.Get("/googledrive", googleCalendarH.OAuthCallbackGoogleCalendar)    // POST /auth/integration/access/googledrive
+				r.Get("/github", googleCalendarH.OAuthCallbackGoogleCalendar)         // POST /auth/integration/access/github
 			})
 		})
 	})
 }
 
 func (r *Router) setupMeetingRoutes() {
-	meetH := handlers.InitMeetingHandler(r.app.Intercators.MeetingManager)
+	meetH := handlers.InitMeetingHandler(r.app.Intercators.MeetingManager, r.app.Intercators.AccountManager, r.app.Integrations.Planners)
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
 	r.router.Route("/meetings", func(r chi.Router) {
