@@ -17,9 +17,11 @@ type MeetingHandler struct {
 	planners          internal.Planners
 }
 
-func InitMeetingHandler(meetInteractor interfaces.IMeetingInteractor) MeetingHandler {
+func InitMeetingHandler(meetInteractor interfaces.IMeetingInteractor, acc interfaces.IAccountInteractor, pl internal.Planners) MeetingHandler {
 	return MeetingHandler{
 		meetingInteractor: meetInteractor,
+		accountInteractor: acc,
+		planners:          pl,
 	}
 }
 
@@ -54,11 +56,12 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 		MeetingTime: reqB.MeetingTime,
 		StudentId:   reqB.StudentId,
 		IsOnline:    reqB.IsOnline,
+		ProjectId:   uint(reqB.ProjectId),
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	meeting_id := h.meetingInteractor.AddMeeting(meetingInput, *h.planners[internal.PlannerName(calendarInfo.Type)])
+	meeting_id := h.meetingInteractor.AddMeeting(meetingInput, h.planners[internal.PlannerName(calendarInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(meeting_id)
@@ -78,7 +81,7 @@ func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Req
 	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	result := h.meetingInteractor.GetProfessorMeetings(input, *h.planners[internal.PlannerName(calendarInfo.Type)])
+	result := h.meetingInteractor.GetProfessorMeetings(input, h.planners[internal.PlannerName(calendarInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)

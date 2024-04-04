@@ -27,9 +27,9 @@ const (
 	YandexCalendar
 )
 
-type GitRepositoryHubs map[GetRepoHubName](*mngInterfaces.IGitRepositoryHub)
-type CloudDrives map[CloudDriveName](*mngInterfaces.ICloudDrive)
-type Planners map[PlannerName](*mngInterfaces.IPlannerService)
+type GitRepositoryHubs map[GetRepoHubName](mngInterfaces.IGitRepositoryHub)
+type CloudDrives map[CloudDriveName](mngInterfaces.ICloudDrive)
+type Planners map[PlannerName](mngInterfaces.IPlannerService)
 
 type StudentsProjectsManagementApp struct {
 	Intercators  Intercators
@@ -38,6 +38,7 @@ type StudentsProjectsManagementApp struct {
 }
 
 type Intercators struct {
+	AccountManager   hInterfaces.IAccountInteractor
 	ProjectManager   hInterfaces.IProjetInteractor
 	StudentManager   hInterfaces.IStudentInteractor
 	MeetingManager   hInterfaces.IMeetingInteractor

@@ -8,12 +8,10 @@ import (
 	studentrepository "mvp-2-spms/database/student-repository"
 	taskrepository "mvp-2-spms/database/task-repository"
 	unirepository "mvp-2-spms/database/university-repository"
-	googleDrive "mvp-2-spms/integrations/cloud-drive/google-drive"
-	"mvp-2-spms/integrations/git-repository-hub/github"
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
 	"mvp-2-spms/internal"
-	serviceinterfaces "mvp-2-spms/services/interfaces"
+	manageaccounts "mvp-2-spms/services/manage-accounts"
 	managemeetings "mvp-2-spms/services/manage-meetings"
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
@@ -23,7 +21,6 @@ import (
 	"net/http"
 
 	"google.golang.org/api/calendar/v3"
-	"google.golang.org/api/drive/v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -46,16 +43,17 @@ func main() {
 		Tasks:        taskrepository.InitTaskRepository(*db),
 	}
 
-	repoHub := github.InitGithub(github.InitGithubAPI())
+	// repoHub := github.InitGithub(github.InitGithubAPI())
 
-	scopes := []string{calendar.CalendarScope, drive.DriveScope}
+	// scopes := []string{calendar.CalendarScope, drive.DriveScope}
 
-	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(scopes...))
+	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(calendar.CalendarScope))
 	gCalendar := googleCalendar.InitGoogleCalendar(gCalendarApi)
-	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(scopes...))
-	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
+	// gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(scopes...))
+	// gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
+		AccountManager:   manageaccounts.InitAccountInteractor(repos.Accounts),
 		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, repos.Universities, repos.Accounts),
 		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
 		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, repos.Accounts, repos.Students, repos.Projects),
@@ -64,14 +62,14 @@ func main() {
 	}
 
 	integrations := internal.Integrations{
-		GitRepositoryHubs: map[internal.GetRepoHubName]*serviceinterfaces.IGitRepositoryHub{},
-		CloudDrives:       map[internal.CloudDriveName]*serviceinterfaces.ICloudDrive{},
-		Planners:          map[internal.PlannerName]*serviceinterfaces.IPlannerService{},
+		GitRepositoryHubs: make(internal.GitRepositoryHubs),
+		CloudDrives:       make(internal.CloudDrives),
+		Planners:          make(internal.Planners),
 	}
 
-	*integrations.Planners[internal.GoogleCalendar] = gCalendar
-	*integrations.CloudDrives[internal.GoogleDrive] = gDrive
-	*integrations.GitRepositoryHubs[internal.GitHub] = repoHub
+	integrations.Planners[internal.GoogleCalendar] = gCalendar
+	// *integrations.CloudDrives[internal.GoogleDrive] = gDrive
+	// *integrations.GitRepositoryHubs[internal.GitHub] = repoHub
 
 	app := internal.StudentsProjectsManagementApp{
 		Intercators:  interactors,
