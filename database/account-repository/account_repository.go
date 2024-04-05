@@ -4,7 +4,6 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	usecasemodels "mvp-2-spms/services/models"
-	"strconv"
 )
 
 type AccountRepository struct {
@@ -36,30 +35,28 @@ func (r *AccountRepository) GetAccountRepoHubData(id string) usecasemodels.BaseI
 	return dbRHub.MapToUseCaseModel()
 }
 
-func (r *AccountRepository) AddAccountPlannerIntegration(accId string, refreshToken string, setvice_type int) {
-	id, _ := strconv.Atoi(accId)
-	dbPlanner := models.PlannerIntegration{
-		AccountId: uint(id),
-		ApiKey:    refreshToken,
-		Type:      setvice_type,
-	}
+func (r *AccountRepository) AddAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) {
+	dbPlanner := models.PlannerIntegration{}
+	dbPlanner.MapUseCaseModelToThis(integr)
 	r.dbContext.DB.Create(&dbPlanner)
 }
-func (r *AccountRepository) AddAccountDriveIntegration(accId string, refreshToken string, setvice_type int) {
-	id, _ := strconv.Atoi(accId)
-	dbDrive := models.DriveIntegration{
-		AccountId: uint(id),
-		ApiKey:    refreshToken,
-		Type:      setvice_type,
-	}
+func (r *AccountRepository) AddAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) {
+	dbDrive := models.DriveIntegration{}
+	dbDrive.MapUseCaseModelToThis(integr)
 	r.dbContext.DB.Create(&dbDrive)
 }
-func (r *AccountRepository) AddAccountRepoHubIntegration(accId string, refreshToken string, setvice_type int) {
-	id, _ := strconv.Atoi(accId)
-	dbRepoHub := models.GitRepositoryIntegration{
-		AccountId: uint(id),
-		ApiKey:    refreshToken,
-		Type:      setvice_type,
-	}
+func (r *AccountRepository) AddAccountRepoHubIntegration(integr usecasemodels.BaseIntegration) {
+	dbRepoHub := models.GitRepositoryIntegration{}
+	dbRepoHub.MapUseCaseModelToThis(integr)
 	r.dbContext.DB.Create(&dbRepoHub)
+}
+
+func (r *AccountRepository) UpdateAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) {
+	r.dbContext.DB.Model(&models.PlannerIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+}
+func (r *AccountRepository) UpdateAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) {
+	r.dbContext.DB.Model(&models.DriveIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+}
+func (r *AccountRepository) UpdateAccountRepoHubIntegration(integr usecasemodels.BaseIntegration) {
+	r.dbContext.DB.Model(&models.GitRepositoryIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
 }

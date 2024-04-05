@@ -55,9 +55,13 @@ type IAccountRepository interface {
 	GetAccountDriveData(id string) models.CloudDriveIntegration // returns drive integration for later usage of api key???
 	GetAccountRepoHubData(id string) models.BaseIntegration     // returns repo hub integration for later usage of api key???
 
-	AddAccountPlannerIntegration(accId string, refreshToken string, setvice_type int)
-	AddAccountDriveIntegration(accId string, refreshToken string, setvice_type int)
-	AddAccountRepoHubIntegration(accId string, refreshToken string, setvice_type int)
+	AddAccountPlannerIntegration(models.PlannerIntegration)
+	AddAccountDriveIntegration(models.CloudDriveIntegration)
+	AddAccountRepoHubIntegration(models.BaseIntegration)
+
+	UpdateAccountPlannerIntegration(models.PlannerIntegration)
+	UpdateAccountDriveIntegration(models.CloudDriveIntegration)
+	UpdateAccountRepoHubIntegration(models.BaseIntegration)
 }
 
 type ITaskRepository interface {

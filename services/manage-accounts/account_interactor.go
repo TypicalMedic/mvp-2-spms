@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-accounts/outputdata"
+	"mvp-2-spms/services/models"
 )
 
 type AccountInteractor struct {
@@ -40,7 +41,16 @@ func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerInte
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
-	a.accountRepo.AddAccountPlannerIntegration(fmt.Sprint(input.AccountId), refreshTok, input.Type)
+
+	integr := models.PlannerIntegration{
+		BaseIntegration: models.BaseIntegration{
+			AccountId: fmt.Sprint(input.AccountId),
+			ApiKey:    refreshTok,
+			Type:      input.Type,
+		},
+		PlannerData: models.PlannerData{},
+	}
+	a.accountRepo.AddAccountPlannerIntegration(integr)
 
 	return outputdata.SetPlannerIntegration{
 		AccessToken: accessTok,
@@ -53,7 +63,16 @@ func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegrat
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
-	a.accountRepo.AddAccountDriveIntegration(fmt.Sprint(input.AccountId), refreshTok, input.Type)
+
+	integr := models.CloudDriveIntegration{
+		BaseIntegration: models.BaseIntegration{
+			AccountId: fmt.Sprint(input.AccountId),
+			ApiKey:    refreshTok,
+			Type:      input.Type,
+		},
+		DriveData: models.DriveData{},
+	}
+	a.accountRepo.AddAccountDriveIntegration(integr)
 
 	return outputdata.SetDriveIntegration{
 		AccessToken: accessTok,
@@ -66,7 +85,12 @@ func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubInte
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
-	a.accountRepo.AddAccountRepoHubIntegration(fmt.Sprint(input.AccountId), refreshTok, input.Type)
+	integr := models.BaseIntegration{
+		AccountId: fmt.Sprint(input.AccountId),
+		ApiKey:    refreshTok,
+		Type:      input.Type,
+	}
+	a.accountRepo.AddAccountRepoHubIntegration(integr)
 
 	return outputdata.SetRepoHubIntegration{
 		AccessToken: accessTok,

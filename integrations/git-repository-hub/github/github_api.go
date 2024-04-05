@@ -37,17 +37,24 @@ func (g *githubAPI) GetAuthLink(redirectURI string, state string) string {
 	return authURL
 }
 
-func (g *githubAPI) GetToken(authCode string) oauth2.Token {
+func (g *githubAPI) GetToken(authCode string) *oauth2.Token {
 	tok, err := g.config.Exchange(context.TODO(), authCode)
 	if err != nil {
 		log.Fatalf("Unable to retrieve token from web: %v", err)
 	}
-	return *tok
+	return tok
 }
 
-func (g *githubAPI) SetupClient(token oauth2.Token) {
-	client := g.config.Client(context.Background(), &token)
+func (g *githubAPI) SetupClient(token *oauth2.Token) {
+	tokenSource := g.config.TokenSource(context.Background(), token)
+	newToken, err := tokenSource.Token()
+	if err != nil {
+		log.Fatalf("Unable to retrieve token: %v", err)
+	}
+	client := oauth2.NewClient(context.Background(), tokenSource)
 	g.api = github.NewClient(client)
+
+	*token = *newToken
 }
 
 func (g *githubAPI) GetRepoBranchCommitsFromTime(owner, repoName string, fromTime time.Time, branch string) ([]*github.RepositoryCommit, error) {

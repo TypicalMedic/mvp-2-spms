@@ -47,6 +47,20 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorPro
 func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits, gitRepositoryHub interfaces.IGitRepositoryHub) outputdata.GetProjectCommits {
 	// get project repo id
 	repo := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
+
+	// getting professor repo hub info, should be checked for existance later
+	repohubInfo := p.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.ProfessorId))
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// check for access token first????????????????????????????????????????????
+	token := &oauth2.Token{
+		RefreshToken: repohubInfo.ApiKey,
+	}
+	gitRepositoryHub.Authentificate(token)
+	// update token
+	repohubInfo.ApiKey = token.RefreshToken
+	// save new token
+	p.accountRepo.UpdateAccountRepoHubIntegration(repohubInfo)
 	// get from repo
 	commits := gitRepositoryHub.GetRepositoryCommitsFromTime(repo, input.From)
 	output := outputdata.MapToGetProjectCommits(commits)
@@ -85,7 +99,7 @@ func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive in
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
-	token := oauth2.Token{
+	token := &oauth2.Token{
 		RefreshToken: driveInfo.ApiKey,
 	}
 	cloudDrive.Authentificate(token)
