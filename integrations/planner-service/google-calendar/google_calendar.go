@@ -49,11 +49,11 @@ func (c *GoogleCalendar) GetAuthLink(redirectURI string, accountId int, returnUR
 	return url
 }
 
-func (c *GoogleCalendar) GetToken(code string) oauth2.Token {
+func (c *GoogleCalendar) GetToken(code string) *oauth2.Token {
 	token := c.api.GetToken(code)
 	return token
 }
 
-func (c *GoogleCalendar) Authentificate(token oauth2.Token) {
+func (c *GoogleCalendar) Authentificate(token *oauth2.Token) {
 	c.api.AuthentificateService(token)
 }

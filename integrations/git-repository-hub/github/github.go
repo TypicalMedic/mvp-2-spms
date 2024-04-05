@@ -67,11 +67,11 @@ func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string
 	return url
 }
 
-func (g *Github) Authentificate(token oauth2.Token) {
+func (g *Github) Authentificate(token *oauth2.Token) {
 	g.api.SetupClient(token)
 }
 
-func (g *Github) GetToken(code string) oauth2.Token {
+func (g *Github) GetToken(code string) *oauth2.Token {
 	token := g.api.GetToken(code)
 	return token
 }

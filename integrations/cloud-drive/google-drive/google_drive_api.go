@@ -26,7 +26,7 @@ func InitDriveApi(googleAPI googleapi.GoogleAPI) googleDriveApi {
 	return d
 }
 
-func (d *googleDriveApi) AuthentificateService(token oauth2.Token) {
+func (d *googleDriveApi) AuthentificateService(token *oauth2.Token) {
 	d.Authentificate(token)
 	api, err := drive.NewService(d.GetContext(), option.WithHTTPClient(d.GetClient()))
 	if err != nil {

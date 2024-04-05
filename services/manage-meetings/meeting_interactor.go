@@ -34,7 +34,7 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
-	token := oauth2.Token{
+	token := &oauth2.Token{
 		RefreshToken: plannerInfo.ApiKey,
 	}
 	planner.Authentificate(token)
@@ -55,7 +55,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
-	token := oauth2.Token{
+	token := &oauth2.Token{
 		RefreshToken: plannerInfo.ApiKey,
 	}
 	planner.Authentificate(token)

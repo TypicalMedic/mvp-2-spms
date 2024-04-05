@@ -38,14 +38,14 @@ func (g *GoogleAPI) GetAuthLink(redirectURI string, state string) string {
 	return authURL
 }
 
-func (g *GoogleAPI) GetToken(authCode string) oauth2.Token {
+func (g *GoogleAPI) GetToken(authCode string) *oauth2.Token {
 	tok, err := g.config.Exchange(context.TODO(), authCode)
 	if err != nil {
 		log.Fatalf("Unable to retrieve token from web: %v", err)
 	}
-	return *tok
+	return tok
 }
 
-func (g *GoogleAPI) SetupClient(token oauth2.Token) {
-	g.Client = g.config.Client(context.Background(), &token)
+func (g *GoogleAPI) SetupClient(token *oauth2.Token) {
+	g.Client = g.config.Client(context.Background(), token)
 }

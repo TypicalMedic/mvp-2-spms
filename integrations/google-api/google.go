@@ -22,7 +22,7 @@ func (g *Google) GetAuthLink(redirectURI string, state string) string {
 	return url
 }
 
-func (g *Google) GetToken(code string) oauth2.Token {
+func (g *Google) GetToken(code string) *oauth2.Token {
 	token := g.api.GetToken(code)
 	return token
 }
@@ -34,6 +34,6 @@ func (g *Google) GetClient() *http.Client {
 	return g.api.Client
 }
 
-func (g *Google) Authentificate(token oauth2.Token) {
+func (g *Google) Authentificate(token *oauth2.Token) {
 	g.api.SetupClient(token)
 }

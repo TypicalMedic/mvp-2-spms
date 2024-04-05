@@ -24,7 +24,7 @@ func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {
 	return c
 }
 
-func (c *googleCalendarApi) AuthentificateService(token oauth2.Token) {
+func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) {
 	c.Authentificate(token)
 	api, err := calendar.NewService(c.GetContext(), option.WithHTTPClient(c.GetClient()))
 	if err != nil {
@@ -65,7 +65,7 @@ func (c *googleCalendarApi) GetEventById(eventId string, calendarId string) (*ca
 }
 
 func (c *googleCalendarApi) GetSchedule(startTime time.Time, calendarId string) (*calendar.Events, error) {
-	events, err := c.api.Events.List("marusya.pletneva2012@gmail.com").ShowDeleted(false).SingleEvents(true).TimeMin(startTime.Format(time.RFC3339)).OrderBy("startTime").Do()
+	events, err := c.api.Events.List(calendarId).ShowDeleted(false).SingleEvents(true).TimeMin(startTime.Format(time.RFC3339)).OrderBy("startTime").Do()
 	if err == nil {
 		return events, nil
 	}

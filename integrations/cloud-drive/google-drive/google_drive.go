@@ -54,11 +54,11 @@ func (d *GoogleDrive) GetAuthLink(redirectURI string, accountId int, returnURL s
 	return url
 }
 
-func (d *GoogleDrive) GetToken(code string) oauth2.Token {
+func (d *GoogleDrive) GetToken(code string) *oauth2.Token {
 	token := d.api.GetToken(code)
 	return token
 }
 
-func (d *GoogleDrive) Authentificate(token oauth2.Token) {
+func (d *GoogleDrive) Authentificate(token *oauth2.Token) {
 	d.api.AuthentificateService(token)
 }
