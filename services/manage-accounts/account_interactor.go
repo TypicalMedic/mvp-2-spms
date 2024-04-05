@@ -60,3 +60,16 @@ func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegrat
 		Expiry:      expires,
 	}
 }
+
+func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) outputdata.SetRepoHubIntegration {
+	token := planner.GetToken(input.AuthCode)
+	refreshTok := token.RefreshToken
+	accessTok := token.AccessToken
+	expires := token.Expiry
+	a.accountRepo.AddAccountRepoHubIntegration(fmt.Sprint(input.AccountId), refreshTok, input.Type)
+
+	return outputdata.SetRepoHubIntegration{
+		AccessToken: accessTok,
+		Expiry:      expires,
+	}
+}
