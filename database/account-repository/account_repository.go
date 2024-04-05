@@ -55,4 +55,11 @@ func (r *AccountRepository) AddAccountDriveIntegration(accId string, refreshToke
 	r.dbContext.DB.Create(&dbDrive)
 }
 func (r *AccountRepository) AddAccountRepoHubIntegration(accId string, refreshToken string, setvice_type int) {
+	id, _ := strconv.Atoi(accId)
+	dbRepoHub := models.GitRepositoryIntegration{
+		AccountId: uint(id),
+		ApiKey:    refreshToken,
+		Type:      setvice_type,
+	}
+	r.dbContext.DB.Create(&dbRepoHub)
 }
