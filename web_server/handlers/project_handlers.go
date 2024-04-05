@@ -21,11 +21,12 @@ type ProjectHandler struct {
 	repoHubs          internal.GitRepositoryHubs
 }
 
-func InitProjectHandler(projInteractor interfaces.IProjetInteractor, acc interfaces.IAccountInteractor, cd internal.CloudDrives) ProjectHandler {
+func InitProjectHandler(projInteractor interfaces.IProjetInteractor, acc interfaces.IAccountInteractor, cd internal.CloudDrives, rh internal.GitRepositoryHubs) ProjectHandler {
 	return ProjectHandler{
 		projectInteractor: projInteractor,
 		accountInteractor: acc,
 		cloudDrives:       cd,
+		repoHubs:          rh,
 	}
 }
 
