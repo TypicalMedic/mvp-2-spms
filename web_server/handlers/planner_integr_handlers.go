@@ -23,11 +23,13 @@ func InitPlannerIntegrationHandler(planners internal.Planners, acc interfaces.IA
 }
 
 func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter, r *http.Request) {
+	cred := GetCredentials(r)
 	returnURL := r.URL.Query().Get("redirect")
-	accountId, _ := strconv.Atoi(r.URL.Query().Get("account"))
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googlecalendar"
-	result := (h.planners[internal.GoogleCalendar]).GetAuthLink(redirectURI, accountId, returnURL)
-	http.Redirect(w, r, result, http.StatusTemporaryRedirect)
+	result := (h.planners[internal.GoogleCalendar]).GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
+	w.Header().Add("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(result))
 }
 
 func (h *PlannerIntegrationHandler) OAuthCallbackGoogleCalendar(w http.ResponseWriter, r *http.Request) {
