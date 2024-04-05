@@ -110,21 +110,21 @@ func (r *Router) setupUniversityRoutes() {
 }
 
 func (r *Router) setupAuthentificationRoutes() {
-	googleCalendarH := handlers.InitPlannerIntegrationHandler(r.app.Integrations.Planners, r.app.Intercators.AccountManager)
-	googleDriveH := handlers.InitCloudDriveHandler(r.app.Integrations.CloudDrives, r.app.Intercators.AccountManager)
-	// githubH := handlers.InitGitHubHandler(r.app.Integrations.GitRepositoryHubs)
+	calendarH := handlers.InitPlannerIntegrationHandler(r.app.Integrations.Planners, r.app.Intercators.AccountManager)
+	driveH := handlers.InitCloudDriveHandler(r.app.Integrations.CloudDrives, r.app.Intercators.AccountManager)
+	repoHubH := handlers.InitGitRepoHandler(r.app.Integrations.GitRepositoryHubs, r.app.Intercators.AccountManager)
 
 	r.router.Route("/auth", func(r chi.Router) {
 		r.Route("/integration", func(r chi.Router) {
 			r.Route("/authlink", func(r chi.Router) {
-				r.Get("/googlecalendar", googleCalendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar
-				r.Get("/googledrive", googleDriveH.GetGoogleDriveLink)          // GET /auth/integration/authlink/googledrive
-				r.Get("/github", googleCalendarH.GetGoogleCalendarLink)         // GET /auth/integration/authlink/github
+				r.Get("/googlecalendar", calendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar
+				r.Get("/googledrive", driveH.GetGoogleDriveLink)          // GET /auth/integration/authlink/googledrive
+				r.Get("/github", repoHubH.GetGitHubLink)                  // GET /auth/integration/authlink/github
 			})
 			r.Route("/access", func(r chi.Router) {
-				r.Get("/googlecalendar", googleCalendarH.OAuthCallbackGoogleCalendar) // GET /auth/integration/access/googlecalendar
-				r.Get("/googledrive", googleDriveH.OAuthCallbackGoogleDrive)          // GET /auth/integration/access/googledrive
-				r.Get("/github", googleCalendarH.OAuthCallbackGoogleCalendar)         // GET /auth/integration/access/github
+				r.Get("/googlecalendar", calendarH.OAuthCallbackGoogleCalendar) // GET /auth/integration/access/googlecalendar
+				r.Get("/googledrive", driveH.OAuthCallbackGoogleDrive)          // GET /auth/integration/access/googledrive
+				r.Get("/github", repoHubH.OAuthCallbackGitHub)                  // GET /auth/integration/access/github
 			})
 		})
 	})

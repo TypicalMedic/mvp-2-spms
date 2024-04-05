@@ -23,3 +23,9 @@ type SetDriveIntegration struct {
 	AuthCode  string
 	Type      int
 }
+
+type SetRepoHubIntegration struct {
+	AccountId uint
+	AuthCode  string
+	Type      int
+}
