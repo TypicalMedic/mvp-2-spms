@@ -9,6 +9,7 @@ import (
 	taskrepository "mvp-2-spms/database/task-repository"
 	unirepository "mvp-2-spms/database/university-repository"
 	googleDrive "mvp-2-spms/integrations/cloud-drive/google-drive"
+	"mvp-2-spms/integrations/git-repository-hub/github"
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
 	"mvp-2-spms/internal"
@@ -45,7 +46,7 @@ func main() {
 		Tasks:        taskrepository.InitTaskRepository(*db),
 	}
 
-	// repoHub := github.InitGithub(github.InitGithubAPI())
+	repoHub := github.InitGithub(github.InitGithubAPI())
 
 	// scopes := []string{calendar.CalendarScope, drive.DriveScope}
 
@@ -71,7 +72,7 @@ func main() {
 
 	integrations.Planners[internal.GoogleCalendar] = gCalendar
 	integrations.CloudDrives[internal.GoogleDrive] = gDrive
-	// *integrations.GitRepositoryHubs[internal.GitHub] = repoHub
+	integrations.GitRepositoryHubs[internal.GitHub] = repoHub
 
 	app := internal.StudentsProjectsManagementApp{
 		Intercators:  interactors,
