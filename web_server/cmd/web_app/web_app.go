@@ -19,6 +19,7 @@ import (
 	managestudents "mvp-2-spms/services/manage-students"
 	managetasks "mvp-2-spms/services/manage-tasks"
 	manageuniversities "mvp-2-spms/services/manage-universities"
+	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/routes"
 	"net/http"
 
@@ -70,9 +71,9 @@ func main() {
 		Planners:          make(internal.Planners),
 	}
 
-	integrations.Planners[internal.GoogleCalendar] = gCalendar
-	integrations.CloudDrives[internal.GoogleDrive] = gDrive
-	integrations.GitRepositoryHubs[internal.GitHub] = repoHub
+	integrations.Planners[models.GoogleCalendar] = gCalendar
+	integrations.CloudDrives[models.GoogleDrive] = gDrive
+	integrations.GitRepositoryHubs[models.GitHub] = repoHub
 
 	app := internal.StudentsProjectsManagementApp{
 		Intercators:  interactors,

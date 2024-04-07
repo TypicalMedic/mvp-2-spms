@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"mvp-2-spms/internal"
 	"mvp-2-spms/services/manage-accounts/inputdata"
+	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	"net/http"
 	"strconv"
@@ -26,7 +27,7 @@ func (h *GitRepoHandler) GetGitHubLink(w http.ResponseWriter, r *http.Request) {
 	cred := GetCredentials(r)
 	returnURL := r.URL.Query().Get("redirect")
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/github"
-	result := h.repos[internal.GitHub].GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
+	result := h.repos[models.GitHub].GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
@@ -45,10 +46,10 @@ func (h *GitRepoHandler) OAuthCallbackGitHub(w http.ResponseWriter, r *http.Requ
 	input := inputdata.SetRepoHubIntegration{
 		AccountId: uint(accountId),
 		AuthCode:  code,
-		Type:      int(internal.GoogleCalendar),
+		Type:      int(models.GitHub),
 	}
 
-	result := h.accountInteractor.SetRepoHubIntegration(input, h.repos[internal.GitHub])
+	result := h.accountInteractor.SetRepoHubIntegration(input, h.repos[models.GitHub])
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)

@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"mvp-2-spms/internal"
 	"mvp-2-spms/services/manage-accounts/inputdata"
+	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	"net/http"
 	"strconv"
@@ -26,7 +27,7 @@ func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter,
 	cred := GetCredentials(r)
 	returnURL := r.URL.Query().Get("redirect")
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googlecalendar"
-	result := (h.planners[internal.GoogleCalendar]).GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
+	result := (h.planners[models.GoogleCalendar]).GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
@@ -45,9 +46,9 @@ func (h *PlannerIntegrationHandler) OAuthCallbackGoogleCalendar(w http.ResponseW
 	input := inputdata.SetPlannerIntegration{
 		AccountId: uint(accountId),
 		AuthCode:  code,
-		Type:      int(internal.GoogleCalendar),
+		Type:      int(models.GoogleCalendar),
 	}
-	result := h.accountInteractor.SetPlannerIntegration(input, h.planners[internal.GoogleCalendar])
+	result := h.accountInteractor.SetPlannerIntegration(input, h.planners[models.GoogleCalendar])
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)

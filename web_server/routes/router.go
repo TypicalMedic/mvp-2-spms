@@ -55,6 +55,7 @@ func (r *Router) SetupRoutes() {
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
 	r.setupUniversityRoutes()
+	r.setupAccountRoutes()
 	r.setupAuthentificationRoutes()
 }
 
@@ -90,6 +91,17 @@ func (r *Router) setupStudentRoutes() {
 	r.router.Route("/students", func(r chi.Router) {
 		r.With().Get("/", studH.GetStudents) // GET /students with middleware (currently empty)
 		r.Post("/add", studH.AddStudent)     // POST /students/add
+	})
+}
+func (r *Router) setupAccountRoutes() {
+	accH := handlers.InitAccountHandler(r.app.Intercators.AccountManager)
+
+	// setup middleware for checking if professor is authorized and it's his projects?
+	r.router.Route("/accounts", func(r chi.Router) {
+		r.Route("/{accID}", func(r chi.Router) {
+			r.Get("/", dummyHandler)                            // GET /accounts/123
+			r.Get("/integrations", accH.GetAccountIntegrations) // GET /accounts/123/integrations
+		})
 	})
 }
 

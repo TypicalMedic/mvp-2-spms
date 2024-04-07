@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"mvp-2-spms/services/manage-accounts/inputdata"
+	"mvp-2-spms/services/models"
 )
 
 type CloudDriveHandler struct {
@@ -27,7 +28,7 @@ func (h *CloudDriveHandler) GetGoogleDriveLink(w http.ResponseWriter, r *http.Re
 	cred := GetCredentials(r)
 	returnURL := r.URL.Query().Get("redirect")
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googledrive"
-	result := h.drives[internal.GoogleDrive].GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
+	result := h.drives[models.GoogleDrive].GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
@@ -47,9 +48,9 @@ func (h *CloudDriveHandler) OAuthCallbackGoogleDrive(w http.ResponseWriter, r *h
 	input := inputdata.SetDriveIntegration{
 		AccountId: uint(accountId),
 		AuthCode:  code,
-		Type:      int(internal.GoogleCalendar),
+		Type:      int(models.GoogleDrive),
 	}
-	result := h.accountInteractor.SetDriveIntegration(input, h.drives[internal.GoogleDrive])
+	result := h.accountInteractor.SetDriveIntegration(input, h.drives[models.GoogleDrive])
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)

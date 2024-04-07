@@ -1,5 +1,13 @@
 package inputdata
 
+type GetAccountInfo struct {
+	AccountId uint
+}
+
+type GetAccountIntegrations struct {
+	AccountId uint
+}
+
 type GetPlannerIntegration struct {
 	AccountId uint
 }
