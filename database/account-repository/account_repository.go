@@ -27,3 +27,36 @@ func (r *AccountRepository) GetAccountDriveData(id string) usecasemodels.CloudDr
 	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbDrive)
 	return dbDrive.MapToUseCaseModel()
 }
+
+// can return multiple for 1 account, should consider this
+func (r *AccountRepository) GetAccountRepoHubData(id string) usecasemodels.BaseIntegration {
+	dbRHub := models.GitRepositoryIntegration{}
+	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbRHub)
+	return dbRHub.MapToUseCaseModel()
+}
+
+func (r *AccountRepository) AddAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) {
+	dbPlanner := models.PlannerIntegration{}
+	dbPlanner.MapUseCaseModelToThis(integr)
+	r.dbContext.DB.Create(&dbPlanner)
+}
+func (r *AccountRepository) AddAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) {
+	dbDrive := models.DriveIntegration{}
+	dbDrive.MapUseCaseModelToThis(integr)
+	r.dbContext.DB.Create(&dbDrive)
+}
+func (r *AccountRepository) AddAccountRepoHubIntegration(integr usecasemodels.BaseIntegration) {
+	dbRepoHub := models.GitRepositoryIntegration{}
+	dbRepoHub.MapUseCaseModelToThis(integr)
+	r.dbContext.DB.Create(&dbRepoHub)
+}
+
+func (r *AccountRepository) UpdateAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) {
+	r.dbContext.DB.Model(&models.PlannerIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+}
+func (r *AccountRepository) UpdateAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) {
+	r.dbContext.DB.Model(&models.DriveIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+}
+func (r *AccountRepository) UpdateAccountRepoHubIntegration(integr usecasemodels.BaseIntegration) {
+	r.dbContext.DB.Model(&models.GitRepositoryIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+}

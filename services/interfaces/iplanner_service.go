@@ -7,6 +7,7 @@ import (
 )
 
 type IPlannerService interface {
+	IIntegration
 	AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) models.PlannerMeeting
 	FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) bool
 	GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) []string

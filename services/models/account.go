@@ -9,6 +9,7 @@ type Account struct {
 type BaseIntegration struct {
 	AccountId string
 	ApiKey    string
+	Type      int
 }
 
 type PlannerIntegration struct {

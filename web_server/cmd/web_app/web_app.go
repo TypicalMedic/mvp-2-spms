@@ -13,6 +13,7 @@ import (
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
 	"mvp-2-spms/internal"
+	manageaccounts "mvp-2-spms/services/manage-accounts"
 	managemeetings "mvp-2-spms/services/manage-meetings"
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
@@ -47,22 +48,35 @@ func main() {
 
 	repoHub := github.InitGithub(github.InitGithubAPI())
 
-	scopes := []string{calendar.CalendarScope, drive.DriveScope}
+	// scopes := []string{calendar.CalendarScope, drive.DriveScope}
 
-	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(scopes...))
+	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(calendar.CalendarScope))
 	gCalendar := googleCalendar.InitGoogleCalendar(gCalendarApi)
-	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(scopes...))
+	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(drive.DriveScope))
 	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
-		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
+		AccountManager:   manageaccounts.InitAccountInteractor(repos.Accounts),
+		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, repos.Universities, repos.Accounts),
 		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
-		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts, repos.Students, repos.Projects),
-		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
+		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, repos.Accounts, repos.Students, repos.Projects),
+		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, repos.Tasks, repos.Accounts),
 		UnversityManager: manageuniversities.InitUniversityInteractor(repos.Universities),
 	}
+
+	integrations := internal.Integrations{
+		GitRepositoryHubs: make(internal.GitRepositoryHubs),
+		CloudDrives:       make(internal.CloudDrives),
+		Planners:          make(internal.Planners),
+	}
+
+	integrations.Planners[internal.GoogleCalendar] = gCalendar
+	integrations.CloudDrives[internal.GoogleDrive] = gDrive
+	integrations.GitRepositoryHubs[internal.GitHub] = repoHub
+
 	app := internal.StudentsProjectsManagementApp{
-		Intercators: interactors,
+		Intercators:  interactors,
+		Integrations: integrations,
 	}
 	router := routes.SetupRouter(&app)
 	http.ListenAndServe(":8080", router.Router())

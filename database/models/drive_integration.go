@@ -10,6 +10,7 @@ type DriveIntegration struct {
 	AccountId    uint   `gorm:"column:account_id"`
 	ApiKey       string `gorm:"column:api_key"`
 	BaseFolderId string `gorm:"column:base_folder_id"`
+	Type         int    `gorm:"column:type"`
 }
 
 func (*DriveIntegration) TableName() string {
@@ -21,6 +22,7 @@ func (di *DriveIntegration) MapToUseCaseModel() models.CloudDriveIntegration {
 		BaseIntegration: models.BaseIntegration{
 			AccountId: fmt.Sprint(di.AccountId),
 			ApiKey:    di.ApiKey,
+			Type:      di.Type,
 		},
 		DriveData: models.DriveData{
 			BaseFolderId: di.BaseFolderId,
@@ -33,4 +35,5 @@ func (di *DriveIntegration) MapUseCaseModelToThis(model models.CloudDriveIntegra
 	di.AccountId = uint(sId)
 	di.BaseFolderId = model.BaseFolderId
 	di.ApiKey = model.ApiKey
+	di.Type = model.Type
 }

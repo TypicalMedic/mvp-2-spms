@@ -55,11 +55,12 @@ func (r *Router) SetupRoutes() {
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
 	r.setupUniversityRoutes()
+	r.setupAuthentificationRoutes()
 }
 
 func (r *Router) setupProjectRoutes() {
-	projH := handlers.InitProjectHandler(r.app.Intercators.ProjectManager)
-	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager)
+	projH := handlers.InitProjectHandler(r.app.Intercators.ProjectManager, r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives, r.app.Integrations.GitRepositoryHubs)
+	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager, r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/projects", func(r chi.Router) {
@@ -108,8 +109,29 @@ func (r *Router) setupUniversityRoutes() {
 	})
 }
 
+func (r *Router) setupAuthentificationRoutes() {
+	calendarH := handlers.InitPlannerIntegrationHandler(r.app.Integrations.Planners, r.app.Intercators.AccountManager)
+	driveH := handlers.InitCloudDriveHandler(r.app.Integrations.CloudDrives, r.app.Intercators.AccountManager)
+	repoHubH := handlers.InitGitRepoHandler(r.app.Integrations.GitRepositoryHubs, r.app.Intercators.AccountManager)
+
+	r.router.Route("/auth", func(r chi.Router) {
+		r.Route("/integration", func(r chi.Router) {
+			r.Route("/authlink", func(r chi.Router) {
+				r.Get("/googlecalendar", calendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar
+				r.Get("/googledrive", driveH.GetGoogleDriveLink)          // GET /auth/integration/authlink/googledrive
+				r.Get("/github", repoHubH.GetGitHubLink)                  // GET /auth/integration/authlink/github
+			})
+			r.Route("/access", func(r chi.Router) {
+				r.Get("/googlecalendar", calendarH.OAuthCallbackGoogleCalendar) // GET /auth/integration/access/googlecalendar
+				r.Get("/googledrive", driveH.OAuthCallbackGoogleDrive)          // GET /auth/integration/access/googledrive
+				r.Get("/github", repoHubH.OAuthCallbackGitHub)                  // GET /auth/integration/access/github
+			})
+		})
+	})
+}
+
 func (r *Router) setupMeetingRoutes() {
-	meetH := handlers.InitMeetingHandler(r.app.Intercators.MeetingManager)
+	meetH := handlers.InitMeetingHandler(r.app.Intercators.MeetingManager, r.app.Intercators.AccountManager, r.app.Integrations.Planners)
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
 	r.router.Route("/meetings", func(r chi.Router) {

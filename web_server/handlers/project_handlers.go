@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"mvp-2-spms/internal"
+	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
@@ -14,11 +16,17 @@ import (
 
 type ProjectHandler struct {
 	projectInteractor interfaces.IProjetInteractor
+	accountInteractor interfaces.IAccountInteractor
+	cloudDrives       internal.CloudDrives
+	repoHubs          internal.GitRepositoryHubs
 }
 
-func InitProjectHandler(projInteractor interfaces.IProjetInteractor) ProjectHandler {
+func InitProjectHandler(projInteractor interfaces.IProjetInteractor, acc interfaces.IAccountInteractor, cd internal.CloudDrives, rh internal.GitRepositoryHubs) ProjectHandler {
 	return ProjectHandler{
 		projectInteractor: projInteractor,
+		accountInteractor: acc,
+		cloudDrives:       cd,
+		repoHubs:          rh,
 	}
 }
 
@@ -37,12 +45,19 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 	cred := GetCredentials(r)
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
+
+	integInput := ainputdata.GetRepoHubIntegration{
+		AccountId: cred.ProfessorId,
+	}
+	hubInfo := h.accountInteractor.GetRepoHubIntegration(integInput)
 	input := inputdata.GetProjectCommits{
 		ProfessorId: cred.ProfessorId,
 		ProjectId:   uint(projectId),
 		From:        from,
 	}
-	result := h.projectInteractor.GetProjectCommits(input)
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
+	result := h.projectInteractor.GetProjectCommits(input, h.repoHubs[internal.GetRepoHubName(hubInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -93,6 +108,10 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	integInput := ainputdata.GetDriveIntegration{
+		AccountId: cred.ProfessorId,
+	}
+	driveInfo := h.accountInteractor.GetDriveIntegration(integInput)
 
 	input := inputdata.AddProject{
 		ProfessorId:         cred.ProfessorId,
@@ -103,7 +122,9 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 		RepositoryName:      reqB.RepositoryName,
 	}
 
-	student_id := h.projectInteractor.AddProject(input)
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
+	student_id := h.projectInteractor.AddProject(input, h.cloudDrives[internal.CloudDriveName(driveInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)

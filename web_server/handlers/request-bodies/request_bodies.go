@@ -15,6 +15,7 @@ type AddMeeting struct {
 	Description string    `json:"description"`
 	MeetingTime time.Time `json:"meeting_time"`
 	StudentId   int       `json:"student_participant_id"`
+	ProjectId   int       `json:"project_id,omitempty"`
 	IsOnline    bool      `json:"is_online"`
 }
 

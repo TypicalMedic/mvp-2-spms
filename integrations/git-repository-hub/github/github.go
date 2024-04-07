@@ -1,6 +1,8 @@
 package github
 
 import (
+	"encoding/base64"
+	"fmt"
 	"log"
 	"sort"
 	"time"
@@ -8,14 +10,15 @@ import (
 	"mvp-2-spms/services/models"
 
 	"github.com/google/go-github/v56/github"
+	"golang.org/x/oauth2"
 )
 
 type Github struct {
 	api githubAPI
 }
 
-func InitGithub(api githubAPI) Github {
-	return Github{api: api}
+func InitGithub(api githubAPI) *Github {
+	return &Github{api: api}
 }
 
 func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit {
@@ -54,6 +57,23 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 	})
 
 	return commits
+}
+
+func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// encode as JSON!
+	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
+	url := g.api.GetAuthLink(redirectURI, statestr)
+	return url
+}
+
+func (g *Github) Authentificate(token *oauth2.Token) {
+	g.api.SetupClient(token)
+}
+
+func (g *Github) GetToken(code string) *oauth2.Token {
+	token := g.api.GetToken(code)
+	return token
 }
 
 func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {

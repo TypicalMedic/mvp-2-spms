@@ -13,6 +13,7 @@ type GetProfessorMeetings struct {
 
 type AddMeeting struct {
 	ProfessorId uint
+	ProjectId   uint
 	Name        string
 	Description string
 	MeetingTime time.Time
@@ -26,6 +27,7 @@ func (am *AddMeeting) MapToMeetingEntity() entities.Meeting {
 		Name:          am.Name,
 		Description:   am.Description,
 		ParticipantId: fmt.Sprint(am.StudentId),
+		ProjectId:     fmt.Sprint(am.ProjectId),
 		Time:          am.MeetingTime,
 		IsOnline:      am.IsOnline,
 		Status:        entities.MeetingStatus(entities.MeetingPlanned),
