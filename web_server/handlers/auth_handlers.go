@@ -144,6 +144,7 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 		Name:    "session_token",
 		Value:   "",
 		Expires: time.Now(),
+		Path:    "/",
 	})
 	w.WriteHeader(http.StatusOK)
 }
