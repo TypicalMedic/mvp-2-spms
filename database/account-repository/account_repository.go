@@ -16,6 +16,23 @@ func InitAccountRepository(dbcxt database.Database) *AccountRepository {
 		dbContext: dbcxt,
 	}
 }
+
+func (r *AccountRepository) GetAccountByLogin(login string) usecasemodels.Account {
+	acc := models.Account{}
+	r.dbContext.DB.Select("*").Where("login = ?", login).Find(&acc)
+	return acc.MapToUseCaseModel()
+}
+
+func (r *AccountRepository) AddAccount(account usecasemodels.Account) {
+	dbAcc := models.Account{}
+	dbAcc.MapUseCaseModelToThis(account)
+
+	//////////////////////////////////////////////////////////////////////////
+	dbAcc.Id = 1
+
+	r.dbContext.DB.Create(&dbAcc)
+}
+
 func (r *AccountRepository) GetProfessorById(id string) entities.Professor {
 	prof := models.Professor{}
 	r.dbContext.DB.Select("*").Where("id = ?", id).Find(&prof)

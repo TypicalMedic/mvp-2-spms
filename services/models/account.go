@@ -62,7 +62,8 @@ func (pn PlannerName) String() string {
 type Account struct {
 	Id    string
 	Login string
-	Hash  string //?
+	Hash  []byte
+	Salt  string
 }
 
 type BaseIntegration struct {
