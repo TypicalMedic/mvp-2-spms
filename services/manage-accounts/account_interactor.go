@@ -1,12 +1,20 @@
 package managestudents
 
 import (
+	"bytes"
+	"crypto/sha512"
 	"fmt"
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-accounts/outputdata"
 	"mvp-2-spms/services/models"
+
+	"github.com/google/uuid"
+	"golang.org/x/crypto/pbkdf2"
 )
+
+const pbkdf2Iterations int = 4096
+const pbkdf2HashSize int = 32
 
 type AccountInteractor struct {
 	accountRepo interfaces.IAccountRepository
@@ -142,9 +150,22 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 }
 
 func (a *AccountInteractor) CheckCredsValidity(input inputdata.CheckCredsValidity) bool {
-	return false
+	account := a.accountRepo.GetAccountByLogin(input.Login)
+	key := pbkdf2.Key([]byte(input.Password), []byte(account.Salt), pbkdf2Iterations, pbkdf2HashSize, sha512.New)
+
+	return bytes.Equal(key, account.Hash)
 }
 func (a *AccountInteractor) CheckUsernameExists(input inputdata.CheckUsernameExists) bool {
-	return false
+	account := a.accountRepo.GetAccountByLogin(input.Login)
+	return account.Login == input.Login
 }
-func (a *AccountInteractor) SignUp(input inputdata.SignUp) {}
+func (a *AccountInteractor) SignUp(input inputdata.SignUp) {
+	salt := uuid.NewString()
+	passHash := pbkdf2.Key([]byte(input.Password), []byte(salt), pbkdf2Iterations, pbkdf2HashSize, sha512.New)
+	account := models.Account{
+		Login: input.Login,
+		Hash:  passHash,
+		Salt:  salt,
+	}
+	a.accountRepo.AddAccount(account)
+}

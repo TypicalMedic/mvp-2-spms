@@ -53,6 +53,8 @@ type IMeetingRepository interface {
 
 type IAccountRepository interface {
 	GetProfessorById(id string) entities.Professor
+	GetAccountByLogin(login string) models.Account
+	AddAccount(models.Account)
 
 	GetAccountPlannerData(id string) models.PlannerIntegration  // returns planner integration for later usage of api key???
 	GetAccountDriveData(id string) models.CloudDriveIntegration // returns drive integration for later usage of api key???
