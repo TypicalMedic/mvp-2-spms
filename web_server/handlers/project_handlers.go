@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/internal"
 	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-projects/inputdata"
+	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
@@ -57,7 +58,7 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	result := h.projectInteractor.GetProjectCommits(input, h.repoHubs[internal.GetRepoHubName(hubInfo.Type)])
+	result := h.projectInteractor.GetProjectCommits(input, h.repoHubs[models.GetRepoHubName(hubInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -124,7 +125,7 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	student_id := h.projectInteractor.AddProject(input, h.cloudDrives[internal.CloudDriveName(driveInfo.Type)])
+	student_id := h.projectInteractor.AddProject(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)

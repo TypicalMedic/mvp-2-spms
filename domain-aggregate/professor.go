@@ -4,6 +4,7 @@ type Professor struct {
 	Person
 	ScienceDegree   string
 	AvailablePlaces []AvailablePlace // make private?
+	UniversityId    string
 }
 
 type AvailablePlace struct {
@@ -12,6 +13,7 @@ type AvailablePlace struct {
 	PlacesCount            uint
 }
 
+// ???
 type Account struct {
 	Id           string
 	Email        string

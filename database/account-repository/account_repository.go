@@ -3,6 +3,7 @@ package accountrepository
 import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
+	entities "mvp-2-spms/domain-aggregate"
 	usecasemodels "mvp-2-spms/services/models"
 )
 
@@ -14,6 +15,11 @@ func InitAccountRepository(dbcxt database.Database) *AccountRepository {
 	return &AccountRepository{
 		dbContext: dbcxt,
 	}
+}
+func (r *AccountRepository) GetProfessorById(id string) entities.Professor {
+	prof := models.Professor{}
+	r.dbContext.DB.Select("*").Where("id = ?", id).Find(&prof)
+	return prof.MapToEntity()
 }
 
 func (r *AccountRepository) GetAccountPlannerData(id string) usecasemodels.PlannerIntegration {

@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/internal"
 	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	minputdata "mvp-2-spms/services/manage-meetings/inputdata"
+	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
@@ -61,7 +62,7 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	meeting_id := h.meetingInteractor.AddMeeting(meetingInput, h.planners[internal.PlannerName(calendarInfo.Type)])
+	meeting_id := h.meetingInteractor.AddMeeting(meetingInput, h.planners[models.PlannerName(calendarInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(meeting_id)
@@ -81,7 +82,7 @@ func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Req
 	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	result := h.meetingInteractor.GetProfessorMeetings(input, h.planners[internal.PlannerName(calendarInfo.Type)])
+	result := h.meetingInteractor.GetProfessorMeetings(input, h.planners[models.PlannerName(calendarInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)

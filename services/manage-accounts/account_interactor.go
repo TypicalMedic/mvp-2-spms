@@ -10,12 +10,21 @@ import (
 
 type AccountInteractor struct {
 	accountRepo interfaces.IAccountRepository
+	uniRepo     interfaces.IUniversityRepository
 }
 
-func InitAccountInteractor(accRepo interfaces.IAccountRepository) *AccountInteractor {
+func InitAccountInteractor(accRepo interfaces.IAccountRepository, uniRepo interfaces.IUniversityRepository) *AccountInteractor {
 	return &AccountInteractor{
 		accountRepo: accRepo,
+		uniRepo:     uniRepo,
 	}
+}
+func (a *AccountInteractor) GetAccountInfo(input inputdata.GetAccountInfo) outputdata.GetAccountInfo {
+	profInfo := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
+	uni := a.uniRepo.GetUniversityById(profInfo.UniversityId)
+	// add get account login
+	output := outputdata.MapToGetAccountInfo(profInfo, uni)
+	return output
 }
 
 func (a *AccountInteractor) GetPlannerIntegration(input inputdata.GetPlannerIntegration) outputdata.GetPlannerIntegration {
@@ -96,4 +105,38 @@ func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubInte
 		AccessToken: accessTok,
 		Expiry:      expires,
 	}
+}
+
+func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountIntegrations) outputdata.GetAccountIntegrations {
+	drive := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
+	planner := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
+	repohub := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
+
+	var (
+		outputDrive   *outputdata.GetAccountIntegrationsDrive
+		outputPlanner *outputdata.GetAccountIntegrationsPlanner
+		outputRepos   []outputdata.GetAccountIntegrationsIntegr = []outputdata.GetAccountIntegrationsIntegr{}
+	)
+	if drive.AccountId != "0" {
+		outputDrive = &outputdata.GetAccountIntegrationsDrive{
+			Type: outputdata.GetAccountIntegrationsIntegr{
+				Name: drive.GetTypeAsString(),
+			},
+			BaseFolderName: drive.BaseFolderId, ///////////////////////////////////////change
+		}
+	}
+	if planner.AccountId != "0" {
+		outputPlanner = &outputdata.GetAccountIntegrationsPlanner{
+			Type: outputdata.GetAccountIntegrationsIntegr{
+				Name: planner.GetTypeAsString(),
+			},
+			PlannerName: planner.PlannerData.Id, ///////////////////////////////////////change
+		}
+	}
+	if repohub.AccountId != "0" {
+		outputRepos = append(outputRepos, outputdata.GetAccountIntegrationsIntegr{
+			Name: repohub.GetRepoHubTypeAsString(),
+		})
+	}
+	return outputdata.MapToGetAccountIntegrations(outputDrive, outputPlanner, outputRepos)
 }

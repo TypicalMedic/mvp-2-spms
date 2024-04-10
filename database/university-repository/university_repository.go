@@ -22,6 +22,12 @@ func (u *UniversityRepository) GetEducationalProgrammeById(epId string) entities
 	return edProg.MapToEntity()
 }
 
+func (u *UniversityRepository) GetUniversityById(uId string) entities.University {
+	var uni models.University
+	u.dbContext.DB.Select("*").Where("id = ?", uId).Find(&uni)
+	return uni.MapToEntity()
+}
+
 func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) []entities.EducationalProgramme {
 	var edProgs []models.EducationalProgramme
 

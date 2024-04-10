@@ -2,34 +2,13 @@ package internal
 
 import (
 	mngInterfaces "mvp-2-spms/services/interfaces"
+	"mvp-2-spms/services/models"
 	hInterfaces "mvp-2-spms/web_server/handlers/interfaces"
 )
 
-type GetRepoHubName int
-
-const (
-	GitHub GetRepoHubName = iota
-	GitLab
-)
-
-type CloudDriveName int
-
-const (
-	GoogleDrive CloudDriveName = iota
-	YandexDisk
-	OneDrive
-)
-
-type PlannerName int
-
-const (
-	GoogleCalendar PlannerName = iota
-	YandexCalendar
-)
-
-type GitRepositoryHubs map[GetRepoHubName](mngInterfaces.IGitRepositoryHub)
-type CloudDrives map[CloudDriveName](mngInterfaces.ICloudDrive)
-type Planners map[PlannerName](mngInterfaces.IPlannerService)
+type GitRepositoryHubs map[models.GetRepoHubName](mngInterfaces.IGitRepositoryHub)
+type CloudDrives map[models.CloudDriveName](mngInterfaces.ICloudDrive)
+type Planners map[models.PlannerName](mngInterfaces.IPlannerService)
 
 type StudentsProjectsManagementApp struct {
 	Intercators  Intercators
