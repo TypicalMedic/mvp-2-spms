@@ -16,7 +16,7 @@ func (Repository) TableName() string {
 	return "repository"
 }
 
-func (r Repository) MapToEntity() models.Repository {
+func (r Repository) MapToUseCaseModel() models.Repository {
 	return models.Repository{
 		RepoId:    r.Name,
 		OwnerName: r.OwnerName,

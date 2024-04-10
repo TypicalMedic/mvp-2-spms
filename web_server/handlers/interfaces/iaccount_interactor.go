@@ -15,4 +15,7 @@ type IAccountInteractor interface {
 	SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) outputdata.SetRepoHubIntegration
 	GetAccountIntegrations(input inputdata.GetAccountIntegrations) outputdata.GetAccountIntegrations
 	GetAccountInfo(input inputdata.GetAccountInfo) outputdata.GetAccountInfo
+	CheckCredsValidity(input inputdata.CheckCredsValidity) bool
+	CheckUsernameExists(input inputdata.CheckUsernameExists) bool
+	SignUp(input inputdata.SignUp)
 }

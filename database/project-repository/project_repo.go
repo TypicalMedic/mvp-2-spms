@@ -35,7 +35,7 @@ func (r *ProjectRepository) GetProjectRepository(projId string) usecaseModels.Re
 	r.dbContext.DB.Select("repo_id").Where("id = ?", projId).Find(&project)
 	var repo models.Repository
 	r.dbContext.DB.Select("*").Where("id = ?", project.RepoId).Find(&repo)
-	return repo.MapToEntity()
+	return repo.MapToUseCaseModel()
 }
 
 func (r *ProjectRepository) GetProjectById(projId string) entities.Project {
