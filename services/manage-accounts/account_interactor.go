@@ -140,3 +140,11 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 	}
 	return outputdata.MapToGetAccountIntegrations(outputDrive, outputPlanner, outputRepos)
 }
+
+func (a *AccountInteractor) CheckCredsValidity(input inputdata.CheckCredsValidity) bool {
+	return false
+}
+func (a *AccountInteractor) CheckUsernameExists(input inputdata.CheckUsernameExists) bool {
+	return false
+}
+func (a *AccountInteractor) SignUp(input inputdata.SignUp) {}
