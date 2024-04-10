@@ -27,3 +27,14 @@ func (h *AccountHandler) GetAccountIntegrations(w http.ResponseWriter, r *http.R
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
+
+func (h *AccountHandler) GetAccountInfo(w http.ResponseWriter, r *http.Request) {
+	cred := GetCredentials(r)
+	input := inputdata.GetAccountInfo{
+		AccountId: cred.ProfessorId,
+	}
+	result := h.accountInteractor.GetAccountInfo(input)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}

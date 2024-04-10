@@ -57,7 +57,7 @@ func main() {
 	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
-		AccountManager:   manageaccounts.InitAccountInteractor(repos.Accounts),
+		AccountManager:   manageaccounts.InitAccountInteractor(repos.Accounts, repos.Universities),
 		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, repos.Universities, repos.Accounts),
 		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
 		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, repos.Accounts, repos.Students, repos.Projects),

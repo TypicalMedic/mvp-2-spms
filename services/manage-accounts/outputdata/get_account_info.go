@@ -1,5 +1,10 @@
 package outputdata
 
+import (
+	entities "mvp-2-spms/domain-aggregate"
+	"strconv"
+)
+
 type GetAccountInfo struct {
 	Id            int    `json:"id"`
 	Login         string `json:"login"`
@@ -8,11 +13,14 @@ type GetAccountInfo struct {
 	University    string `json:"university"`
 }
 
-// func MapToGetAccountInfo(integr models.CloudDriveIntegration) GetAccountInfo {
-// 	return GetDriveIntegration{
-// 		BaseGetIntegration: BaseGetIntegration{
-// 			APIKey: integr.ApiKey,
-// 			Type:   integr.Type,
-// 		},
-// 	}
-// }
+func MapToGetAccountInfo(prof entities.Professor, uni entities.University) GetAccountInfo {
+	pId, _ := strconv.Atoi(prof.Id)
+
+	return GetAccountInfo{
+		Id:            pId,
+		Login:         "", ////////////////////////////
+		Name:          prof.FullNameToString(),
+		ScienceDegree: prof.ScienceDegree,
+		University:    uni.Name,
+	}
+}

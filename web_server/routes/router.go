@@ -99,7 +99,7 @@ func (r *Router) setupAccountRoutes() {
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.Route("/accounts", func(r chi.Router) {
 		r.Route("/{accID}", func(r chi.Router) {
-			r.Get("/", dummyHandler)                            // GET /accounts/123
+			r.Get("/", accH.GetAccountInfo)                     // GET /accounts/123
 			r.Get("/integrations", accH.GetAccountIntegrations) // GET /accounts/123/integrations
 		})
 	})

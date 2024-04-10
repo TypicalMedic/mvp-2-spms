@@ -10,12 +10,21 @@ import (
 
 type AccountInteractor struct {
 	accountRepo interfaces.IAccountRepository
+	uniRepo     interfaces.IUniversityRepository
 }
 
-func InitAccountInteractor(accRepo interfaces.IAccountRepository) *AccountInteractor {
+func InitAccountInteractor(accRepo interfaces.IAccountRepository, uniRepo interfaces.IUniversityRepository) *AccountInteractor {
 	return &AccountInteractor{
 		accountRepo: accRepo,
+		uniRepo:     uniRepo,
 	}
+}
+func (a *AccountInteractor) GetAccountInfo(input inputdata.GetAccountInfo) outputdata.GetAccountInfo {
+	profInfo := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
+	uni := a.uniRepo.GetUniversityById(profInfo.UniversityId)
+	// add get account login
+	output := outputdata.MapToGetAccountInfo(profInfo, uni)
+	return output
 }
 
 func (a *AccountInteractor) GetPlannerIntegration(input inputdata.GetPlannerIntegration) outputdata.GetPlannerIntegration {
