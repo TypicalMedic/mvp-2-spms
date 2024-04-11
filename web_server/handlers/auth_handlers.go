@@ -53,17 +53,14 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	// Create a new random session token
 	sessionToken := uuid.NewString() + "/" + creds.Username
-	expiresAt := time.Now().Add(7 * 24 * time.Hour)
+	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
-	session.Sessions[sessionToken] = session.InitSession(creds.Username, expiresAt)
+	profId := h.accountInteractor.GetAccountProfessorId(creds.Username)
+	user := session.InitUserInfo(creds.Username, profId)
+	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
 	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   sessionToken,
-		Expires: expiresAt,
-		Path:    "/",
-	})
+	http.SetCookie(w, setSesionCookie(sessionToken, expiresAt))
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -77,7 +74,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// декодируем тело запроса
-	var creds requestbodies.Credentials
+	var creds requestbodies.SignUp
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&creds)
@@ -97,25 +94,26 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	signupInput := inputdata.SignUp{
-		Login:    creds.Username,
-		Password: creds.Password,
+		Login:         creds.Username,
+		Password:      creds.Password,
+		Name:          creds.Name,
+		Surname:       creds.Surname,
+		Middlename:    creds.Middlename,
+		UniId:         creds.UniversityId,
+		ScienceDegree: creds.ScienceDegree,
 	}
 
-	h.accountInteractor.SignUp(signupInput)
+	account := h.accountInteractor.SignUp(signupInput)
 
 	// Create a new random session token
 	sessionToken := uuid.NewString() + "/" + creds.Username
-	expiresAt := time.Now().Add(7 * 24 * time.Hour)
+	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
-	session.Sessions[sessionToken] = session.InitSession(creds.Username, expiresAt)
+	user := session.InitUserInfo(account.Login, account.Id)
+	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
 	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   sessionToken,
-		Expires: expiresAt,
-		Path:    "/",
-	})
+	http.SetCookie(w, setSesionCookie(sessionToken, expiresAt))
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -140,12 +138,7 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	// We need to let the client know that the cookie is expired
 	// In the response, we set the session token to an empty
 	// value and set its expiry as the current time
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   "",
-		Expires: time.Now(),
-		Path:    "/",
-	})
+	http.SetCookie(w, deleteSesionCookie())
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -155,23 +148,35 @@ func (h *AuthHandler) RefreshSession(w http.ResponseWriter, r *http.Request) {
 	sessionToken := c.Value
 	userSession := session.Sessions[sessionToken]
 
-	newSessionToken := uuid.NewString() + "/" + userSession.GetUsername()
-	expiresAt := time.Now().Add(120 * time.Second)
+	newSessionToken := uuid.NewString() + "/" + userSession.GetUser().GetUsername()
+	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
 	// Set the token in the session map, along with the user whom it represents
 	session.Sessions[newSessionToken] = session.InitSession(
-		userSession.GetUsername(), expiresAt,
+		userSession.GetUser(), expiresAt,
 	)
 
 	// Delete the older session token
 	delete(session.Sessions, sessionToken)
 
 	// Set the new token as the users `session_token` cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   newSessionToken,
-		Expires: time.Now().Add(120 * time.Second),
-		Path:    "/",
-	})
+	http.SetCookie(w, setSesionCookie(sessionToken, expiresAt))
 	w.WriteHeader(http.StatusOK)
+}
+
+func setSesionCookie(sessionTok string, exp time.Time) *http.Cookie {
+	return &http.Cookie{
+		Name:    "session_token",
+		Value:   sessionTok,
+		Expires: exp,
+		Path:    "/",
+	}
+}
+func deleteSesionCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:    "session_token",
+		Value:   "",
+		Expires: time.Now(),
+		Path:    "/",
+	}
 }

@@ -14,8 +14,9 @@ type IAccountInteractor interface {
 	SetDriveIntegration(input inputdata.SetDriveIntegration, planner interfaces.ICloudDrive) outputdata.SetDriveIntegration
 	SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) outputdata.SetRepoHubIntegration
 	GetAccountIntegrations(input inputdata.GetAccountIntegrations) outputdata.GetAccountIntegrations
-	GetAccountInfo(input inputdata.GetAccountInfo) outputdata.GetAccountInfo
+	GetProfessorInfo(input inputdata.GetProfessorInfo) outputdata.GetProfessorInfo
 	CheckCredsValidity(input inputdata.CheckCredsValidity) bool
 	CheckUsernameExists(input inputdata.CheckUsernameExists) bool
-	SignUp(input inputdata.SignUp)
+	SignUp(input inputdata.SignUp) outputdata.SignUp
+	GetAccountProfessorId(login string) string
 }
