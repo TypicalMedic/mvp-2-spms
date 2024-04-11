@@ -19,26 +19,26 @@ func (*Professor) TableName() string {
 	return "professor"
 }
 
-func (s *Professor) MapToEntity() entities.Professor {
+func (p *Professor) MapToEntity() entities.Professor {
 	return entities.Professor{
 		Person: entities.Person{
-			Id:         fmt.Sprint(s.Id),
-			Name:       s.Name,
-			Surname:    s.Surname,
-			Middlename: s.Middlename,
+			Id:         fmt.Sprint(p.Id),
+			Name:       p.Name,
+			Surname:    p.Surname,
+			Middlename: p.Middlename,
 		},
-		ScienceDegree: s.ScienceDegree,
-		UniversityId:  fmt.Sprint(s.UniversityId),
+		ScienceDegree: p.ScienceDegree,
+		UniversityId:  fmt.Sprint(p.UniversityId),
 	}
 }
 
-func (s *Professor) MapEntityToThis(entity entities.Professor) {
+func (p *Professor) MapEntityToThis(entity entities.Professor) {
 	pId, _ := strconv.Atoi(entity.Id)
 	uId, _ := strconv.Atoi(entity.UniversityId)
-	s.Id = uint(pId)
-	s.Name = entity.Name
-	s.Surname = entity.Surname
-	s.Middlename = entity.Middlename
-	s.ScienceDegree = entity.ScienceDegree
-	s.UniversityId = uint(uId)
+	p.Id = uint(pId)
+	p.Name = entity.Name
+	p.Surname = entity.Surname
+	p.Middlename = entity.Middlename
+	p.ScienceDegree = entity.ScienceDegree
+	p.UniversityId = uint(uId)
 }

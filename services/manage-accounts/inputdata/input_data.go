@@ -1,8 +1,13 @@
 package inputdata
 
 type SignUp struct {
-	Login    string
-	Password string
+	Login         string
+	Password      string
+	Name          string
+	Surname       string
+	Middlename    string
+	ScienceDegree string
+	UniId         int
 }
 
 type CheckCredsValidity struct {
@@ -14,7 +19,7 @@ type CheckUsernameExists struct {
 	Login string
 }
 
-type GetAccountInfo struct {
+type GetProfessorInfo struct {
 	AccountId uint
 }
 

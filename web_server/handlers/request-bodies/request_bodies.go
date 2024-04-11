@@ -7,6 +7,15 @@ type Credentials struct {
 	Password string `json:"password"`
 }
 
+type SignUp struct {
+	Credentials
+	Name          string `json:"name"`
+	Surname       string `json:"surname"`
+	Middlename    string `json:"middlename"`
+	ScienceDegree string `json:"science_degree"`
+	UniversityId  int    `json:"university_id"`
+}
+
 type AddStudent struct {
 	Name                   string `json:"name"`
 	Surname                string `json:"surname"`

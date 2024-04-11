@@ -22,14 +22,16 @@ func (r *AccountRepository) GetAccountByLogin(login string) usecasemodels.Accoun
 	r.dbContext.DB.Select("*").Where("login = ?", login).Find(&acc)
 	return acc.MapToUseCaseModel()
 }
+func (r *AccountRepository) AddProfessor(prof entities.Professor) entities.Professor {
+	dbProf := models.Professor{}
+	dbProf.MapEntityToThis(prof)
+	r.dbContext.DB.Create(&dbProf)
+	return dbProf.MapToEntity()
+}
 
 func (r *AccountRepository) AddAccount(account usecasemodels.Account) {
 	dbAcc := models.Account{}
 	dbAcc.MapUseCaseModelToThis(account)
-
-	//////////////////////////////////////////////////////////////////////////
-	dbAcc.Id = 1
-
 	r.dbContext.DB.Create(&dbAcc)
 }
 

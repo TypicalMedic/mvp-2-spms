@@ -30,10 +30,10 @@ func (h *AccountHandler) GetAccountIntegrations(w http.ResponseWriter, r *http.R
 
 func (h *AccountHandler) GetAccountInfo(w http.ResponseWriter, r *http.Request) {
 	cred := GetCredentials(r)
-	input := inputdata.GetAccountInfo{
+	input := inputdata.GetProfessorInfo{
 		AccountId: cred.ProfessorId,
 	}
-	result := h.accountInteractor.GetAccountInfo(input)
+	result := h.accountInteractor.GetProfessorInfo(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
