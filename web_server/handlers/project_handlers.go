@@ -32,9 +32,10 @@ func InitProjectHandler(projInteractor interfaces.IProjetInteractor, acc interfa
 }
 
 func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	input := inputdata.GetProfessorProjects{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 	}
 	result := h.projectInteractor.GetProfessorProjects(input)
 	w.Header().Add("Content-Type", "application/json")
@@ -43,16 +44,17 @@ func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
 
 	integInput := ainputdata.GetRepoHubIntegration{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	hubInfo := h.accountInteractor.GetRepoHubIntegration(integInput)
 	input := inputdata.GetProjectCommits{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 		From:        from,
 	}
@@ -65,10 +67,11 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	input := inputdata.GetProjectById{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
 	result := h.projectInteractor.GetProjectById(input)
@@ -78,10 +81,11 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ProjectHandler) GetProjectStatistics(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	input := inputdata.GetProjectStatsById{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
 	result := h.projectInteractor.GetProjectStatsById(input)
@@ -91,7 +95,8 @@ func (h *ProjectHandler) GetProjectStatistics(w http.ResponseWriter, r *http.Req
 }
 
 func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -110,12 +115,12 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	integInput := ainputdata.GetDriveIntegration{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	driveInfo := h.accountInteractor.GetDriveIntegration(integInput)
 
 	input := inputdata.AddProject{
-		ProfessorId:         cred.ProfessorId,
+		ProfessorId:         uint(id),
 		Theme:               reqB.Theme,
 		StudentId:           uint(reqB.StudentId),
 		Year:                uint(reqB.Year),

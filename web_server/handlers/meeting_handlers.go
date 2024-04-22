@@ -9,6 +9,7 @@ import (
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -27,7 +28,8 @@ func InitMeetingHandler(meetInteractor interfaces.IMeetingInteractor, acc interf
 }
 
 func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -47,11 +49,11 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 	}
 
 	integInput := ainputdata.GetPlannerIntegration{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
 	meetingInput := minputdata.AddMeeting{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		Name:        reqB.Name,
 		Description: reqB.Description,
 		MeetingTime: reqB.MeetingTime,
@@ -69,15 +71,16 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
 	input := minputdata.GetProfessorMeetings{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		From:        from,
 	}
 
 	integInput := ainputdata.GetPlannerIntegration{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

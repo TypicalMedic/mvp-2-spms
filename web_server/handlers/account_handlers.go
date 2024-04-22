@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	"net/http"
+	"strconv"
 )
 
 type AccountHandler struct {
@@ -18,9 +19,10 @@ func InitAccountHandler(accountInteractor interfaces.IAccountInteractor) Account
 }
 
 func (h *AccountHandler) GetAccountIntegrations(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	input := inputdata.GetAccountIntegrations{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	result := h.accountInteractor.GetAccountIntegrations(input)
 	w.Header().Add("Content-Type", "application/json")
@@ -29,9 +31,10 @@ func (h *AccountHandler) GetAccountIntegrations(w http.ResponseWriter, r *http.R
 }
 
 func (h *AccountHandler) GetAccountInfo(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	input := inputdata.GetProfessorInfo{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	result := h.accountInteractor.GetProfessorInfo(input)
 	w.Header().Add("Content-Type", "application/json")

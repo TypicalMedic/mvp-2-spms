@@ -29,7 +29,8 @@ func InitTaskHandler(taskInteractor interfaces.ITaskInteractor, acc interfaces.I
 }
 
 func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 
 	headerContentTtype := r.Header.Get("Content-Type")
@@ -50,11 +51,11 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	integInput := ainputdata.GetDriveIntegration{
-		AccountId: cred.ProfessorId,
+		AccountId: uint(id),
 	}
 	driveInfo := h.accountInteractor.GetDriveIntegration(integInput)
 	input := inputdata.AddTask{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		Name:        reqB.Name,
 		Description: reqB.Description,
 		Deadline:    reqB.Deadline,
@@ -70,10 +71,11 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TaskHandler) GetAllProjectTasks(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
 	input := inputdata.GetProjectTasks{
-		ProfessorId: cred.ProfessorId,
+		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
 	result := h.taskInteractor.GetProjectTasks(input)

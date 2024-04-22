@@ -21,10 +21,11 @@ func InitUniversityHandler(uInteractor interfaces.IUniversityInteractor) Univers
 }
 
 func (h *UniversityHandler) GetAllUniEdProgrammes(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	uniId, _ := strconv.ParseUint(chi.URLParam(r, "uniID"), 10, 32)
 	input := inputdata.GetUniEducationalProgrammes{
-		ProfessorId:  cred.ProfessorId,
+		ProfessorId:  uint(id),
 		UniversityId: uint(uniId),
 	}
 	result := h.uniInteractor.GetUniEdProgrammes(input)
