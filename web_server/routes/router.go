@@ -50,7 +50,8 @@ func (r *Router) SetupMiddleware() {
 }
 
 func (r *Router) SetupRoutes() {
-	r.router.Get("/", handlers.Ping)
+	r.router.Get("/ping", handlers.Ping)
+	r.router.With(handlers.Authentificator).Get("/pingauth", handlers.Ping)
 	r.setupMeetingRoutes()
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()

@@ -5,6 +5,7 @@ import (
 	"mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
+	responsebodies "mvp-2-spms/web_server/handlers/response_bodies"
 	"mvp-2-spms/web_server/session"
 	"net/http"
 	"time"
@@ -59,10 +60,14 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	user := session.InitUserInfo(creds.Username, profId)
 	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
-	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	http.SetCookie(w, setSesionCookie(sessionToken, expiresAt))
+	resBody := responsebodies.SessionToken{
+		Token:  sessionToken,
+		Expiry: expiresAt,
+	}
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resBody)
 }
 
 func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -112,10 +117,14 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	user := session.InitUserInfo(account.Login, account.Id)
 	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
-	// Finally, we set the client cookie for "session_token" as the session token we just generated
-	http.SetCookie(w, setSesionCookie(sessionToken, expiresAt))
+	resBody := responsebodies.SessionToken{
+		Token:  sessionToken,
+		Expiry: expiresAt,
+	}
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resBody)
 }
 
 func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
@@ -138,8 +147,15 @@ func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	// We need to let the client know that the cookie is expired
 	// In the response, we set the session token to an empty
 	// value and set its expiry as the current time
-	http.SetCookie(w, deleteSesionCookie())
+
+	resBody := responsebodies.SessionToken{
+		Token:  sessionToken,
+		Expiry: time.Now(),
+	}
+
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resBody)
 }
 
 func (h *AuthHandler) RefreshSession(w http.ResponseWriter, r *http.Request) {
@@ -160,23 +176,12 @@ func (h *AuthHandler) RefreshSession(w http.ResponseWriter, r *http.Request) {
 	delete(session.Sessions, sessionToken)
 
 	// Set the new token as the users `session_token` cookie
-	http.SetCookie(w, setSesionCookie(sessionToken, expiresAt))
-	w.WriteHeader(http.StatusOK)
-}
+	resBody := responsebodies.SessionToken{
+		Token:  sessionToken,
+		Expiry: expiresAt,
+	}
 
-func setSesionCookie(sessionTok string, exp time.Time) *http.Cookie {
-	return &http.Cookie{
-		Name:    "session_token",
-		Value:   sessionTok,
-		Expires: exp,
-		Path:    "/",
-	}
-}
-func deleteSesionCookie() *http.Cookie {
-	return &http.Cookie{
-		Name:    "session_token",
-		Value:   "",
-		Expires: time.Now(),
-		Path:    "/",
-	}
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resBody)
 }
