@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha512"
 	"fmt"
+	entities "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-accounts/outputdata"
@@ -27,7 +28,12 @@ func InitAccountInteractor(accRepo interfaces.IAccountRepository, uniRepo interf
 		uniRepo:     uniRepo,
 	}
 }
-func (a *AccountInteractor) GetAccountInfo(input inputdata.GetAccountInfo) outputdata.GetAccountInfo {
+
+func (a *AccountInteractor) GetAccountProfessorId(login string) string {
+	return a.accountRepo.GetAccountByLogin(login).Id
+}
+
+func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) outputdata.GetProfessorInfo {
 	profInfo := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
 	uni := a.uniRepo.GetUniversityById(profInfo.UniversityId)
 	// add get account login
@@ -159,13 +165,29 @@ func (a *AccountInteractor) CheckUsernameExists(input inputdata.CheckUsernameExi
 	account := a.accountRepo.GetAccountByLogin(input.Login)
 	return account.Login == input.Login
 }
-func (a *AccountInteractor) SignUp(input inputdata.SignUp) {
+func (a *AccountInteractor) SignUp(input inputdata.SignUp) outputdata.SignUp {
 	salt := uuid.NewString()
 	passHash := pbkdf2.Key([]byte(input.Password), []byte(salt), pbkdf2Iterations, pbkdf2HashSize, sha512.New)
+
+	prof := entities.Professor{
+		Person: entities.Person{
+			Name:       input.Name,
+			Surname:    input.Surname,
+			Middlename: input.Middlename,
+		},
+		ScienceDegree: input.ScienceDegree,
+		UniversityId:  fmt.Sprint(input.UniId),
+	}
+	prof = a.accountRepo.AddProfessor(prof)
 	account := models.Account{
 		Login: input.Login,
 		Hash:  passHash,
 		Salt:  salt,
+		Id:    prof.Id,
 	}
 	a.accountRepo.AddAccount(account)
+	return outputdata.SignUp{
+		Id:    account.Id,
+		Login: account.Login,
+	}
 }

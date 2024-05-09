@@ -12,14 +12,3 @@ type AvailablePlace struct {
 	Cource                 uint
 	PlacesCount            uint
 }
-
-// ???
-type Account struct {
-	Id           string
-	Email        string
-	Integrations Integrations
-}
-
-type Integrations struct {
-	// api keys?
-}

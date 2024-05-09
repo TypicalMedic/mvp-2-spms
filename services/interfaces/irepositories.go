@@ -53,6 +53,8 @@ type IMeetingRepository interface {
 
 type IAccountRepository interface {
 	GetProfessorById(id string) entities.Professor
+	AddProfessor(entities.Professor) entities.Professor
+
 	GetAccountByLogin(login string) models.Account
 	AddAccount(models.Account)
 

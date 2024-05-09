@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-type GetAccountInfo struct {
+type GetProfessorInfo struct {
 	Id            int    `json:"id"`
 	Login         string `json:"login"`
 	Name          string `json:"name"`
@@ -13,10 +13,10 @@ type GetAccountInfo struct {
 	University    string `json:"university"`
 }
 
-func MapToGetAccountInfo(prof entities.Professor, uni entities.University) GetAccountInfo {
+func MapToGetAccountInfo(prof entities.Professor, uni entities.University) GetProfessorInfo {
 	pId, _ := strconv.Atoi(prof.Id)
 
-	return GetAccountInfo{
+	return GetProfessorInfo{
 		Id:            pId,
 		Login:         "", ////////////////////////////
 		Name:          prof.FullNameToString(),

@@ -12,7 +12,6 @@ type Planners map[models.PlannerName](mngInterfaces.IPlannerService)
 
 type StudentsProjectsManagementApp struct {
 	Intercators  Intercators
-	Authorizer   hInterfaces.IAuthorizer
 	Integrations Integrations
 }
 

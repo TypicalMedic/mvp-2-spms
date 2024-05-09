@@ -39,10 +39,10 @@ func (r *Router) SetupMiddleware() {
 	r.router.Use(middleware.Logger)
 	r.router.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedOrigins: []string{"https://127.0.0.1:3000", "http://127.0.0.1:3000", "https://localhost:3000", "http://localhost:3000", "http://localhost:3000"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Professor-Id"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Session-Id"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
@@ -50,7 +50,8 @@ func (r *Router) SetupMiddleware() {
 }
 
 func (r *Router) SetupRoutes() {
-	r.router.Get("/", handlers.Ping)
+	r.router.Get("/ping", handlers.Ping)
+	r.router.With(handlers.Authentificator).Get("/pingauth", handlers.Ping)
 	r.setupMeetingRoutes()
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
@@ -97,11 +98,9 @@ func (r *Router) setupAccountRoutes() {
 	accH := handlers.InitAccountHandler(r.app.Intercators.AccountManager)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
-	r.router.With(handlers.Authentificator).Route("/accounts", func(r chi.Router) {
-		r.Route("/{accID}", func(r chi.Router) {
-			r.Get("/", accH.GetAccountInfo)                     // GET /accounts/123
-			r.Get("/integrations", accH.GetAccountIntegrations) // GET /accounts/123/integrations
-		})
+	r.router.With(handlers.Authentificator).Route("/account", func(r chi.Router) {
+		r.Get("/", accH.GetAccountInfo)                     // GET /account/
+		r.Get("/integrations", accH.GetAccountIntegrations) // GET /account/integrations
 	})
 }
 
@@ -129,7 +128,7 @@ func (r *Router) setupAuthenRoutes() {
 
 	r.router.Route("/auth", func(r chi.Router) {
 		r.Route("/integration", func(r chi.Router) {
-			r.Route("/authlink", func(r chi.Router) {
+			r.With(handlers.Authentificator).Route("/authlink", func(r chi.Router) {
 				r.Get("/googlecalendar", calendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar
 				r.Get("/googledrive", driveH.GetGoogleDriveLink)          // GET /auth/integration/authlink/googledrive
 				r.Get("/github", repoHubH.GetGitHubLink)                  // GET /auth/integration/authlink/github

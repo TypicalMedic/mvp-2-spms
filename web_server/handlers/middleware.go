@@ -9,28 +9,15 @@ import (
 func Authentificator(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			// We can obtain the session token from the requests cookies, which come with every request
-			c, err := r.Cookie("session_token")
-			if err != nil {
-				if err == http.ErrNoCookie {
-					// If the cookie is not set, return an unauthorized status
-					w.WriteHeader(http.StatusUnauthorized)
-					return
-				}
-				// For any other type of error, return a bad request status
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			sessionToken := c.Value
-
-			userSession, exists := session.Sessions[sessionToken]
+			creds := GetCredentials(r)
+			userSession, exists := session.Sessions[creds.Session]
 			if !exists {
 				// If the session token is not present in session map, return an unauthorized error
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 			if userSession.IsExpired() {
-				delete(session.Sessions, sessionToken)
+				delete(session.Sessions, creds.Session)
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
@@ -39,16 +26,23 @@ func Authentificator(next http.Handler) http.Handler {
 	)
 }
 
+func GetSessionUser(r *http.Request) session.UserInfo {
+	// session is already validated by middleware
+	creds := GetCredentials(r)
+	userSession := session.Sessions[creds.Session]
+	return userSession.GetUser()
+}
+
 // ///////////////////////////////////////////////////////////////////////////??
 func GetCredentials(r *http.Request) Credntials {
 	professorId, _ := strconv.ParseUint(r.Header.Get("Professor-Id"), 10, 32)
-	authTok := r.Header.Get("Auth-Token")
+	session := r.Header.Get("Session-Id")
 	gcTok := r.Header.Get("Google-Calendar-Token")
 	gdTok := r.Header.Get("Google-Drive-Token")
 	ghTok := r.Header.Get("GitHub-Token")
 	return Credntials{
 		ProfessorId:         uint(professorId),
-		AuthToken:           authTok,
+		Session:             session,
 		GoogleCalendarToken: gcTok,
 		GoogleDriveToken:    gdTok,
 		GitHubToken:         ghTok,
@@ -57,7 +51,7 @@ func GetCredentials(r *http.Request) Credntials {
 
 type Credntials struct {
 	ProfessorId         uint
-	AuthToken           string
+	Session             string
 	GoogleCalendarToken string
 	GoogleDriveToken    string
 	GitHubToken         string

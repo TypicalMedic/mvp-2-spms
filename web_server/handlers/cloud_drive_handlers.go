@@ -25,10 +25,11 @@ func InitCloudDriveHandler(drives internal.CloudDrives, acc interfaces.IAccountI
 }
 
 func (h *CloudDriveHandler) GetGoogleDriveLink(w http.ResponseWriter, r *http.Request) {
-	cred := GetCredentials(r)
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
 	returnURL := r.URL.Query().Get("redirect")
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googledrive"
-	result := h.drives[models.GoogleDrive].GetAuthLink(redirectURI, int(cred.ProfessorId), returnURL)
+	result := h.drives[models.GoogleDrive].GetAuthLink(redirectURI, int(uint(id)), returnURL)
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
