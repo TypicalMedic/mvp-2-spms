@@ -127,6 +127,10 @@ func (r *Router) setupAuthenRoutes() {
 	authH := handlers.InitAuthHandler(r.app.Intercators.AccountManager)
 
 	r.router.Route("/auth", func(r chi.Router) {
+		r.With(handlers.BotAuthentificator).Route("/bot", func(r chi.Router) {
+			r.Post("/signinuser", authH.SignInBot)
+			r.Post("/signupuser", authH.SignUp)
+		})
 		r.Route("/integration", func(r chi.Router) {
 			r.With(handlers.Authentificator).Route("/authlink", func(r chi.Router) {
 				r.Get("/googlecalendar", calendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar

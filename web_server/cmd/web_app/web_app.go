@@ -21,6 +21,7 @@ import (
 	manageuniversities "mvp-2-spms/services/manage-universities"
 	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/routes"
+	"mvp-2-spms/web_server/session"
 	"net/http"
 
 	"google.golang.org/api/calendar/v3"
@@ -31,6 +32,7 @@ import (
 )
 
 func main() {
+	session.SetBotTokenFromJson("credentials_bot.json")
 	dsn := "root:root@tcp(127.0.0.1:3306)/student_project_management?parseTime=true"
 	gdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
