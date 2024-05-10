@@ -23,6 +23,52 @@ func InitAuthHandler(acc interfaces.IAccountInteractor) AuthHandler {
 	}
 }
 
+func (h *AuthHandler) SignInBot(w http.ResponseWriter, r *http.Request) {
+	headerContentTtype := r.Header.Get("Content-Type")
+	// проверяем соответсвтвие типа содержимого запроса
+	if headerContentTtype != "application/json" {
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return
+	}
+
+	// декодируем тело запроса
+	var creds requestbodies.CredentialsBot
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&creds)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	inp := inputdata.CheckUsernameExists{
+		Login: creds.Phone,
+	}
+	found := h.accountInteractor.CheckUsernameExists(inp)
+	if !found {
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode("account with phone is not found")
+		return
+	}
+
+	// Create a new random session token
+	sessionToken := uuid.NewString() + "/" + creds.Phone
+	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
+
+	profId := h.accountInteractor.GetAccountProfessorId(creds.Phone)
+	user := session.InitUserInfo(creds.Phone, profId)
+	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
+
+	resBody := responsebodies.SessionToken{
+		Token:  sessionToken,
+		Expiry: expiresAt,
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resBody)
+}
+
 func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса

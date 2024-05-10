@@ -6,6 +6,9 @@ type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+type CredentialsBot struct {
+	Phone string `json:"phone_number"`
+}
 
 type SignUp struct {
 	Credentials

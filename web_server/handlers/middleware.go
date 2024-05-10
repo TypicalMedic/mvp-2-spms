@@ -6,6 +6,18 @@ import (
 	"strconv"
 )
 
+func BotAuthentificator(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			botToken := r.Header.Get("Bot-Token")
+			if botToken != session.BotToken {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+}
+
 func Authentificator(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
