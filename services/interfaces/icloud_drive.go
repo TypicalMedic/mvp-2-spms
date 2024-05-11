@@ -8,5 +8,6 @@ import (
 type ICloudDrive interface {
 	IIntegration
 	AddProjectFolder(project entities.Project, driveInfo models.CloudDriveIntegration) models.DriveProject
+	AddProfessorBaseFolder() models.DriveData
 	AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask
 }

@@ -87,13 +87,16 @@ func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegrat
 	accessTok := token.AccessToken
 	expires := token.Expiry
 
+	drive.Authentificate(token)
+	baseFolder := drive.AddProfessorBaseFolder()
+
 	integr := models.CloudDriveIntegration{
 		BaseIntegration: models.BaseIntegration{
 			AccountId: fmt.Sprint(input.AccountId),
 			ApiKey:    refreshTok,
 			Type:      input.Type,
 		},
-		DriveData: models.DriveData{},
+		DriveData: baseFolder,
 	}
 	a.accountRepo.AddAccountDriveIntegration(integr)
 
