@@ -95,7 +95,7 @@ func (r *Router) setupStudentRoutes() {
 	})
 }
 func (r *Router) setupAccountRoutes() {
-	accH := handlers.InitAccountHandler(r.app.Intercators.AccountManager)
+	accH := handlers.InitAccountHandler(r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.With(handlers.Authentificator).Route("/account", func(r chi.Router) {

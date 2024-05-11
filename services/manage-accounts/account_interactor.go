@@ -12,6 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/pbkdf2"
+	"golang.org/x/oauth2"
 )
 
 const pbkdf2Iterations int = 4096
@@ -51,6 +52,19 @@ func (a *AccountInteractor) GetDriveIntegration(input inputdata.GetDriveIntegrat
 	drive := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
 	output := outputdata.MapToGetDriveIntegration(drive)
 	return output
+}
+
+func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) string {
+	driveInfo := a.accountRepo.GetAccountDriveData(fmt.Sprint(profId))
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// check for access token first????????????????????????????????????????????
+	token := &oauth2.Token{
+		RefreshToken: driveInfo.ApiKey,
+	}
+	cloudDrive.Authentificate(token)
+	folderName := cloudDrive.GetFolderNameById(folderId)
+	return folderName
 }
 
 func (a *AccountInteractor) GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) outputdata.GetRepoHubIntegration {
@@ -137,14 +151,16 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 	if drive.AccountId != "0" {
 		outputDrive = &outputdata.GetAccountIntegrationsDrive{
 			Type: outputdata.GetAccountIntegrationsIntegr{
+				Id:   drive.Type,
 				Name: drive.GetTypeAsString(),
 			},
-			BaseFolderName: drive.BaseFolderId, ///////////////////////////////////////change
+			BaseFolderId: drive.BaseFolderId, ///////////////////////////////////////change
 		}
 	}
 	if planner.AccountId != "0" {
 		outputPlanner = &outputdata.GetAccountIntegrationsPlanner{
 			Type: outputdata.GetAccountIntegrationsIntegr{
+				Id:   planner.Type,
 				Name: planner.GetTypeAsString(),
 			},
 			PlannerName: planner.PlannerData.Id, ///////////////////////////////////////change
@@ -152,6 +168,7 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 	}
 	if repohub.AccountId != "0" {
 		outputRepos = append(outputRepos, outputdata.GetAccountIntegrationsIntegr{
+			Id:   repohub.Type,
 			Name: repohub.GetRepoHubTypeAsString(),
 		})
 	}

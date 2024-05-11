@@ -45,6 +45,11 @@ func (d *GoogleDrive) AddProfessorBaseFolder() models.DriveData {
 	}
 }
 
+func (d *GoogleDrive) GetFolderNameById(id string) string {
+	folder, _ := d.api.GetFolderById(id)
+	return folder.Name
+}
+
 func (d *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask {
 	// add task folder
 	folderName := fmt.Sprint("Task ", task.Id, "_", task.Name, " until: ", task.Deadline.Format("02.01.2006"))

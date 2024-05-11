@@ -7,6 +7,7 @@ import (
 )
 
 type IAccountInteractor interface {
+	GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) string
 	GetPlannerIntegration(input inputdata.GetPlannerIntegration) outputdata.GetPlannerIntegration
 	GetDriveIntegration(input inputdata.GetDriveIntegration) outputdata.GetDriveIntegration
 	GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) outputdata.GetRepoHubIntegration
