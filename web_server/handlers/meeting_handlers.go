@@ -74,9 +74,16 @@ func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Req
 	user := GetSessionUser(r)
 	id, _ := strconv.Atoi(user.GetProfId())
 	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
+
 	input := minputdata.GetProfessorMeetings{
 		ProfessorId: uint(id),
 		From:        from,
+	}
+
+	toStr := r.URL.Query().Get("to")
+	if toStr != "" {
+		to, _ := time.Parse("2006-01-02T15:04:05.000Z", toStr)
+		input.To = to
 	}
 
 	integInput := ainputdata.GetPlannerIntegration{

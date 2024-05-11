@@ -49,7 +49,7 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 
 func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) outputdata.GetProfesorMeetings {
 	// get from db
-	meetings := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From)
+	meetings := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	// getting calendar info, should be checked for existance later
 	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))

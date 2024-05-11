@@ -9,6 +9,7 @@ import (
 type GetProfessorMeetings struct {
 	ProfessorId uint
 	From        time.Time
+	To          time.Time
 }
 
 type AddMeeting struct {
