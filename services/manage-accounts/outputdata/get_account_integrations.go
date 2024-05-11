@@ -21,11 +21,13 @@ func MapToGetAccountIntegrations(cdi *GetAccountIntegrationsDrive, pi *GetAccoun
 }
 
 type GetAccountIntegrationsIntegr struct {
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
 type GetAccountIntegrationsDrive struct {
 	Type           GetAccountIntegrationsIntegr `json:"type"`
+	BaseFolderId   string                       `json:"base_folder_id,omitempty"`
 	BaseFolderName string                       `json:"base_folder_name,omitempty"`
 }
 

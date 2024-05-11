@@ -1,6 +1,7 @@
 package clouddrive
 
 import (
+	"fmt"
 	"log"
 	googleapi "mvp-2-spms/integrations/google-api"
 	"strings"
@@ -35,13 +36,29 @@ func (d *googleDriveApi) AuthentificateService(token *oauth2.Token) {
 	d.api = api
 }
 
-func (d *googleDriveApi) CreateFolder(folderName string, parentFolder string) (*drive.File, error) {
+func (d *googleDriveApi) CreateFolder(folderName string, parentFolder ...string) (*drive.File, error) {
 	fileMetadata := &drive.File{
 		Name:     folderName,
 		MimeType: "application/vnd.google-apps.folder",
-		Parents:  []string{parentFolder},
+		Parents:  parentFolder,
 	}
 	file, err := d.api.Files.Create(fileMetadata).Fields("id", "webViewLink").Do()
+	if err == nil {
+		return file, nil
+	}
+	return nil, err
+}
+
+func (d *googleDriveApi) GetFolderById(folderId string) (*drive.File, error) {
+	file, err := d.api.Files.Get(folderId).Fields("id", "webViewLink", "name").Do()
+	if err == nil {
+		return file, nil
+	}
+	return nil, err
+}
+
+func (d *googleDriveApi) GetFoldersByName(folderName string) (*drive.FileList, error) {
+	file, err := d.api.Files.List().Q(fmt.Sprint("name='", folderName, "'")).Do()
 	if err == nil {
 		return file, nil
 	}

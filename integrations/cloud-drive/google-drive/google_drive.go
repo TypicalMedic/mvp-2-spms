@@ -29,6 +29,27 @@ func (d *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo model
 	}
 }
 
+func (d *GoogleDrive) AddProfessorBaseFolder() models.DriveData {
+	folderName := "Student Project Management System Project Folder"
+	existingFolders, _ := d.api.GetFoldersByName(folderName)
+	count := 0
+	for len(existingFolders.Files) != 0 {
+		count++
+		folderNameCopy := fmt.Sprint(folderName, " (", count, ")")
+		existingFolders, _ = d.api.GetFoldersByName(folderNameCopy)
+	}
+
+	folder, _ := d.api.CreateFolder(fmt.Sprint(folderName, " (", count, ")"))
+	return models.DriveData{
+		BaseFolderId: folder.Id,
+	}
+}
+
+func (d *GoogleDrive) GetFolderNameById(id string) string {
+	folder, _ := d.api.GetFolderById(id)
+	return folder.Name
+}
+
 func (d *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask {
 	// add task folder
 	folderName := fmt.Sprint("Task ", task.Id, "_", task.Name, " until: ", task.Deadline.Format("02.01.2006"))
