@@ -132,6 +132,8 @@ func (r *Router) setupAuthenRoutes() {
 			r.Post("/signupuser", authH.SignUp)
 		})
 		r.Route("/integration", func(r chi.Router) {
+			r.With(handlers.Authentificator).Get("/getplanners", calendarH.GetProfessorPlanners)
+			r.With(handlers.Authentificator).Post("/setplanner", calendarH.SetProfessorPlanner)
 			r.With(handlers.Authentificator).Route("/authlink", func(r chi.Router) {
 				r.Get("/googlecalendar", calendarH.GetGoogleCalendarLink) // GET /auth/integration/authlink/googlecalendar
 				r.Get("/googledrive", driveH.GetGoogleDriveLink)          // GET /auth/integration/authlink/googledrive

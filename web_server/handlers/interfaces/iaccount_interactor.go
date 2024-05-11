@@ -20,4 +20,6 @@ type IAccountInteractor interface {
 	CheckUsernameExists(input inputdata.CheckUsernameExists) bool
 	SignUp(input inputdata.SignUp) outputdata.SignUp
 	GetAccountProfessorId(login string) string
+	SetProfessorPlanner(plannerId, profId string)
+	GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) outputdata.GetProfessorIntegrPlanners
 }

@@ -71,3 +71,11 @@ func (c *googleCalendarApi) GetSchedule(startTime time.Time, calendarId string) 
 	}
 	return nil, err
 }
+
+func (c *googleCalendarApi) GetAllCalendars() (*calendar.CalendarList, error) {
+	calendars, err := c.api.CalendarList.List().Do()
+	if err == nil {
+		return calendars, nil
+	}
+	return nil, err
+}

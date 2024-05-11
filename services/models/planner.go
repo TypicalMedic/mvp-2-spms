@@ -5,11 +5,11 @@ import (
 )
 
 type PlannerData struct {
-	Id string
-	//Owner string
+	Id   string
+	Name string
 }
 
 type PlannerMeeting struct {
 	entities.Meeting
-	PlannerId string
+	MeetingPlannerId string
 }
