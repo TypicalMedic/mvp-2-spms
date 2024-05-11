@@ -47,7 +47,7 @@ type IUniversityRepository interface {
 type IMeetingRepository interface {
 	CreateMeeting(entities.Meeting) entities.Meeting
 	AssignPlannerMeeting(models.PlannerMeeting)
-	GetProfessorMeetings(profId string, from time.Time) []entities.Meeting
+	GetProfessorMeetings(profId string, from time.Time, to time.Time) []entities.Meeting
 	GetMeetingPlannerId(meetId string) string
 }
 

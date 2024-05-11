@@ -30,9 +30,13 @@ func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMe
 	r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.PlannerId)
 }
 
-func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time) []entities.Meeting {
+func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, to time.Time) []entities.Meeting {
 	var meetings []models.Meeting
-	r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time >= ?", profId, from).Order("meeting_time asc").Find(&meetings)
+	if to.IsZero() {
+		r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time > ?", profId, from).Order("meeting_time asc").Find(&meetings)
+	} else {
+		r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time > ? AND meeting_time < ?", profId, from, to).Order("meeting_time asc").Find(&meetings)
+	}
 	result := []entities.Meeting{}
 	for _, m := range meetings {
 		result = append(result, m.MapToEntity())
