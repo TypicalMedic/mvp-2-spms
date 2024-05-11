@@ -22,9 +22,21 @@ func InitGoogleCalendar(api googleCalendarApi) *GoogleCalendar {
 func (c *GoogleCalendar) AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) models.PlannerMeeting {
 	event, _ := c.api.AddEvent(meeting.Time, meeting.Name, meeting.Description, plannerInfo.PlannerData.Id)
 	return models.PlannerMeeting{
-		Meeting:   meeting,
-		PlannerId: event.Id,
+		Meeting:          meeting,
+		MeetingPlannerId: event.Id,
 	}
+}
+
+func (c *GoogleCalendar) GetAllPlanners() []models.PlannerData {
+	planners, _ := c.api.GetAllCalendars()
+	result := []models.PlannerData{}
+	for _, pl := range planners.Items {
+		result = append(result, models.PlannerData{
+			Id:   pl.Id,
+			Name: pl.Summary,
+		})
+	}
+	return result
 }
 
 func (c *GoogleCalendar) GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) []string {

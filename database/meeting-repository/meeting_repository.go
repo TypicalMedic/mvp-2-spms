@@ -27,7 +27,7 @@ func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) entities.Mee
 }
 
 func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) {
-	r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.PlannerId)
+	r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
 }
 
 func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, to time.Time) []entities.Meeting {

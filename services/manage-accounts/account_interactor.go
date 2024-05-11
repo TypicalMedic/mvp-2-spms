@@ -53,6 +53,24 @@ func (a *AccountInteractor) GetDriveIntegration(input inputdata.GetDriveIntegrat
 	output := outputdata.MapToGetDriveIntegration(drive)
 	return output
 }
+func (a *AccountInteractor) SetProfessorPlanner(plannerId, profId string) {
+	plannerInfo := a.accountRepo.GetAccountPlannerData(profId)
+	plannerInfo.PlannerData.Id = plannerId
+	a.accountRepo.UpdateAccountPlannerIntegration(plannerInfo)
+}
+
+func (a *AccountInteractor) GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) outputdata.GetProfessorIntegrPlanners {
+	plannerInfo := a.accountRepo.GetAccountPlannerData(profId)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// check for access token first????????????????????????????????????????????
+	token := &oauth2.Token{
+		RefreshToken: plannerInfo.ApiKey,
+	}
+	planner.Authentificate(token)
+
+	planners := planner.GetAllPlanners()
+	return outputdata.MapToGetProfessorIntegrPlanners(planners)
+}
 
 func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) string {
 	driveInfo := a.accountRepo.GetAccountDriveData(fmt.Sprint(profId))

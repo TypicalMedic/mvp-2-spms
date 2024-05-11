@@ -77,7 +77,9 @@ func (r *AccountRepository) AddAccountRepoHubIntegration(integr usecasemodels.Ba
 }
 
 func (r *AccountRepository) UpdateAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) {
-	r.dbContext.DB.Model(&models.PlannerIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+	plannerDb := models.PlannerIntegration{}
+	plannerDb.MapUseCaseModelToThis(integr)
+	r.dbContext.DB.Where("account_id = ?", integr.AccountId).Save(&plannerDb)
 }
 func (r *AccountRepository) UpdateAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) {
 	r.dbContext.DB.Model(&models.DriveIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)

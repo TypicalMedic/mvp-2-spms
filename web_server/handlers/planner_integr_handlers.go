@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"mvp-2-spms/internal"
-	"mvp-2-spms/services/manage-accounts/inputdata"
+	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
+	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,6 +24,46 @@ func InitPlannerIntegrationHandler(planners internal.Planners, acc interfaces.IA
 		planners:          planners,
 		accountInteractor: acc,
 	}
+}
+
+func (h *PlannerIntegrationHandler) GetProfessorPlanners(w http.ResponseWriter, r *http.Request) {
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
+
+	integInput := ainputdata.GetPlannerIntegration{
+		AccountId: uint(id),
+	}
+	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
+
+	result := h.accountInteractor.GetProfessorIntegrPlanners(fmt.Sprint(id), h.planners[models.PlannerName(calendarInfo.Type)])
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
+func (h *PlannerIntegrationHandler) SetProfessorPlanner(w http.ResponseWriter, r *http.Request) {
+	user := GetSessionUser(r)
+	id, _ := strconv.Atoi(user.GetProfId())
+
+	headerContentTtype := r.Header.Get("Content-Type")
+	// проверяем соответсвтвие типа содержимого запроса
+	if headerContentTtype != "application/json" {
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return
+	}
+
+	// декодируем тело запроса
+	var reqB requestbodies.SetProfessorPlanner
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&reqB)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	h.accountInteractor.SetProfessorPlanner(reqB.Id, fmt.Sprint(id))
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +87,7 @@ func (h *PlannerIntegrationHandler) OAuthCallbackGoogleCalendar(w http.ResponseW
 	accountId, _ := strconv.Atoi(params[0])
 	redirect := params[1]
 
-	input := inputdata.SetPlannerIntegration{
+	input := ainputdata.SetPlannerIntegration{
 		AccountId: uint(accountId),
 		AuthCode:  code,
 		Type:      int(models.GoogleCalendar),

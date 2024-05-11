@@ -6,6 +6,7 @@ type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
 type CredentialsBot struct {
 	Phone string `json:"phone_number"`
 }
@@ -17,6 +18,10 @@ type SignUp struct {
 	Middlename    string `json:"middlename"`
 	ScienceDegree string `json:"science_degree"`
 	UniversityId  int    `json:"university_id"`
+}
+
+type SetProfessorPlanner struct {
+	Id string `json:"planner_id"`
 }
 
 type AddStudent struct {
