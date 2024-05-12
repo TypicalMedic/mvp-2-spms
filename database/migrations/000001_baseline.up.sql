@@ -1,8 +1,3 @@
-CREATE DATABASE IF NOT EXISTS student_project_management;
-
-USE student_project_management;
-
-
 CREATE TABLE IF NOT EXISTS
     professor (
         id INT NOT NULL auto_increment,

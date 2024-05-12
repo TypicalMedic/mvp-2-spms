@@ -1,5 +1,3 @@
-USE student_project_management;
-
 DROP TABLE task;
 
 DROP TABLE project;
