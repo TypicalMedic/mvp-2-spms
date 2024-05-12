@@ -29,7 +29,7 @@ func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, accRepo interfa
 
 func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner interfaces.IPlannerService) outputdata.AddMeeting {
 	// adding meeting to db, returns created meeting (with id)
-	meeting := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
+	meeting, _ := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
 	// getting calendar info, should be checked for existance later
 	plannerInfo, _ := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 
 func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) outputdata.GetProfesorMeetings {
 	// get from db
-	meetings := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
+	meetings, _ := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	// getting calendar info, should be checked for existance later
 	plannerInfo, _ := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
@@ -64,7 +64,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 		student := m.studentRepo.GetStudentById(meet.ParticipantId)
 		proj := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
 		// getting planner meeting id
-		plannerId := m.meetingRepo.GetMeetingPlannerId(meet.Id)
+		plannerId, _ := m.meetingRepo.GetMeetingPlannerId(meet.Id)
 		// check if meeting exists in planner
 		hasPlanner := slices.Contains(plannerMetingsIds, plannerId)
 		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{

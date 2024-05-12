@@ -19,18 +19,19 @@ func InitMeetingRepository(dbcxt database.Database) *MeetingRepository {
 	}
 }
 
-func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) entities.Meeting {
+func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) (entities.Meeting, error) {
 	dbmeeting := models.Meeting{}
 	dbmeeting.MapEntityToThis(meeting)
 	r.dbContext.DB.Create(&dbmeeting)
-	return dbmeeting.MapToEntity()
+	return dbmeeting.MapToEntity(), nil
 }
 
-func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) {
+func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) error {
 	r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
+	return nil
 }
 
-func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, to time.Time) []entities.Meeting {
+func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, to time.Time) ([]entities.Meeting, error) {
 	var meetings []models.Meeting
 	if to.IsZero() {
 		r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time > ?", profId, from).Order("meeting_time asc").Find(&meetings)
@@ -41,11 +42,11 @@ func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, 
 	for _, m := range meetings {
 		result = append(result, m.MapToEntity())
 	}
-	return result
+	return result, nil
 }
 
-func (r *MeetingRepository) GetMeetingPlannerId(meetId string) string {
+func (r *MeetingRepository) GetMeetingPlannerId(meetId string) (string, error) {
 	meeting := models.Meeting{}
 	r.dbContext.DB.Select("planner_id").Where("id = ?", meetId).Find(&meeting)
-	return fmt.Sprint(meeting.PlannerId)
+	return fmt.Sprint(meeting.PlannerId), nil
 }

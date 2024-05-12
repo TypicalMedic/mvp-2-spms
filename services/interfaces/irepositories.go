@@ -45,10 +45,10 @@ type IUniversityRepository interface {
 
 // transfers data in domain entities
 type IMeetingRepository interface {
-	CreateMeeting(entities.Meeting) entities.Meeting
-	AssignPlannerMeeting(models.PlannerMeeting)
-	GetProfessorMeetings(profId string, from time.Time, to time.Time) []entities.Meeting
-	GetMeetingPlannerId(meetId string) string
+	CreateMeeting(entities.Meeting) (entities.Meeting, error)
+	AssignPlannerMeeting(models.PlannerMeeting) error
+	GetProfessorMeetings(profId string, from time.Time, to time.Time) ([]entities.Meeting, error)
+	GetMeetingPlannerId(meetId string) (string, error)
 }
 
 type IAccountRepository interface {
