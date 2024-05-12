@@ -39,7 +39,7 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 	}
 	planner.Authentificate(token)
 	// add meeting to calendar
-	meeitngPlanner := planner.AddMeeting(meeting, plannerInfo)
+	meeitngPlanner, _ := planner.AddMeeting(meeting, plannerInfo)
 	// add meeting id from planner
 	m.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
 	// returning id
@@ -59,7 +59,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 		RefreshToken: plannerInfo.ApiKey,
 	}
 	planner.Authentificate(token)
-	plannerMetingsIds := planner.GetScheduleMeetinIds(input.From, plannerInfo)
+	plannerMetingsIds, _ := planner.GetScheduleMeetinIds(input.From, plannerInfo)
 	for _, meet := range meetings {
 		student, _ := m.studentRepo.GetStudentById(meet.ParticipantId)
 		proj, _ := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)

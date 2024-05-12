@@ -19,15 +19,15 @@ func InitGoogleCalendar(api googleCalendarApi) *GoogleCalendar {
 	return &GoogleCalendar{api: api}
 }
 
-func (c *GoogleCalendar) AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) models.PlannerMeeting {
+func (c *GoogleCalendar) AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) (models.PlannerMeeting, error) {
 	event, _ := c.api.AddEvent(meeting.Time, meeting.Name, meeting.Description, plannerInfo.PlannerData.Id)
 	return models.PlannerMeeting{
 		Meeting:          meeting,
 		MeetingPlannerId: event.Id,
-	}
+	}, nil
 }
 
-func (c *GoogleCalendar) GetAllPlanners() []models.PlannerData {
+func (c *GoogleCalendar) GetAllPlanners() ([]models.PlannerData, error) {
 	planners, _ := c.api.GetAllCalendars()
 	result := []models.PlannerData{}
 	for _, pl := range planners.Items {
@@ -36,21 +36,21 @@ func (c *GoogleCalendar) GetAllPlanners() []models.PlannerData {
 			Name: pl.Summary,
 		})
 	}
-	return result
+	return result, nil
 }
 
-func (c *GoogleCalendar) GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) []string {
+func (c *GoogleCalendar) GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) ([]string, error) {
 	events, _ := c.api.GetSchedule(from, plannerInfo.PlannerData.Id)
 	result := []string{}
 	for _, event := range events.Items {
 		result = append(result, strings.Split(event.Id, "_")[0])
 	}
-	return result
+	return result, nil
 }
 
-func (c *GoogleCalendar) FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) bool {
+func (c *GoogleCalendar) FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) (bool, error) {
 	event, _ := c.api.GetEventById(meetId, plannerInfo.PlannerData.Id)
-	return event.Id != ""
+	return event.Id != "", nil
 }
 
 func (c *GoogleCalendar) GetAuthLink(redirectURI string, accountId int, returnURL string) (string, error) {

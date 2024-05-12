@@ -8,8 +8,8 @@ import (
 
 type IPlannerService interface {
 	IIntegration
-	AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) models.PlannerMeeting
-	FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) bool
-	GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) []string
-	GetAllPlanners() []models.PlannerData
+	AddMeeting(meeting entities.Meeting, plannerInfo models.PlannerIntegration) (models.PlannerMeeting, error)
+	FindMeetingById(meetId string, plannerInfo models.PlannerIntegration) (bool, error)
+	GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) ([]string, error)
+	GetAllPlanners() ([]models.PlannerData, error)
 }

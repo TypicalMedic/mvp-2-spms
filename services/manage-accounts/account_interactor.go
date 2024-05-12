@@ -69,7 +69,7 @@ func (a *AccountInteractor) GetProfessorIntegrPlanners(profId string, planner in
 	}
 	planner.Authentificate(token)
 
-	planners := planner.GetAllPlanners()
+	planners, _ := planner.GetAllPlanners()
 	return outputdata.MapToGetProfessorIntegrPlanners(planners)
 }
 
