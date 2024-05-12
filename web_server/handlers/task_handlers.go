@@ -53,7 +53,7 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	integInput := ainputdata.GetDriveIntegration{
 		AccountId: uint(id),
 	}
-	driveInfo := h.accountInteractor.GetDriveIntegration(integInput)
+	driveInfo, _ := h.accountInteractor.GetDriveIntegration(integInput)
 	input := inputdata.AddTask{
 		ProfessorId: uint(id),
 		Name:        reqB.Name,

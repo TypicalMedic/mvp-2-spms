@@ -52,7 +52,7 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 	integInput := ainputdata.GetRepoHubIntegration{
 		AccountId: uint(id),
 	}
-	hubInfo := h.accountInteractor.GetRepoHubIntegration(integInput)
+	hubInfo, _ := h.accountInteractor.GetRepoHubIntegration(integInput)
 	input := inputdata.GetProjectCommits{
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
@@ -117,7 +117,7 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 	integInput := ainputdata.GetDriveIntegration{
 		AccountId: uint(id),
 	}
-	driveInfo := h.accountInteractor.GetDriveIntegration(integInput)
+	driveInfo, _ := h.accountInteractor.GetDriveIntegration(integInput)
 
 	input := inputdata.AddProject{
 		ProfessorId:         uint(id),

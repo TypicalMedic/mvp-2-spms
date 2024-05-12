@@ -51,7 +51,7 @@ func (h *CloudDriveHandler) OAuthCallbackGoogleDrive(w http.ResponseWriter, r *h
 		AuthCode:  code,
 		Type:      int(models.GoogleDrive),
 	}
-	result := h.accountInteractor.SetDriveIntegration(input, h.drives[models.GoogleDrive])
+	result, _ := h.accountInteractor.SetDriveIntegration(input, h.drives[models.GoogleDrive])
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)

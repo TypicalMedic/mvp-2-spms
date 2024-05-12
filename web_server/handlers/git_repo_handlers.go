@@ -50,7 +50,7 @@ func (h *GitRepoHandler) OAuthCallbackGitHub(w http.ResponseWriter, r *http.Requ
 		Type:      int(models.GitHub),
 	}
 
-	result := h.accountInteractor.SetRepoHubIntegration(input, h.repos[models.GitHub])
+	result, _ := h.accountInteractor.SetRepoHubIntegration(input, h.repos[models.GitHub])
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)

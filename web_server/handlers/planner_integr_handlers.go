@@ -33,9 +33,9 @@ func (h *PlannerIntegrationHandler) GetProfessorPlanners(w http.ResponseWriter, 
 	integInput := ainputdata.GetPlannerIntegration{
 		AccountId: uint(id),
 	}
-	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
+	calendarInfo, _ := h.accountInteractor.GetPlannerIntegration(integInput)
 
-	result := h.accountInteractor.GetProfessorIntegrPlanners(fmt.Sprint(id), h.planners[models.PlannerName(calendarInfo.Type)])
+	result, _ := h.accountInteractor.GetProfessorIntegrPlanners(fmt.Sprint(id), h.planners[models.PlannerName(calendarInfo.Type)])
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -92,7 +92,7 @@ func (h *PlannerIntegrationHandler) OAuthCallbackGoogleCalendar(w http.ResponseW
 		AuthCode:  code,
 		Type:      int(models.GoogleCalendar),
 	}
-	result := h.accountInteractor.SetPlannerIntegration(input, h.planners[models.GoogleCalendar])
+	result, _ := h.accountInteractor.SetPlannerIntegration(input, h.planners[models.GoogleCalendar])
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)

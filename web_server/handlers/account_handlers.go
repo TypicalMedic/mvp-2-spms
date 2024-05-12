@@ -29,10 +29,10 @@ func (h *AccountHandler) GetAccountIntegrations(w http.ResponseWriter, r *http.R
 	input := inputdata.GetAccountIntegrations{
 		AccountId: uint(id),
 	}
-	result := h.accountInteractor.GetAccountIntegrations(input)
+	result, _ := h.accountInteractor.GetAccountIntegrations(input)
 
 	if result.CloudDrive.BaseFolderId != "" {
-		result.CloudDrive.BaseFolderName = h.accountInteractor.GetDriveBaseFolderName(
+		result.CloudDrive.BaseFolderName, _ = h.accountInteractor.GetDriveBaseFolderName(
 			result.CloudDrive.BaseFolderId, fmt.Sprint(id), h.cloudDrives[models.CloudDriveName(result.CloudDrive.Type.Id)])
 	}
 
@@ -47,7 +47,7 @@ func (h *AccountHandler) GetAccountInfo(w http.ResponseWriter, r *http.Request) 
 	input := inputdata.GetProfessorInfo{
 		AccountId: uint(id),
 	}
-	result := h.accountInteractor.GetProfessorInfo(input)
+	result, _ := h.accountInteractor.GetProfessorInfo(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)

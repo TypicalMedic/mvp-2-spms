@@ -5,7 +5,7 @@ import (
 	"mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
-	responsebodies "mvp-2-spms/web_server/handlers/response_bodies"
+	responsebodies "mvp-2-spms/web_server/handlers/response-bodies"
 	"mvp-2-spms/web_server/session"
 	"net/http"
 	"time"
@@ -44,7 +44,7 @@ func (h *AuthHandler) SignInBot(w http.ResponseWriter, r *http.Request) {
 	inp := inputdata.CheckUsernameExists{
 		Login: creds.Phone,
 	}
-	found := h.accountInteractor.CheckUsernameExists(inp)
+	found, _ := h.accountInteractor.CheckUsernameExists(inp)
 	if !found {
 		w.WriteHeader(http.StatusConflict)
 		json.NewEncoder(w).Encode("account with phone is not found")
@@ -55,7 +55,7 @@ func (h *AuthHandler) SignInBot(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString() + "/" + creds.Phone
 	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
-	profId := h.accountInteractor.GetAccountProfessorId(creds.Phone)
+	profId, _ := h.accountInteractor.GetAccountProfessorId(creds.Phone)
 	user := session.InitUserInfo(creds.Phone, profId)
 	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
@@ -91,7 +91,7 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		Login:    creds.Username,
 		Password: creds.Password,
 	}
-	valid := h.accountInteractor.CheckCredsValidity(input)
+	valid, _ := h.accountInteractor.CheckCredsValidity(input)
 
 	if !valid {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -102,7 +102,7 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString() + "/" + creds.Username
 	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
-	profId := h.accountInteractor.GetAccountProfessorId(creds.Username)
+	profId, _ := h.accountInteractor.GetAccountProfessorId(creds.Username)
 	user := session.InitUserInfo(creds.Username, profId)
 	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
@@ -137,7 +137,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	input := inputdata.CheckUsernameExists{
 		Login: creds.Username,
 	}
-	usernameExists := h.accountInteractor.CheckUsernameExists(input)
+	usernameExists, _ := h.accountInteractor.CheckUsernameExists(input)
 	if usernameExists {
 		w.WriteHeader(http.StatusConflict)
 		json.NewEncoder(w).Encode("username already exists")
@@ -154,7 +154,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		ScienceDegree: creds.ScienceDegree,
 	}
 
-	account := h.accountInteractor.SignUp(signupInput)
+	account, _ := h.accountInteractor.SignUp(signupInput)
 
 	// Create a new random session token
 	sessionToken := uuid.NewString() + "/" + creds.Username

@@ -51,7 +51,7 @@ func (h *MeetingHandler) AddMeeting(w http.ResponseWriter, r *http.Request) {
 	integInput := ainputdata.GetPlannerIntegration{
 		AccountId: uint(id),
 	}
-	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
+	calendarInfo, _ := h.accountInteractor.GetPlannerIntegration(integInput)
 	meetingInput := minputdata.AddMeeting{
 		ProfessorId: uint(id),
 		Name:        reqB.Name,
@@ -89,7 +89,7 @@ func (h *MeetingHandler) GetProfessorMeetings(w http.ResponseWriter, r *http.Req
 	integInput := ainputdata.GetPlannerIntegration{
 		AccountId: uint(id),
 	}
-	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
+	calendarInfo, _ := h.accountInteractor.GetPlannerIntegration(integInput)
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
 	result := h.meetingInteractor.GetProfessorMeetings(input, h.planners[models.PlannerName(calendarInfo.Type)])
