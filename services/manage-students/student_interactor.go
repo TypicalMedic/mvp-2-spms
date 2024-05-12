@@ -34,7 +34,7 @@ func (p *StudentInteractor) GetStudents(input inputdata.GetStudents) outputdata.
 	students, _ := p.studentRepo.GetStudents()
 	for _, student := range students {
 		project, _ := p.projetRepo.GetStudentCurrentProject(student.Id)
-		edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
+		edProg, _ := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
 		stEntities = append(stEntities, outputdata.GetStudentsEntities{
 			ProjectTheme:         project.Theme,
 			Student:              student,

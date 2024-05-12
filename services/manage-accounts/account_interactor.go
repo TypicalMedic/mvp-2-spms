@@ -37,7 +37,7 @@ func (a *AccountInteractor) GetAccountProfessorId(login string) string {
 
 func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) outputdata.GetProfessorInfo {
 	profInfo, _ := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
-	uni := a.uniRepo.GetUniversityById(profInfo.UniversityId)
+	uni, _ := a.uniRepo.GetUniversityById(profInfo.UniversityId)
 	// add get account login
 	output := outputdata.MapToGetAccountInfo(profInfo, uni)
 	return output

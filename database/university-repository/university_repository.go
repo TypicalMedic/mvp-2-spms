@@ -16,19 +16,19 @@ func InitUniversityRepository(dbcxt database.Database) *UniversityRepository {
 	}
 }
 
-func (u *UniversityRepository) GetEducationalProgrammeById(epId string) entities.EducationalProgramme {
+func (u *UniversityRepository) GetEducationalProgrammeById(epId string) (entities.EducationalProgramme, error) {
 	var edProg models.EducationalProgramme
 	u.dbContext.DB.Select("*").Where("id = ?", epId).Find(&edProg)
-	return edProg.MapToEntity()
+	return edProg.MapToEntity(), nil
 }
 
-func (u *UniversityRepository) GetUniversityById(uId string) entities.University {
+func (u *UniversityRepository) GetUniversityById(uId string) (entities.University, error) {
 	var uni models.University
 	u.dbContext.DB.Select("*").Where("id = ?", uId).Find(&uni)
-	return uni.MapToEntity()
+	return uni.MapToEntity(), nil
 }
 
-func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) []entities.EducationalProgramme {
+func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) ([]entities.EducationalProgramme, error) {
 	var edProgs []models.EducationalProgramme
 
 	u.dbContext.DB.Raw(
@@ -44,5 +44,5 @@ func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) 
 	for _, p := range edProgs {
 		result = append(result, p.MapToEntity())
 	}
-	return result
+	return result, nil
 }

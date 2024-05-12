@@ -19,7 +19,7 @@ func InitUniversityInteractor(uRepo interfaces.IUniversityRepository) *Universit
 
 func (p *UniversityInteractor) GetUniEdProgrammes(input inputdata.GetUniEducationalProgrammes) outputdata.GetUniEducationalProgrammes {
 	// get progs from db
-	progs := p.uniRepo.GetUniversityEducationalProgrammes(fmt.Sprint(input.UniversityId))
+	progs, _ := p.uniRepo.GetUniversityEducationalProgrammes(fmt.Sprint(input.UniversityId))
 	output := outputdata.MapToGetUniEducationalProgramme(progs)
 	return output
 }

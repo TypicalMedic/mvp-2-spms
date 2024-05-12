@@ -74,7 +74,7 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outpu
 	cloudFolder, _ := p.projectRepo.GetProjectFolderLink(fmt.Sprint(input.ProjectId))
 	// getting student info
 	student, _ := p.studentRepo.GetStudentById(project.StudentId)
-	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
+	edProg, _ := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
 	output := outputdata.MapToGetProjectsById(project, student, edProg, cloudFolder)
 	return output
 }
