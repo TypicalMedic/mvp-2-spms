@@ -7,9 +7,9 @@ import (
 )
 
 type IProjetInteractor interface {
-	GetProfessorProjects(input inputdata.GetProfessorProjects) outputdata.GetProfessorProjects
-	GetProjectCommits(input inputdata.GetProjectCommits, gitRepositoryHub interfaces.IGitRepositoryHub) outputdata.GetProjectCommits
-	GetProjectById(input inputdata.GetProjectById) outputdata.GetProjectById
-	AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) outputdata.AddProject
-	GetProjectStatsById(input inputdata.GetProjectStatsById) outputdata.GetProjectStatsById
+	GetProfessorProjects(input inputdata.GetProfessorProjects) (outputdata.GetProfessorProjects, error)
+	GetProjectCommits(input inputdata.GetProjectCommits, gitRepositoryHub interfaces.IGitRepositoryHub) (outputdata.GetProjectCommits, error)
+	GetProjectById(input inputdata.GetProjectById) (outputdata.GetProjectById, error)
+	AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) (outputdata.AddProject, error)
+	GetProjectStatsById(input inputdata.GetProjectStatsById) (outputdata.GetProjectStatsById, error)
 }

@@ -37,7 +37,7 @@ func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Reque
 	input := inputdata.GetProfessorProjects{
 		ProfessorId: uint(id),
 	}
-	result := h.projectInteractor.GetProfessorProjects(input)
+	result, _ := h.projectInteractor.GetProfessorProjects(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -60,7 +60,7 @@ func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Reques
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	result := h.projectInteractor.GetProjectCommits(input, h.repoHubs[models.GetRepoHubName(hubInfo.Type)])
+	result, _ := h.projectInteractor.GetProjectCommits(input, h.repoHubs[models.GetRepoHubName(hubInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -74,7 +74,7 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
-	result := h.projectInteractor.GetProjectById(input)
+	result, _ := h.projectInteractor.GetProjectById(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -88,7 +88,7 @@ func (h *ProjectHandler) GetProjectStatistics(w http.ResponseWriter, r *http.Req
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
-	result := h.projectInteractor.GetProjectStatsById(input)
+	result, _ := h.projectInteractor.GetProjectStatsById(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
@@ -130,7 +130,7 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	student_id := h.projectInteractor.AddProject(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
+	student_id, _ := h.projectInteractor.AddProject(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)
