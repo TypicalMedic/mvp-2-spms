@@ -17,7 +17,7 @@ func InitGoogleDrive(api googleDriveApi) *GoogleDrive {
 	return &GoogleDrive{api: api}
 }
 
-func (d *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo models.CloudDriveIntegration) models.DriveProject {
+func (d *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo models.CloudDriveIntegration) (models.DriveProject, error) {
 	folderName := fmt.Sprint("Project ", project.Id, "_", project.Theme)
 	folder, _ := d.api.CreateFolder(folderName, driveInfo.BaseFolderId)
 	return models.DriveProject{
@@ -26,10 +26,10 @@ func (d *GoogleDrive) AddProjectFolder(project entities.Project, driveInfo model
 			Id:   folder.Id,
 			Link: folder.WebViewLink,
 		},
-	}
+	}, nil
 }
 
-func (d *GoogleDrive) AddProfessorBaseFolder() models.DriveData {
+func (d *GoogleDrive) AddProfessorBaseFolder() (models.DriveData, error) {
 	folderName := "Student Project Management System Project Folder"
 	existingFolders, _ := d.api.GetFoldersByName(folderName)
 	count := 0
@@ -42,15 +42,15 @@ func (d *GoogleDrive) AddProfessorBaseFolder() models.DriveData {
 	folder, _ := d.api.CreateFolder(fmt.Sprint(folderName, " (", count, ")"))
 	return models.DriveData{
 		BaseFolderId: folder.Id,
-	}
+	}, nil
 }
 
-func (d *GoogleDrive) GetFolderNameById(id string) string {
+func (d *GoogleDrive) GetFolderNameById(id string) (string, error) {
 	folder, _ := d.api.GetFolderById(id)
-	return folder.Name
+	return folder.Name, nil
 }
 
-func (d *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) models.DriveTask {
+func (d *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string) (models.DriveTask, error) {
 	// add task folder
 	folderName := fmt.Sprint("Task ", task.Id, "_", task.Name, " until: ", task.Deadline.Format("02.01.2006"))
 	folder, _ := d.api.CreateFolder(folderName, projectFolderId)
@@ -65,21 +65,22 @@ func (d *GoogleDrive) AddTaskToDrive(task entities.Task, projectFolderId string)
 			Link: folder.WebViewLink,
 		},
 		TaskFileId: file.Id,
-	}
+	}, nil
 }
-func (d *GoogleDrive) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+func (d *GoogleDrive) GetAuthLink(redirectURI string, accountId int, returnURL string) (string, error) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// encode as JSON!
 	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
 	url := d.api.GetAuthLink(redirectURI, statestr)
-	return url
+	return url, nil
 }
 
-func (d *GoogleDrive) GetToken(code string) *oauth2.Token {
+func (d *GoogleDrive) GetToken(code string) (*oauth2.Token, error) {
 	token := d.api.GetToken(code)
-	return token
+	return token, nil
 }
 
-func (d *GoogleDrive) Authentificate(token *oauth2.Token) {
+func (d *GoogleDrive) Authentificate(token *oauth2.Token) error {
 	d.api.AuthentificateService(token)
+	return nil
 }

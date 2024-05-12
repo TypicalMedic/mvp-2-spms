@@ -40,7 +40,7 @@ func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.
 	cloudDrive.Authentificate(token)
 
 	// add folder to cloud (create folder and task file)
-	driveTask := cloudDrive.AddTaskToDrive(task, projFolder)
+	driveTask, _ := cloudDrive.AddTaskToDrive(task, projFolder)
 	// add folder id and file id from drive
 	p.taskRepo.AssignDriveTask(driveTask)
 	// returning id

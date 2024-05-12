@@ -105,7 +105,7 @@ func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive in
 	cloudDrive.Authentificate(token)
 
 	// add folder to cloud
-	driveProject := cloudDrive.AddProjectFolder(proj.Project, driveInfo)
+	driveProject, _ := cloudDrive.AddProjectFolder(proj.Project, driveInfo)
 	// add folder id from drive
 	p.projectRepo.AssignDriveFolder(driveProject)
 	// returning id

@@ -59,21 +59,22 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 	return commits
 }
 
-func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) (string, error) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// encode as JSON!
 	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
 	url := g.api.GetAuthLink(redirectURI, statestr)
-	return url
+	return url, nil
 }
 
-func (g *Github) Authentificate(token *oauth2.Token) {
+func (g *Github) Authentificate(token *oauth2.Token) error {
 	g.api.SetupClient(token)
+	return nil
 }
 
-func (g *Github) GetToken(code string) *oauth2.Token {
+func (g *Github) GetToken(code string) (*oauth2.Token, error) {
 	token := g.api.GetToken(code)
-	return token
+	return token, nil
 }
 
 func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {

@@ -71,7 +71,7 @@ func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter,
 	id, _ := strconv.Atoi(user.GetProfId())
 	returnURL := r.URL.Query().Get("redirect")
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googlecalendar"
-	result := (h.planners[models.GoogleCalendar]).GetAuthLink(redirectURI, int(uint(id)), returnURL)
+	result, _ := (h.planners[models.GoogleCalendar]).GetAuthLink(redirectURI, int(uint(id)), returnURL)
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))

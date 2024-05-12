@@ -82,7 +82,7 @@ func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, clou
 		RefreshToken: driveInfo.ApiKey,
 	}
 	cloudDrive.Authentificate(token)
-	folderName := cloudDrive.GetFolderNameById(folderId)
+	folderName, _ := cloudDrive.GetFolderNameById(folderId)
 	return folderName
 }
 
@@ -93,7 +93,7 @@ func (a *AccountInteractor) GetRepoHubIntegration(input inputdata.GetRepoHubInte
 }
 
 func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) outputdata.SetPlannerIntegration {
-	token := planner.GetToken(input.AuthCode)
+	token, _ := planner.GetToken(input.AuthCode)
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
@@ -115,13 +115,13 @@ func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerInte
 }
 
 func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegration, drive interfaces.ICloudDrive) outputdata.SetDriveIntegration {
-	token := drive.GetToken(input.AuthCode)
+	token, _ := drive.GetToken(input.AuthCode)
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
 
 	drive.Authentificate(token)
-	baseFolder := drive.AddProfessorBaseFolder()
+	baseFolder, _ := drive.AddProfessorBaseFolder()
 
 	integr := models.CloudDriveIntegration{
 		BaseIntegration: models.BaseIntegration{
@@ -140,7 +140,7 @@ func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegrat
 }
 
 func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) outputdata.SetRepoHubIntegration {
-	token := planner.GetToken(input.AuthCode)
+	token, _ := planner.GetToken(input.AuthCode)
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry

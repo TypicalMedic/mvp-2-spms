@@ -53,19 +53,20 @@ func (c *GoogleCalendar) FindMeetingById(meetId string, plannerInfo models.Plann
 	return event.Id != ""
 }
 
-func (c *GoogleCalendar) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+func (c *GoogleCalendar) GetAuthLink(redirectURI string, accountId int, returnURL string) (string, error) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// encode as JSON!
 	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
 	url := c.api.GetAuthLink(redirectURI, statestr)
-	return url
+	return url, nil
 }
 
-func (c *GoogleCalendar) GetToken(code string) *oauth2.Token {
+func (c *GoogleCalendar) GetToken(code string) (*oauth2.Token, error) {
 	token := c.api.GetToken(code)
-	return token
+	return token, nil
 }
 
-func (c *GoogleCalendar) Authentificate(token *oauth2.Token) {
+func (c *GoogleCalendar) Authentificate(token *oauth2.Token) error {
 	c.api.AuthentificateService(token)
+	return nil
 }
