@@ -31,11 +31,12 @@ func InitAccountInteractor(accRepo interfaces.IAccountRepository, uniRepo interf
 }
 
 func (a *AccountInteractor) GetAccountProfessorId(login string) string {
-	return a.accountRepo.GetAccountByLogin(login).Id
+	res, _ := a.accountRepo.GetAccountByLogin(login)
+	return res.Id
 }
 
 func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) outputdata.GetProfessorInfo {
-	profInfo := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
+	profInfo, _ := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
 	uni := a.uniRepo.GetUniversityById(profInfo.UniversityId)
 	// add get account login
 	output := outputdata.MapToGetAccountInfo(profInfo, uni)
@@ -43,24 +44,24 @@ func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) o
 }
 
 func (a *AccountInteractor) GetPlannerIntegration(input inputdata.GetPlannerIntegration) outputdata.GetPlannerIntegration {
-	planner := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
+	planner, _ := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
 	output := outputdata.MapToGetPlannerIntegration(planner)
 	return output
 }
 
 func (a *AccountInteractor) GetDriveIntegration(input inputdata.GetDriveIntegration) outputdata.GetDriveIntegration {
-	drive := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
+	drive, _ := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
 	output := outputdata.MapToGetDriveIntegration(drive)
 	return output
 }
 func (a *AccountInteractor) SetProfessorPlanner(plannerId, profId string) {
-	plannerInfo := a.accountRepo.GetAccountPlannerData(profId)
+	plannerInfo, _ := a.accountRepo.GetAccountPlannerData(profId)
 	plannerInfo.PlannerData.Id = plannerId
 	a.accountRepo.UpdateAccountPlannerIntegration(plannerInfo)
 }
 
 func (a *AccountInteractor) GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) outputdata.GetProfessorIntegrPlanners {
-	plannerInfo := a.accountRepo.GetAccountPlannerData(profId)
+	plannerInfo, _ := a.accountRepo.GetAccountPlannerData(profId)
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
 	token := &oauth2.Token{
@@ -73,7 +74,7 @@ func (a *AccountInteractor) GetProfessorIntegrPlanners(profId string, planner in
 }
 
 func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) string {
-	driveInfo := a.accountRepo.GetAccountDriveData(fmt.Sprint(profId))
+	driveInfo, _ := a.accountRepo.GetAccountDriveData(fmt.Sprint(profId))
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
@@ -86,7 +87,7 @@ func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, clou
 }
 
 func (a *AccountInteractor) GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) outputdata.GetRepoHubIntegration {
-	repoHub := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
+	repoHub, _ := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
 	output := outputdata.MapToGetRepoHubIntegration(repoHub)
 	return output
 }
@@ -157,9 +158,9 @@ func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubInte
 }
 
 func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountIntegrations) outputdata.GetAccountIntegrations {
-	drive := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
-	planner := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
-	repohub := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
+	drive, _ := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
+	planner, _ := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
+	repohub, _ := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
 
 	var (
 		outputDrive   *outputdata.GetAccountIntegrationsDrive
@@ -194,13 +195,13 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 }
 
 func (a *AccountInteractor) CheckCredsValidity(input inputdata.CheckCredsValidity) bool {
-	account := a.accountRepo.GetAccountByLogin(input.Login)
+	account, _ := a.accountRepo.GetAccountByLogin(input.Login)
 	key := pbkdf2.Key([]byte(input.Password), []byte(account.Salt), pbkdf2Iterations, pbkdf2HashSize, sha512.New)
 
 	return bytes.Equal(key, account.Hash)
 }
 func (a *AccountInteractor) CheckUsernameExists(input inputdata.CheckUsernameExists) bool {
-	account := a.accountRepo.GetAccountByLogin(input.Login)
+	account, _ := a.accountRepo.GetAccountByLogin(input.Login)
 	return account.Login == input.Login
 }
 func (a *AccountInteractor) SignUp(input inputdata.SignUp) outputdata.SignUp {
@@ -216,7 +217,7 @@ func (a *AccountInteractor) SignUp(input inputdata.SignUp) outputdata.SignUp {
 		ScienceDegree: input.ScienceDegree,
 		UniversityId:  fmt.Sprint(input.UniId),
 	}
-	prof = a.accountRepo.AddProfessor(prof)
+	prof, _ = a.accountRepo.AddProfessor(prof)
 	account := models.Account{
 		Login: input.Login,
 		Hash:  passHash,

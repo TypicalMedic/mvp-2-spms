@@ -31,7 +31,7 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 	// adding meeting to db, returns created meeting (with id)
 	meeting := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
 	// getting calendar info, should be checked for existance later
-	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	plannerInfo, _ := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
 	token := &oauth2.Token{
@@ -52,7 +52,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	meetings := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	// getting calendar info, should be checked for existance later
-	plannerInfo := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	plannerInfo, _ := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
 	token := &oauth2.Token{

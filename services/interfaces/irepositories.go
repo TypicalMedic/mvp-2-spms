@@ -52,23 +52,23 @@ type IMeetingRepository interface {
 }
 
 type IAccountRepository interface {
-	GetProfessorById(id string) entities.Professor
-	AddProfessor(entities.Professor) entities.Professor
+	GetProfessorById(id string) (entities.Professor, error)
+	AddProfessor(entities.Professor) (entities.Professor, error)
 
-	GetAccountByLogin(login string) models.Account
-	AddAccount(models.Account)
+	GetAccountByLogin(login string) (models.Account, error)
+	AddAccount(models.Account) error
 
-	GetAccountPlannerData(id string) models.PlannerIntegration  // returns planner integration for later usage of api key???
-	GetAccountDriveData(id string) models.CloudDriveIntegration // returns drive integration for later usage of api key???
-	GetAccountRepoHubData(id string) models.BaseIntegration     // returns repo hub integration for later usage of api key???
+	GetAccountPlannerData(id string) (models.PlannerIntegration, error)  // returns planner integration for later usage of api key???
+	GetAccountDriveData(id string) (models.CloudDriveIntegration, error) // returns drive integration for later usage of api key???
+	GetAccountRepoHubData(id string) (models.BaseIntegration, error)     // returns repo hub integration for later usage of api key???
 
-	AddAccountPlannerIntegration(models.PlannerIntegration)
-	AddAccountDriveIntegration(models.CloudDriveIntegration)
-	AddAccountRepoHubIntegration(models.BaseIntegration)
+	AddAccountPlannerIntegration(models.PlannerIntegration) error
+	AddAccountDriveIntegration(models.CloudDriveIntegration) error
+	AddAccountRepoHubIntegration(models.BaseIntegration) error
 
-	UpdateAccountPlannerIntegration(models.PlannerIntegration)
-	UpdateAccountDriveIntegration(models.CloudDriveIntegration)
-	UpdateAccountRepoHubIntegration(models.BaseIntegration)
+	UpdateAccountPlannerIntegration(models.PlannerIntegration) error
+	UpdateAccountDriveIntegration(models.CloudDriveIntegration) error
+	UpdateAccountRepoHubIntegration(models.BaseIntegration) error
 }
 
 type ITaskRepository interface {

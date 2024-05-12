@@ -49,7 +49,7 @@ func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits,
 	repo := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
 
 	// getting professor repo hub info, should be checked for existance later
-	repohubInfo := p.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.ProfessorId))
+	repohubInfo, _ := p.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.ProfessorId))
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
@@ -95,7 +95,7 @@ func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive in
 	// add to db with repository
 	proj := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
 	// getting professor drive info, should be checked for existance later
-	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
+	driveInfo, _ := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????

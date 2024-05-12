@@ -30,7 +30,7 @@ func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.
 	projFolder := p.projectRepo.GetProjectCloudFolderId(fmt.Sprint(input.ProjectId))
 
 	// getting professor drive info, should be checked for existance later
-	driveInfo := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
+	driveInfo, _ := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
