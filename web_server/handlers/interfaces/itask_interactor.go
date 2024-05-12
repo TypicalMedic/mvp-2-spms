@@ -7,6 +7,6 @@ import (
 )
 
 type ITaskInteractor interface {
-	AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) outputdata.AddTask
-	GetProjectTasks(input inputdata.GetProjectTasks) outputdata.GetProjectTasks
+	AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) (outputdata.AddTask, error)
+	GetProjectTasks(input inputdata.GetProjectTasks) (outputdata.GetProjectTasks, error)
 }

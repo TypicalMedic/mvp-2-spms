@@ -23,7 +23,7 @@ func InitTaskInteractor(projRepo interfaces.IProjetRepository, taskRepo interfac
 	}
 }
 
-func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) outputdata.AddTask {
+func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) (outputdata.AddTask, error) {
 	// add to db
 	task, _ := p.taskRepo.CreateTask(input.MapToTaskEntity())
 	// get project folder id
@@ -45,12 +45,12 @@ func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.
 	p.taskRepo.AssignDriveTask(driveTask)
 	// returning id
 	output := outputdata.MapToAddTask(task)
-	return output
+	return output, nil
 }
 
-func (p *TaskInteractor) GetProjectTasks(input inputdata.GetProjectTasks) outputdata.GetProjectTasks {
+func (p *TaskInteractor) GetProjectTasks(input inputdata.GetProjectTasks) (outputdata.GetProjectTasks, error) {
 	// get tasks from db
 	tasks, _ := p.taskRepo.GetProjectTasksWithCloud(fmt.Sprint(input.ProjectId))
 	output := outputdata.MapToGetProjectTasks(tasks)
-	return output
+	return output, nil
 }

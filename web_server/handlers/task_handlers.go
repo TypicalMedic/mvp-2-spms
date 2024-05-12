@@ -64,7 +64,7 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	task_id := h.taskInteractor.AddTask(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
+	task_id, _ := h.taskInteractor.AddTask(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task_id)
@@ -78,7 +78,7 @@ func (h *TaskHandler) GetAllProjectTasks(w http.ResponseWriter, r *http.Request)
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
-	result := h.taskInteractor.GetProjectTasks(input)
+	result, _ := h.taskInteractor.GetProjectTasks(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
