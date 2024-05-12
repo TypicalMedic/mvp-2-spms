@@ -32,9 +32,9 @@ type IProjetRepository interface {
 
 // transfers data in domain entities
 type IStudentRepository interface {
-	GetStudentById(studId string) entities.Student
-	GetStudents() []entities.Student
-	CreateStudent(entities.Student) entities.Student
+	GetStudentById(studId string) (entities.Student, error)
+	GetStudents() ([]entities.Student, error)
+	CreateStudent(entities.Student) (entities.Student, error)
 }
 
 type IUniversityRepository interface {

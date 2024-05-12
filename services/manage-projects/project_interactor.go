@@ -33,7 +33,7 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorPro
 	projEntities := []outputdata.GetProfessorProjectsEntities{}
 	projects, _ := p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))
 	for _, project := range projects {
-		student := p.studentRepo.GetStudentById(project.StudentId)
+		student, _ := p.studentRepo.GetStudentById(project.StudentId)
 		projEntities = append(projEntities, outputdata.GetProfessorProjectsEntities{
 			Project: project,
 			Student: student,
@@ -73,7 +73,7 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outpu
 	project, _ := p.projectRepo.GetProjectById(fmt.Sprint(input.ProjectId))
 	cloudFolder, _ := p.projectRepo.GetProjectFolderLink(fmt.Sprint(input.ProjectId))
 	// getting student info
-	student := p.studentRepo.GetStudentById(project.StudentId)
+	student, _ := p.studentRepo.GetStudentById(project.StudentId)
 	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
 	output := outputdata.MapToGetProjectsById(project, student, edProg, cloudFolder)
 	return output

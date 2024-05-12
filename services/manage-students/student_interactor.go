@@ -22,7 +22,7 @@ func InitStudentInteractor(stRepo interfaces.IStudentRepository, pjRepo interfac
 
 func (p *StudentInteractor) AddStudent(input inputdata.AddStudent) outputdata.AddStudent {
 	// adding student to db, returns created student (with id)
-	student := p.studentRepo.CreateStudent(input.MapToStudentEntity())
+	student, _ := p.studentRepo.CreateStudent(input.MapToStudentEntity())
 	// returning id
 	output := outputdata.MapToAddStudent(student)
 	return output
@@ -31,7 +31,7 @@ func (p *StudentInteractor) AddStudent(input inputdata.AddStudent) outputdata.Ad
 func (p *StudentInteractor) GetStudents(input inputdata.GetStudents) outputdata.GetStudents {
 	// get from database
 	stEntities := []outputdata.GetStudentsEntities{}
-	students := p.studentRepo.GetStudents()
+	students, _ := p.studentRepo.GetStudents()
 	for _, student := range students {
 		project, _ := p.projetRepo.GetStudentCurrentProject(student.Id)
 		edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)

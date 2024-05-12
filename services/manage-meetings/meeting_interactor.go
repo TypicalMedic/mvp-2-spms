@@ -61,7 +61,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	planner.Authentificate(token)
 	plannerMetingsIds := planner.GetScheduleMeetinIds(input.From, plannerInfo)
 	for _, meet := range meetings {
-		student := m.studentRepo.GetStudentById(meet.ParticipantId)
+		student, _ := m.studentRepo.GetStudentById(meet.ParticipantId)
 		proj, _ := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
 		// getting planner meeting id
 		plannerId, _ := m.meetingRepo.GetMeetingPlannerId(meet.Id)
