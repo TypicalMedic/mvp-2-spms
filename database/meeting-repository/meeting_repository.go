@@ -1,12 +1,14 @@
 package meetingrepository
 
 import (
-	"fmt"
+	"errors"
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
 	usecasemodels "mvp-2-spms/services/models"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type MeetingRepository struct {
@@ -22,31 +24,50 @@ func InitMeetingRepository(dbcxt database.Database) *MeetingRepository {
 func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) (entities.Meeting, error) {
 	dbmeeting := models.Meeting{}
 	dbmeeting.MapEntityToThis(meeting)
-	r.dbContext.DB.Create(&dbmeeting)
+	result := r.dbContext.DB.Create(&dbmeeting)
+	if result.Error != nil {
+		return entities.Meeting{}, result.Error
+	}
 	return dbmeeting.MapToEntity(), nil
 }
 
 func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) error {
-	r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
+	result := r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
 }
 
 func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, to time.Time) ([]entities.Meeting, error) {
-	var meetings []models.Meeting
+	var meetingsDb []models.Meeting
+
+	query := r.dbContext.DB.Select("*")
 	if to.IsZero() {
-		r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time > ?", profId, from).Order("meeting_time asc").Find(&meetings)
+		query = query.Where("professor_id = ? AND meeting_time > ?", profId, from)
 	} else {
-		r.dbContext.DB.Select("*").Where("professor_id = ? AND meeting_time > ? AND meeting_time < ?", profId, from, to).Order("meeting_time asc").Find(&meetings)
+		query = query.Where("professor_id = ? AND meeting_time > ? AND meeting_time < ?", profId, from, to)
 	}
-	result := []entities.Meeting{}
-	for _, m := range meetings {
-		result = append(result, m.MapToEntity())
+	result := query.Order("meeting_time asc").Find(&meetingsDb)
+	if result.Error != nil {
+		return []entities.Meeting{}, result.Error
 	}
-	return result, nil
+
+	meetings := []entities.Meeting{}
+	for _, m := range meetingsDb {
+		meetings = append(meetings, m.MapToEntity())
+	}
+	return meetings, nil
 }
 
 func (r *MeetingRepository) GetMeetingPlannerId(meetId string) (string, error) {
 	meeting := models.Meeting{}
-	r.dbContext.DB.Select("planner_id").Where("id = ?", meetId).Find(&meeting)
-	return fmt.Sprint(meeting.PlannerId), nil
+	result := r.dbContext.DB.Select("planner_id").Where("id = ?", meetId).Take(&meeting)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return "", usecasemodels.ErrMeetingNotFound
+		}
+		return "", result.Error
+	}
+	return meeting.PlannerId.String, nil
 }
