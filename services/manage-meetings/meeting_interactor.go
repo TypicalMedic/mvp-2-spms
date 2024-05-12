@@ -62,7 +62,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 	plannerMetingsIds := planner.GetScheduleMeetinIds(input.From, plannerInfo)
 	for _, meet := range meetings {
 		student := m.studentRepo.GetStudentById(meet.ParticipantId)
-		proj := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
+		proj, _ := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
 		// getting planner meeting id
 		plannerId, _ := m.meetingRepo.GetMeetingPlannerId(meet.Id)
 		// check if meeting exists in planner

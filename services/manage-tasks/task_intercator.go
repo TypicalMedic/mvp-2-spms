@@ -27,7 +27,7 @@ func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.
 	// add to db
 	task := p.taskRepo.CreateTask(input.MapToTaskEntity())
 	// get project folder id
-	projFolder := p.projectRepo.GetProjectCloudFolderId(fmt.Sprint(input.ProjectId))
+	projFolder, _ := p.projectRepo.GetProjectCloudFolderId(fmt.Sprint(input.ProjectId))
 
 	// getting professor drive info, should be checked for existance later
 	driveInfo, _ := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))

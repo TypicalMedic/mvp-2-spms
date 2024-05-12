@@ -19,7 +19,7 @@ func InitProjectRepository(dbcxt database.Database) *ProjectRepository {
 	}
 }
 
-func (r *ProjectRepository) GetProfessorProjects(profId string) []entities.Project {
+func (r *ProjectRepository) GetProfessorProjects(profId string) ([]entities.Project, error) {
 	var projects []models.Project
 	r.dbContext.DB.Select("*").Where("supervisor_id = ?", profId).Find(&projects)
 	result := []entities.Project{}
@@ -27,31 +27,31 @@ func (r *ProjectRepository) GetProfessorProjects(profId string) []entities.Proje
 		// вынести в маппер
 		result = append(result, pj.MapToEntity())
 	}
-	return result
+	return result, nil
 }
 
-func (r *ProjectRepository) GetProjectRepository(projId string) usecaseModels.Repository {
+func (r *ProjectRepository) GetProjectRepository(projId string) (usecaseModels.Repository, error) {
 	var project models.Project
 	r.dbContext.DB.Select("repo_id").Where("id = ?", projId).Find(&project)
 	var repo models.Repository
 	r.dbContext.DB.Select("*").Where("id = ?", project.RepoId).Find(&repo)
-	return repo.MapToUseCaseModel()
+	return repo.MapToUseCaseModel(), nil
 }
 
-func (r *ProjectRepository) GetProjectById(projId string) entities.Project {
+func (r *ProjectRepository) GetProjectById(projId string) (entities.Project, error) {
 	var project models.Project
 	r.dbContext.DB.Select("*").Where("id = ?", projId).Find(&project)
-	return project.MapToEntity()
+	return project.MapToEntity(), nil
 }
 
-func (r *ProjectRepository) CreateProject(project entities.Project) entities.Project {
+func (r *ProjectRepository) CreateProject(project entities.Project) (entities.Project, error) {
 	dbProject := models.Project{}
 	dbProject.MapEntityToThis(project)
 	r.dbContext.DB.Create(&dbProject)
-	return dbProject.MapToEntity()
+	return dbProject.MapToEntity(), nil
 }
 
-func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project, repo usecaseModels.Repository) usecaseModels.ProjectInRepository {
+func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project, repo usecaseModels.Repository) (usecaseModels.ProjectInRepository, error) {
 	dbRepo := models.Repository{}
 	dbRepo.MapModelToThis(repo)
 	r.dbContext.DB.Create(&dbRepo)
@@ -62,37 +62,39 @@ func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project
 	r.dbContext.DB.Create(&dbProject)
 	return usecaseModels.ProjectInRepository{
 		Project: dbProject.MapToEntity(),
-	}
+	}, nil
 }
 
-func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) {
+func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) error {
 	dbCloudFolder := models.CloudFolder{}
 	dbCloudFolder.MapUseCaseModelToThis(project.DriveFolder)
 	r.dbContext.DB.Create(&dbCloudFolder)
 	r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.DriveFolder.Id)
+	return nil
 }
 
-func (r *ProjectRepository) GetProjectCloudFolderId(projId string) string {
+func (r *ProjectRepository) GetProjectCloudFolderId(projId string) (string, error) {
 	proj := models.Project{}
 	r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Find(&proj)
-	return fmt.Sprint(proj.CloudId)
+	return fmt.Sprint(proj.CloudId), nil
 }
 
-func (r *ProjectRepository) GetProjectFolderLink(projId string) string {
+func (r *ProjectRepository) GetProjectFolderLink(projId string) (string, error) {
 	result := models.CloudFolder{}
-	r.dbContext.DB.Select("link").Where("id = ?", r.GetProjectCloudFolderId(projId)).Find(&result)
-	return result.Link
+	folderid, _ := r.GetProjectCloudFolderId(projId)
+	r.dbContext.DB.Select("link").Where("id = ?", folderid).Find(&result)
+	return result.Link, nil
 }
 
-func (r *ProjectRepository) GetStudentCurrentProject(studId string) entities.Project {
+func (r *ProjectRepository) GetStudentCurrentProject(studId string) (entities.Project, error) {
 	proj := models.Project{}
 	r.dbContext.DB.Select("*").Where("student_id = ? AND status_id IN(?, ?)",
 		studId, entities.ProjectInProgress,
 		entities.ProjectNotConfirmed).Order("year desc").Limit(1).Find(&proj)
-	return proj.MapToEntity()
+	return proj.MapToEntity(), nil
 }
 
-func (r *ProjectRepository) GetProjectGradingById(projId string) entities.ProjectGrading {
+func (r *ProjectRepository) GetProjectGradingById(projId string) (entities.ProjectGrading, error) {
 	var defenceGrade sql.NullFloat64
 	r.dbContext.DB.Model(models.Project{}).Select("defence_grade").Where("id=?", projId).Find(&defenceGrade)
 
@@ -116,25 +118,25 @@ func (r *ProjectRepository) GetProjectGradingById(projId string) entities.Projec
 		}
 		result.SupervisorReview = supReview.MapToEntity(criterias)
 	}
-	return result
+	return result, nil
 }
 
-func (r *ProjectRepository) GetProjectTaskInfoById(projId string) usecaseModels.TasksInfo {
+func (r *ProjectRepository) GetProjectTaskInfoById(projId string) (usecaseModels.TasksInfo, error) {
 	result := models.ProjectTaskInfo{}
 	r.dbContext.DB.Raw(` 
 	SELECT status, COUNT(status) as count
 	FROM task
 	WHERE project_id = ?
 	GROUP BY status`, projId).Scan(&result.Statuses)
-	return result.MapToUseCaseModel()
+	return result.MapToUseCaseModel(), nil
 }
 
-func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) usecaseModels.MeetingInfo {
+func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecaseModels.MeetingInfo, error) {
 	var result int
 	r.dbContext.DB.Raw(` SELECT COUNT(id) as count
 	FROM meeting
 	WHERE project_id = ? and status = 2`, projId).Scan(&result)
 	return usecaseModels.MeetingInfo{
 		PassedCount: result,
-	}
+	}, nil
 }

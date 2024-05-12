@@ -8,7 +8,7 @@ import (
 
 // transfers data in domain entities
 type IProjetRepository interface {
-	GetProfessorProjects(profId string) []entities.Project
+	GetProfessorProjects(profId string) ([]entities.Project, error)
 	// возвращать вообще все здесь??? а что делать если там нет чего-то в дб? как понять?
 	// писать что будет возвращено в структуре
 	// но тогда будет неявное раскрытие деталей реализации
@@ -17,17 +17,17 @@ type IProjetRepository interface {
 	// т.е. сущность проекта не будет содержать список тасок
 	// таски проекта будут получаться через обращение к бдшке
 	// наверно так изначально предполагается
-	GetProjectRepository(projId string) models.Repository
-	GetProjectById(projId string) entities.Project
-	CreateProject(entities.Project) entities.Project
-	CreateProjectWithRepository(entities.Project, models.Repository) models.ProjectInRepository
-	AssignDriveFolder(models.DriveProject)
-	GetProjectCloudFolderId(projId string) string
-	GetStudentCurrentProject(studId string) entities.Project
-	GetProjectFolderLink(projId string) string
-	GetProjectGradingById(projId string) entities.ProjectGrading
-	GetProjectTaskInfoById(projId string) models.TasksInfo
-	GetProjectMeetingInfoById(projId string) models.MeetingInfo
+	GetProjectRepository(projId string) (models.Repository, error)
+	GetProjectById(projId string) (entities.Project, error)
+	CreateProject(entities.Project) (entities.Project, error)
+	CreateProjectWithRepository(entities.Project, models.Repository) (models.ProjectInRepository, error)
+	AssignDriveFolder(models.DriveProject) error
+	GetProjectCloudFolderId(projId string) (string, error)
+	GetStudentCurrentProject(studId string) (entities.Project, error)
+	GetProjectFolderLink(projId string) (string, error)
+	GetProjectGradingById(projId string) (entities.ProjectGrading, error)
+	GetProjectTaskInfoById(projId string) (models.TasksInfo, error)
+	GetProjectMeetingInfoById(projId string) (models.MeetingInfo, error)
 }
 
 // transfers data in domain entities

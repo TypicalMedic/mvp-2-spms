@@ -31,7 +31,7 @@ func InitProjectInteractor(projRepo interfaces.IProjetRepository, stRepo interfa
 func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorProjects) outputdata.GetProfessorProjects {
 	// get from database
 	projEntities := []outputdata.GetProfessorProjectsEntities{}
-	projects := p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))
+	projects, _ := p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))
 	for _, project := range projects {
 		student := p.studentRepo.GetStudentById(project.StudentId)
 		projEntities = append(projEntities, outputdata.GetProfessorProjectsEntities{
@@ -46,7 +46,7 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorPro
 // returns all commits from all branches from specific time
 func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits, gitRepositoryHub interfaces.IGitRepositoryHub) outputdata.GetProjectCommits {
 	// get project repo id
-	repo := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
+	repo, _ := p.projectRepo.GetProjectRepository(fmt.Sprint(input.ProjectId))
 
 	// getting professor repo hub info, should be checked for existance later
 	repohubInfo, _ := p.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.ProfessorId))
@@ -70,8 +70,8 @@ func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits,
 // returns detailed project data (with student data and ed programme)
 func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) outputdata.GetProjectById {
 	// get project by id
-	project := p.projectRepo.GetProjectById(fmt.Sprint(input.ProjectId))
-	cloudFolder := p.projectRepo.GetProjectFolderLink(fmt.Sprint(input.ProjectId))
+	project, _ := p.projectRepo.GetProjectById(fmt.Sprint(input.ProjectId))
+	cloudFolder, _ := p.projectRepo.GetProjectFolderLink(fmt.Sprint(input.ProjectId))
 	// getting student info
 	student := p.studentRepo.GetStudentById(project.StudentId)
 	edProg := p.uniRepo.GetEducationalProgrammeById(student.EducationalProgrammeId)
@@ -84,16 +84,16 @@ func (p *ProjectInteractor) GetProjectStatsById(input inputdata.GetProjectStatsB
 	stats := models.ProjectStats{}
 	projId := fmt.Sprint(input.ProjectId)
 
-	stats.ProjectGrading = p.projectRepo.GetProjectGradingById(projId)
-	stats.MeetingInfo = p.projectRepo.GetProjectMeetingInfoById(projId)
-	stats.TasksInfo = p.projectRepo.GetProjectTaskInfoById(projId)
+	stats.ProjectGrading, _ = p.projectRepo.GetProjectGradingById(projId)
+	stats.MeetingInfo, _ = p.projectRepo.GetProjectMeetingInfoById(projId)
+	stats.TasksInfo, _ = p.projectRepo.GetProjectTaskInfoById(projId)
 	output := outputdata.MapToGetProjectStatsById(stats)
 	return output
 }
 
 func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) outputdata.AddProject {
 	// add to db with repository
-	proj := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
+	proj, _ := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
 	// getting professor drive info, should be checked for existance later
 	driveInfo, _ := p.accountRepo.GetAccountDriveData(fmt.Sprint(input.ProfessorId))
 
