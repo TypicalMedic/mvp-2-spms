@@ -17,14 +17,14 @@ func InitTaskRepository(dbcxt database.Database) *TaskRepository {
 	}
 }
 
-func (r *TaskRepository) CreateTask(task entities.Task) entities.Task {
+func (r *TaskRepository) CreateTask(task entities.Task) (entities.Task, error) {
 	dbtask := models.Task{}
 	dbtask.MapEntityToThis(task)
 	r.dbContext.DB.Create(&dbtask)
-	return dbtask.MapToEntity()
+	return dbtask.MapToEntity(), nil
 }
 
-func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) {
+func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) error {
 	dbCloudFolder := models.CloudFolder{}
 	dbCloudFolder.MapUseCaseModelToThis(task.DriveFolder)
 	r.dbContext.DB.Create(&dbCloudFolder)
@@ -33,19 +33,20 @@ func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) {
 			FolderId:   task.DriveFolder.Id,
 			TaskFileId: task.TaskFileId,
 		})
+	return nil
 }
 
-func (r *TaskRepository) GetProjectTasks(projId string) []entities.Task {
+func (r *TaskRepository) GetProjectTasks(projId string) ([]entities.Task, error) {
 	var tasks []models.Task
 	r.dbContext.DB.Select("*").Where("project_id = ?", projId).Find(&tasks)
 	result := []entities.Task{}
 	for _, t := range tasks {
 		result = append(result, t.MapToEntity())
 	}
-	return result
+	return result, nil
 }
 
-func (r *TaskRepository) GetProjectTasksWithCloud(projId string) []usecaseModels.DriveTask {
+func (r *TaskRepository) GetProjectTasksWithCloud(projId string) ([]usecaseModels.DriveTask, error) {
 	joinedResults := []struct {
 		models.Task
 		models.CloudFolder
@@ -62,5 +63,5 @@ func (r *TaskRepository) GetProjectTasksWithCloud(projId string) []usecaseModels
 			},
 		)
 	}
-	return result
+	return result, nil
 }

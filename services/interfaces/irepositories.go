@@ -72,8 +72,8 @@ type IAccountRepository interface {
 }
 
 type ITaskRepository interface {
-	CreateTask(entities.Task) entities.Task
-	AssignDriveTask(models.DriveTask)
-	GetProjectTasks(projId string) []entities.Task
-	GetProjectTasksWithCloud(projId string) []models.DriveTask
+	CreateTask(entities.Task) (entities.Task, error)
+	AssignDriveTask(models.DriveTask) error
+	GetProjectTasks(projId string) ([]entities.Task, error)
+	GetProjectTasksWithCloud(projId string) ([]models.DriveTask, error)
 }
