@@ -28,7 +28,7 @@ func (h *UniversityHandler) GetAllUniEdProgrammes(w http.ResponseWriter, r *http
 		ProfessorId:  uint(id),
 		UniversityId: uint(uniId),
 	}
-	result := h.uniInteractor.GetUniEdProgrammes(input)
+	result, _ := h.uniInteractor.GetUniEdProgrammes(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
