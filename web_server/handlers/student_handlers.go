@@ -49,7 +49,7 @@ func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 		Cource:                 uint(reqB.Cource),
 	}
 
-	student_id := h.studentInteractor.AddStudent(input)
+	student_id, _ := h.studentInteractor.AddStudent(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)
@@ -61,7 +61,7 @@ func (h *StudentHandler) GetStudents(w http.ResponseWriter, r *http.Request) {
 	input := inputdata.GetStudents{
 		ProfessorId: uint(id),
 	}
-	result := h.studentInteractor.GetStudents(input)
+	result, _ := h.studentInteractor.GetStudents(input)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
