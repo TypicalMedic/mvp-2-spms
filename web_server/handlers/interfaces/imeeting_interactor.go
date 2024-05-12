@@ -7,6 +7,6 @@ import (
 )
 
 type IMeetingInteractor interface {
-	AddMeeting(input inputdata.AddMeeting, planner interfaces.IPlannerService) outputdata.AddMeeting
-	GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) outputdata.GetProfesorMeetings
+	AddMeeting(input inputdata.AddMeeting, planner interfaces.IPlannerService) (outputdata.AddMeeting, error)
+	GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) (outputdata.GetProfesorMeetings, error)
 }

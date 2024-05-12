@@ -27,7 +27,7 @@ func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, accRepo interfa
 	}
 }
 
-func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner interfaces.IPlannerService) outputdata.AddMeeting {
+func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner interfaces.IPlannerService) (outputdata.AddMeeting, error) {
 	// adding meeting to db, returns created meeting (with id)
 	meeting, _ := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
 	// getting calendar info, should be checked for existance later
@@ -44,10 +44,10 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 	m.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
 	// returning id
 	output := outputdata.MapToAddMeeting(meeting)
-	return output
+	return output, nil
 }
 
-func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) outputdata.GetProfesorMeetings {
+func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) (outputdata.GetProfesorMeetings, error) {
 	// get from db
 	meetings, _ := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
@@ -75,5 +75,5 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 		})
 	}
 	output := outputdata.MapToGetProfesorMeetings(meetEntities)
-	return output
+	return output, nil
 }
