@@ -21,7 +21,7 @@ func InitGithub(api githubAPI) *Github {
 	return &Github{api: api}
 }
 
-func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit {
+func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) ([]models.Commit, error) {
 	// to get all commits we need to check all the branches
 	ghbranches, err := g.api.GetRepoBranches(repo.OwnerName, repo.RepoId)
 	if err != nil {
@@ -56,7 +56,7 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 		return commits[i].Date.Unix() > commits[j].Date.Unix()
 	})
 
-	return commits
+	return commits, nil
 }
 
 func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) (string, error) {

@@ -62,7 +62,7 @@ func (p *ProjectInteractor) GetProjectCommits(input inputdata.GetProjectCommits,
 	// save new token
 	p.accountRepo.UpdateAccountRepoHubIntegration(repohubInfo)
 	// get from repo
-	commits := gitRepositoryHub.GetRepositoryCommitsFromTime(repo, input.From)
+	commits, _ := gitRepositoryHub.GetRepositoryCommitsFromTime(repo, input.From)
 	output := outputdata.MapToGetProjectCommits(commits)
 	return output
 }
