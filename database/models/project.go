@@ -1,24 +1,25 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"strconv"
 )
 
 type Project struct {
-	Id                 uint    `gorm:"column:id"`
-	Theme              string  `gorm:"column:theme"`
-	Year               uint    `gorm:"column:year"`
-	SupervisorId       uint    `gorm:"column:supervisor_id"`
-	StudentId          uint    `gorm:"column:student_id"`
-	DefenceGrade       float32 `gorm:"column:defence_grade;default:null"`
-	FinalGrade         float32 `gorm:"column:final_grade;default:null"`
-	SupervisorReviewId uint    `gorm:"column:supervisor_review_id;default:null"`
-	RepoId             uint    `gorm:"column:repo_id;default:null"`
-	CloudId            string  `gorm:"column:cloud_id;default:null"`
-	StageId            uint    `gorm:"column:stage_id"`
-	StatusId           uint    `gorm:"column:status_id"`
+	Id                 uint           `gorm:"column:id"`
+	Theme              string         `gorm:"column:theme"`
+	Year               uint           `gorm:"column:year"`
+	SupervisorId       uint           `gorm:"column:supervisor_id"`
+	StudentId          uint           `gorm:"column:student_id"`
+	DefenceGrade       float32        `gorm:"column:defence_grade;default:null"`
+	FinalGrade         float32        `gorm:"column:final_grade;default:null"`
+	SupervisorReviewId uint           `gorm:"column:supervisor_review_id;default:null"`
+	RepoId             sql.NullInt64  `gorm:"column:repo_id;default:null"`
+	CloudId            sql.NullString `gorm:"column:cloud_id;default:null"`
+	StageId            uint           `gorm:"column:stage_id"`
+	StatusId           uint           `gorm:"column:status_id"`
 }
 
 func (Project) TableName() string {

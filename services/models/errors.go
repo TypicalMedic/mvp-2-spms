@@ -17,6 +17,7 @@ var (
 	ErrProjectCloudFolderLinkNotFound = errors.New("project cloud folder link not found")
 	ErrProjectRepoNotFound            = errors.New("project repository not found")
 	ErrStudentHasNoCurrentProject     = errors.New("student has no current object")
+	ErrSupervisorReviewNotFound       = errors.New("supervisor review not found")
 
 	ErrStudentNotFound = errors.New("student not found")
 
