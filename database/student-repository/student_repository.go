@@ -1,9 +1,13 @@
 package studentrepository
 
 import (
+	"errors"
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
+	usecaseModels "mvp-2-spms/services/models"
+
+	"gorm.io/gorm"
 )
 
 type StudentRepository struct {
@@ -18,24 +22,41 @@ func InitStudentRepository(dbcxt database.Database) *StudentRepository {
 
 func (r *StudentRepository) GetStudentById(studId string) (entities.Student, error) {
 	var student models.Student
-	r.dbContext.DB.Select("*").Where("id = ?", studId).Find(&student)
-	result := student.MapToEntity()
-	return result, nil
+
+	result := r.dbContext.DB.Select("*").Where("id = ?", studId).Take(&student)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return entities.Student{}, usecaseModels.ErrStudentNotFound
+		}
+		return entities.Student{}, result.Error
+	}
+
+	return student.MapToEntity(), nil
 }
 
 func (r *StudentRepository) CreateStudent(student entities.Student) (entities.Student, error) {
 	dbstudent := models.Student{}
 	dbstudent.MapEntityToThis(student)
-	r.dbContext.DB.Create(&dbstudent)
+
+	result := r.dbContext.DB.Create(&dbstudent)
+	if result.Error != nil {
+		return entities.Student{}, result.Error
+	}
+
 	return dbstudent.MapToEntity(), nil
 }
 
 func (r *StudentRepository) GetStudents() ([]entities.Student, error) {
-	var students []models.Student
-	r.dbContext.DB.Select("*").Find(&students)
-	result := []entities.Student{}
-	for _, s := range students {
-		result = append(result, s.MapToEntity())
+	var studentsDb []models.Student
+
+	result := r.dbContext.DB.Select("*").Find(&studentsDb)
+	if result.Error != nil {
+		return []entities.Student{}, result.Error
 	}
-	return result, nil
+
+	students := []entities.Student{}
+	for _, s := range studentsDb {
+		students = append(students, s.MapToEntity())
+	}
+	return students, nil
 }
