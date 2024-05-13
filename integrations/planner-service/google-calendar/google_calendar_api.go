@@ -1,7 +1,6 @@
 package googlecalendar
 
 import (
-	"log"
 	googleapi "mvp-2-spms/integrations/google-api"
 	"time"
 
@@ -24,13 +23,16 @@ func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {
 	return c
 }
 
-func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) {
+func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) error {
 	c.Authentificate(token)
+
 	api, err := calendar.NewService(c.GetContext(), option.WithHTTPClient(c.GetClient()))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		return err
 	}
+
 	c.api = api
+	return nil
 }
 
 // startTime should be UTC+0!!!
