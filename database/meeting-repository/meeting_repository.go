@@ -32,11 +32,20 @@ func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) (entities.Me
 }
 
 func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) error {
-	result := r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	err := r.dbContext.DB.Transaction(func(tx *gorm.DB) error {
+		result := r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		if result.RowsAffected == 0 {
+			return usecasemodels.ErrMeetingNotFound
+		}
+
+		return nil
+	})
+
+	return err
 }
 
 func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, to time.Time) ([]entities.Meeting, error) {
@@ -48,6 +57,7 @@ func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, 
 	} else {
 		query = query.Where("professor_id = ? AND meeting_time > ? AND meeting_time < ?", profId, from, to)
 	}
+
 	result := query.Order("meeting_time asc").Find(&meetingsDb)
 	if result.Error != nil {
 		return []entities.Meeting{}, result.Error
@@ -62,6 +72,7 @@ func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, 
 
 func (r *MeetingRepository) GetMeetingPlannerId(meetId string) (string, error) {
 	meeting := models.Meeting{}
+
 	result := r.dbContext.DB.Select("planner_id").Where("id = ?", meetId).Take(&meeting)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -69,5 +80,6 @@ func (r *MeetingRepository) GetMeetingPlannerId(meetId string) (string, error) {
 		}
 		return "", result.Error
 	}
+
 	return meeting.PlannerId.String, nil
 }

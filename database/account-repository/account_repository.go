@@ -23,6 +23,7 @@ func InitAccountRepository(dbcxt database.Database) *AccountRepository {
 
 func (r *AccountRepository) GetAccountByLogin(login string) (usecasemodels.Account, error) {
 	acc := models.Account{}
+
 	result := r.dbContext.DB.Select("*").Where("login = ?", login).Take(&acc)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -30,6 +31,7 @@ func (r *AccountRepository) GetAccountByLogin(login string) (usecasemodels.Accou
 		}
 		return usecasemodels.Account{}, result.Error
 	}
+
 	return acc.MapToUseCaseModel(), nil
 }
 
@@ -60,34 +62,41 @@ func (r *AccountRepository) DeleteAccountByLogin(login string) error {
 func (r *AccountRepository) AddProfessor(prof entities.Professor) (entities.Professor, error) {
 	dbProf := models.Professor{}
 	dbProf.MapEntityToThis(prof)
+
 	result := r.dbContext.DB.Create(&dbProf)
 	if result.Error != nil {
 		return entities.Professor{}, result.Error
 	}
+
 	return dbProf.MapToEntity(), nil
 }
 
 func (r *AccountRepository) DeleteProfessor(profId int) error {
 	dbProf := models.Professor{Id: uint(profId)}
+
 	result := r.dbContext.DB.Delete(&dbProf)
 	if result.Error != nil {
 		return result.Error
 	}
+
 	return nil
 }
 
 func (r *AccountRepository) AddAccount(account usecasemodels.Account) error {
 	dbAcc := models.Account{}
 	dbAcc.MapUseCaseModelToThis(account)
+
 	result := r.dbContext.DB.Create(&dbAcc)
 	if result.Error != nil {
 		return result.Error
 	}
+
 	return nil
 }
 
 func (r *AccountRepository) GetProfessorById(id string) (entities.Professor, error) {
 	prof := models.Professor{}
+
 	result := r.dbContext.DB.Select("*").Where("id = ?", id).Take(&prof)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -95,6 +104,7 @@ func (r *AccountRepository) GetProfessorById(id string) (entities.Professor, err
 		}
 		return entities.Professor{}, result.Error
 	}
+
 	return prof.MapToEntity(), nil
 }
 

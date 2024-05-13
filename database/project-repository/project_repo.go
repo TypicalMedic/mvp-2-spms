@@ -88,20 +88,29 @@ func (r *ProjectRepository) CreateProject(project entities.Project) (entities.Pr
 func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project, repo usecaseModels.Repository) (usecaseModels.ProjectInRepository, error) {
 	dbRepo := models.Repository{}
 	dbRepo.MapModelToThis(repo)
-	result := r.dbContext.DB.Create(&dbRepo)
-	if result.Error != nil {
-		return usecaseModels.ProjectInRepository{}, result.Error
-	}
 
 	dbProject := models.Project{}
 	dbProject.MapEntityToThis(project)
-	dbProject.RepoId = sql.NullInt64{Int64: int64(dbRepo.Id), Valid: true}
 
-	result = r.dbContext.DB.Create(&dbProject)
-	if result.Error != nil {
-		return usecaseModels.ProjectInRepository{}, result.Error
+	err := r.dbContext.DB.Transaction(func(tx *gorm.DB) error {
+		result := tx.Create(&dbRepo)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		dbProject.RepoId = sql.NullInt64{Int64: int64(dbRepo.Id), Valid: true}
+
+		result = tx.Create(&dbProject)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return usecaseModels.ProjectInRepository{}, err
 	}
-
 	return usecaseModels.ProjectInRepository{
 		Project: dbProject.MapToEntity(),
 	}, nil
@@ -111,16 +120,24 @@ func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject
 	dbCloudFolder := models.CloudFolder{}
 	dbCloudFolder.MapUseCaseModelToThis(project.DriveFolder)
 
-	result := r.dbContext.DB.Create(&dbCloudFolder)
-	if result.Error != nil {
-		return result.Error
-	}
+	err := r.dbContext.DB.Transaction(func(tx *gorm.DB) error {
+		result := tx.Create(&dbCloudFolder)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	result = r.dbContext.DB.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.DriveFolder.Id)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+		result = tx.Model(&models.Project{}).Where("id = ?", project.Project.Id).Update("cloud_id", project.DriveFolder.Id)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		if result.RowsAffected == 0 {
+			return usecaseModels.ErrProjectNotFound
+		}
+		return nil
+	})
+
+	return err
 }
 
 func (r *ProjectRepository) GetProjectCloudFolderId(projId string) (string, error) {
