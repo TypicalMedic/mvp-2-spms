@@ -4,7 +4,7 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
-	usecaseModels "mvp-2-spms/services/models"
+	usecasemodels "mvp-2-spms/services/models"
 
 	"gorm.io/gorm"
 )
@@ -31,7 +31,7 @@ func (r *TaskRepository) CreateTask(task entities.Task) (entities.Task, error) {
 	return dbtask.MapToEntity(), nil
 }
 
-func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) error {
+func (r *TaskRepository) AssignDriveTask(task usecasemodels.DriveTask) error {
 	dbCloudFolder := models.CloudFolder{}
 	dbCloudFolder.MapUseCaseModelToThis(task.DriveFolder)
 
@@ -52,7 +52,7 @@ func (r *TaskRepository) AssignDriveTask(task usecaseModels.DriveTask) error {
 		}
 		// таска с таким id не найдена, отмена транзакции
 		if result.RowsAffected == 0 {
-			return usecaseModels.ErrTaskNotFound
+			return usecasemodels.ErrTaskNotFound
 		}
 		return nil
 	})
@@ -76,7 +76,7 @@ func (r *TaskRepository) GetProjectTasks(projId string) ([]entities.Task, error)
 	return tasks, nil
 }
 
-func (r *TaskRepository) GetProjectTasksWithCloud(projId string) ([]usecaseModels.DriveTask, error) {
+func (r *TaskRepository) GetProjectTasksWithCloud(projId string) ([]usecasemodels.DriveTask, error) {
 	joinedResults := []struct {
 		models.Task
 		models.CloudFolder
@@ -84,13 +84,13 @@ func (r *TaskRepository) GetProjectTasksWithCloud(projId string) ([]usecaseModel
 
 	result := r.dbContext.DB.Model(models.Task{}).Select("*").Joins("left join cloud_folder on cloud_folder.id=task.folder_id").Where("project_id = ?", projId).Find(&joinedResults)
 	if result.Error != nil {
-		return []usecaseModels.DriveTask{}, result.Error
+		return []usecasemodels.DriveTask{}, result.Error
 	}
 
-	driveTasks := []usecaseModels.DriveTask{}
+	driveTasks := []usecasemodels.DriveTask{}
 	for _, t := range joinedResults {
 		driveTasks = append(driveTasks,
-			usecaseModels.DriveTask{
+			usecasemodels.DriveTask{
 				Task:        t.Task.MapToEntity(),
 				DriveFolder: t.CloudFolder.MapToUseCaseModel(),
 			},

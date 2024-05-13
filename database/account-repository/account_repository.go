@@ -110,53 +110,116 @@ func (r *AccountRepository) GetProfessorById(id string) (entities.Professor, err
 
 func (r *AccountRepository) GetAccountPlannerData(id string) (usecasemodels.PlannerIntegration, error) {
 	dbPlanner := models.PlannerIntegration{}
-	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbPlanner)
+
+	result := r.dbContext.DB.Select("*").Where("account_id = ?", id).Take(&dbPlanner)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return usecasemodels.PlannerIntegration{}, usecasemodels.ErrAccountPlannerDataNotFound
+		}
+		return usecasemodels.PlannerIntegration{}, result.Error
+	}
+
 	return dbPlanner.MapToUseCaseModel(), nil
 }
 
 func (r *AccountRepository) GetAccountDriveData(id string) (usecasemodels.CloudDriveIntegration, error) {
 	dbDrive := models.DriveIntegration{}
-	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbDrive)
+
+	result := r.dbContext.DB.Select("*").Where("account_id = ?", id).Take(&dbDrive)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return usecasemodels.CloudDriveIntegration{}, usecasemodels.ErrAccountDriveDataNotFound
+		}
+		return usecasemodels.CloudDriveIntegration{}, result.Error
+	}
+
 	return dbDrive.MapToUseCaseModel(), nil
 }
 
 // can return multiple for 1 account, should consider this
 func (r *AccountRepository) GetAccountRepoHubData(id string) (usecasemodels.BaseIntegration, error) {
 	dbRHub := models.GitRepositoryIntegration{}
-	r.dbContext.DB.Select("*").Where("account_id = ?", id).Find(&dbRHub)
+
+	result := r.dbContext.DB.Select("*").Where("account_id = ?", id).Take(&dbRHub)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return usecasemodels.BaseIntegration{}, usecasemodels.ErrAccountRepoHubDataNotFound
+		}
+		return usecasemodels.BaseIntegration{}, result.Error
+	}
+
 	return dbRHub.MapToUseCaseModel(), nil
 }
 
 func (r *AccountRepository) AddAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) error {
 	dbPlanner := models.PlannerIntegration{}
 	dbPlanner.MapUseCaseModelToThis(integr)
-	r.dbContext.DB.Create(&dbPlanner)
+
+	result := r.dbContext.DB.Create(&dbPlanner)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 func (r *AccountRepository) AddAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) error {
 	dbDrive := models.DriveIntegration{}
 	dbDrive.MapUseCaseModelToThis(integr)
-	r.dbContext.DB.Create(&dbDrive)
+
+	result := r.dbContext.DB.Create(&dbDrive)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 func (r *AccountRepository) AddAccountRepoHubIntegration(integr usecasemodels.BaseIntegration) error {
 	dbRepoHub := models.GitRepositoryIntegration{}
 	dbRepoHub.MapUseCaseModelToThis(integr)
-	r.dbContext.DB.Create(&dbRepoHub)
+
+	result := r.dbContext.DB.Create(&dbRepoHub)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 
 func (r *AccountRepository) UpdateAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) error {
 	plannerDb := models.PlannerIntegration{}
 	plannerDb.MapUseCaseModelToThis(integr)
-	r.dbContext.DB.Where("account_id = ?", integr.AccountId).Save(&plannerDb)
+
+	result := r.dbContext.DB.Where("account_id = ?", integr.AccountId).Save(&plannerDb)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
+
 func (r *AccountRepository) UpdateAccountDriveIntegration(integr usecasemodels.CloudDriveIntegration) error {
-	r.dbContext.DB.Model(&models.DriveIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+	result := r.dbContext.DB.Model(&models.DriveIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return usecasemodels.ErrAccountDriveDataNotFound
+	}
+
 	return nil
 }
+
 func (r *AccountRepository) UpdateAccountRepoHubIntegration(integr usecasemodels.BaseIntegration) error {
-	r.dbContext.DB.Model(&models.GitRepositoryIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+	result := r.dbContext.DB.Model(&models.GitRepositoryIntegration{}).Where("account_id = ?", integr.AccountId).Update("api_key", integr.ApiKey)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return usecasemodels.ErrAccountDriveDataNotFound
+	}
+
 	return nil
 }

@@ -7,7 +7,7 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
-	usecaseModels "mvp-2-spms/services/models"
+	usecasemodels "mvp-2-spms/services/models"
 
 	"gorm.io/gorm"
 )
@@ -36,27 +36,27 @@ func (r *ProjectRepository) GetProfessorProjects(profId string) ([]entities.Proj
 	return projects, nil
 }
 
-func (r *ProjectRepository) GetProjectRepository(projId string) (usecaseModels.Repository, error) {
+func (r *ProjectRepository) GetProjectRepository(projId string) (usecasemodels.Repository, error) {
 	var project models.Project
 	result := r.dbContext.DB.Select("repo_id").Where("id = ?", projId).Take(&project)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return usecaseModels.Repository{}, usecaseModels.ErrProjectNotFound
+			return usecasemodels.Repository{}, usecasemodels.ErrProjectNotFound
 		}
-		return usecaseModels.Repository{}, result.Error
+		return usecasemodels.Repository{}, result.Error
 	}
 
 	if !project.RepoId.Valid {
-		return usecaseModels.Repository{}, usecaseModels.ErrProjectRepoNotFound
+		return usecasemodels.Repository{}, usecasemodels.ErrProjectRepoNotFound
 	}
 
 	var repo models.Repository
 	result = r.dbContext.DB.Select("*").Where("id = ?", project.RepoId).Take(&repo)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return usecaseModels.Repository{}, usecaseModels.ErrProjectRepoNotFound
+			return usecasemodels.Repository{}, usecasemodels.ErrProjectRepoNotFound
 		}
-		return usecaseModels.Repository{}, result.Error
+		return usecasemodels.Repository{}, result.Error
 	}
 
 	return repo.MapToUseCaseModel(), nil
@@ -67,7 +67,7 @@ func (r *ProjectRepository) GetProjectById(projId string) (entities.Project, err
 	result := r.dbContext.DB.Select("*").Where("id = ?", projId).Take(&project)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return entities.Project{}, usecaseModels.ErrProjectNotFound
+			return entities.Project{}, usecasemodels.ErrProjectNotFound
 		}
 		return entities.Project{}, result.Error
 	}
@@ -85,7 +85,7 @@ func (r *ProjectRepository) CreateProject(project entities.Project) (entities.Pr
 	return dbProject.MapToEntity(), nil
 }
 
-func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project, repo usecaseModels.Repository) (usecaseModels.ProjectInRepository, error) {
+func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project, repo usecasemodels.Repository) (usecasemodels.ProjectInRepository, error) {
 	dbRepo := models.Repository{}
 	dbRepo.MapModelToThis(repo)
 
@@ -109,14 +109,14 @@ func (r *ProjectRepository) CreateProjectWithRepository(project entities.Project
 	})
 
 	if err != nil {
-		return usecaseModels.ProjectInRepository{}, err
+		return usecasemodels.ProjectInRepository{}, err
 	}
-	return usecaseModels.ProjectInRepository{
+	return usecasemodels.ProjectInRepository{
 		Project: dbProject.MapToEntity(),
 	}, nil
 }
 
-func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject) error {
+func (r *ProjectRepository) AssignDriveFolder(project usecasemodels.DriveProject) error {
 	dbCloudFolder := models.CloudFolder{}
 	dbCloudFolder.MapUseCaseModelToThis(project.DriveFolder)
 
@@ -132,7 +132,7 @@ func (r *ProjectRepository) AssignDriveFolder(project usecaseModels.DriveProject
 		}
 
 		if result.RowsAffected == 0 {
-			return usecaseModels.ErrProjectNotFound
+			return usecasemodels.ErrProjectNotFound
 		}
 		return nil
 	})
@@ -145,13 +145,13 @@ func (r *ProjectRepository) GetProjectCloudFolderId(projId string) (string, erro
 	result := r.dbContext.DB.Select("cloud_id").Where("id = ?", projId).Take(&proj)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return "", usecaseModels.ErrProjectNotFound
+			return "", usecasemodels.ErrProjectNotFound
 		}
 		return "", result.Error
 	}
 
 	if !proj.CloudId.Valid {
-		return "", usecaseModels.ErrProjectCloudFolderNotFound
+		return "", usecasemodels.ErrProjectCloudFolderNotFound
 	}
 	return fmt.Sprint(proj.CloudId.String), nil
 }
@@ -166,7 +166,7 @@ func (r *ProjectRepository) GetProjectFolderLink(projId string) (string, error) 
 	result := r.dbContext.DB.Select("link").Where("id = ?", folderid).Take(&folder)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return "", usecaseModels.ErrProjectCloudFolderLinkNotFound
+			return "", usecasemodels.ErrProjectCloudFolderLinkNotFound
 		}
 		return "", result.Error
 	}
@@ -181,7 +181,7 @@ func (r *ProjectRepository) GetStudentCurrentProject(studId string) (entities.Pr
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return entities.Project{}, usecaseModels.ErrStudentHasNoCurrentProject
+			return entities.Project{}, usecasemodels.ErrStudentHasNoCurrentProject
 		}
 		return entities.Project{}, result.Error
 	}
@@ -194,7 +194,7 @@ func (r *ProjectRepository) GetProjectGradingById(projId string) (entities.Proje
 	result := r.dbContext.DB.Model(models.Project{}).Select("defence_grade").Where("id=?", projId).Take(&defenceGrade)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return entities.ProjectGrading{}, usecaseModels.ErrProjectNotFound
+			return entities.ProjectGrading{}, usecasemodels.ErrProjectNotFound
 		}
 		return entities.ProjectGrading{}, result.Error
 	}
@@ -203,7 +203,7 @@ func (r *ProjectRepository) GetProjectGradingById(projId string) (entities.Proje
 	result = r.dbContext.DB.Model(models.Project{}).Select("supervisor_review_id").Where("id=?", projId).Take(&supReview.Id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return entities.ProjectGrading{}, usecaseModels.ErrProjectNotFound
+			return entities.ProjectGrading{}, usecasemodels.ErrProjectNotFound
 		}
 		return entities.ProjectGrading{}, result.Error
 	}
@@ -218,7 +218,7 @@ func (r *ProjectRepository) GetProjectGradingById(projId string) (entities.Proje
 		result = r.dbContext.DB.Select("*").Where("id=?", supReview.Id).Take(&supReview)
 		if result.Error != nil {
 			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				return entities.ProjectGrading{}, usecaseModels.ErrSupervisorReviewNotFound
+				return entities.ProjectGrading{}, usecasemodels.ErrSupervisorReviewNotFound
 			}
 			return entities.ProjectGrading{}, result.Error
 		}
@@ -235,7 +235,7 @@ func (r *ProjectRepository) GetProjectGradingById(projId string) (entities.Proje
 	return grading, nil
 }
 
-func (r *ProjectRepository) GetProjectTaskInfoById(projId string) (usecaseModels.TasksInfo, error) {
+func (r *ProjectRepository) GetProjectTaskInfoById(projId string) (usecasemodels.TasksInfo, error) {
 	taskInfo := models.ProjectTaskInfo{}
 
 	result := r.dbContext.DB.Raw(` 
@@ -244,13 +244,13 @@ func (r *ProjectRepository) GetProjectTaskInfoById(projId string) (usecaseModels
 	WHERE project_id = ?
 	GROUP BY status`, projId).Scan(&taskInfo.Statuses)
 	if result.Error != nil {
-		return usecaseModels.TasksInfo{}, result.Error
+		return usecasemodels.TasksInfo{}, result.Error
 	}
 
 	return taskInfo.MapToUseCaseModel(), nil
 }
 
-func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecaseModels.MeetingInfo, error) {
+func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecasemodels.MeetingInfo, error) {
 	var meetCount int
 
 	result := r.dbContext.DB.Raw(`
@@ -258,10 +258,10 @@ func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecaseMod
 	FROM meeting
 	WHERE project_id = ? and status = 2`, projId).Scan(&meetCount)
 	if result.Error != nil {
-		return usecaseModels.MeetingInfo{}, result.Error
+		return usecasemodels.MeetingInfo{}, result.Error
 	}
 
-	return usecaseModels.MeetingInfo{
+	return usecasemodels.MeetingInfo{
 		PassedCount: meetCount,
 	}, nil
 }

@@ -5,7 +5,7 @@ import (
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
-	usecaseModels "mvp-2-spms/services/models"
+	usecasemodels "mvp-2-spms/services/models"
 
 	"gorm.io/gorm"
 )
@@ -26,7 +26,7 @@ func (r *StudentRepository) GetStudentById(studId string) (entities.Student, err
 	result := r.dbContext.DB.Select("*").Where("id = ?", studId).Take(&student)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return entities.Student{}, usecaseModels.ErrStudentNotFound
+			return entities.Student{}, usecasemodels.ErrStudentNotFound
 		}
 		return entities.Student{}, result.Error
 	}
