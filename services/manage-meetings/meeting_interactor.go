@@ -38,26 +38,33 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 	}
 
 	// getting calendar info, should be checked for existance later
+	plannerFound := true
 	plannerInfo, err := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	if err != nil {
-		return outputdata.AddMeeting{}, err
+		if !errors.Is(err, models.ErrAccountPlannerDataNotFound) {
+			return outputdata.AddMeeting{}, err
+		}
+		plannerFound = false
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// check for access token first????????????????????????????????????????????
-	token := &oauth2.Token{
-		RefreshToken: plannerInfo.ApiKey,
-	}
+	meeitngPlanner := models.PlannerMeeting{Meeting: meeting}
+	if plannerFound {
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// check for access token first????????????????????????????????????????????
+		token := &oauth2.Token{
+			RefreshToken: plannerInfo.ApiKey,
+		}
 
-	err = planner.Authentificate(token)
-	if err != nil {
-		return outputdata.AddMeeting{}, err
-	}
+		err = planner.Authentificate(token)
+		if err != nil {
+			return outputdata.AddMeeting{}, err
+		}
 
-	// add meeting to calendar
-	meeitngPlanner, err := planner.AddMeeting(meeting, plannerInfo)
-	if err != nil {
-		return outputdata.AddMeeting{}, err
+		// add meeting to calendar
+		meeitngPlanner, err = planner.AddMeeting(meeting, plannerInfo)
+		if err != nil {
+			return outputdata.AddMeeting{}, err
+		}
 	}
 
 	// add meeting id from planner
@@ -80,25 +87,32 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	// getting calendar info, should be checked for existance later
+	plannerFound := true
 	plannerInfo, err := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
 	if err != nil {
-		return outputdata.GetProfesorMeetings{}, err
+		if !errors.Is(err, models.ErrAccountPlannerDataNotFound) {
+			return outputdata.GetProfesorMeetings{}, err
+		}
+		plannerFound = false
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// check for access token first????????????????????????????????????????????
-	token := &oauth2.Token{
-		RefreshToken: plannerInfo.ApiKey,
-	}
+	plannerMetingsIds := []string{}
+	if plannerFound {
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// check for access token first????????????????????????????????????????????
+		token := &oauth2.Token{
+			RefreshToken: plannerInfo.ApiKey,
+		}
 
-	err = planner.Authentificate(token)
-	if err != nil {
-		return outputdata.GetProfesorMeetings{}, err
-	}
+		err = planner.Authentificate(token)
+		if err != nil {
+			return outputdata.GetProfesorMeetings{}, err
+		}
 
-	plannerMetingsIds, err := planner.GetScheduleMeetingIds(input.From, plannerInfo)
-	if err != nil {
-		return outputdata.GetProfesorMeetings{}, err
+		plannerMetingsIds, err = planner.GetScheduleMeetingIds(input.From, plannerInfo)
+		if err != nil {
+			return outputdata.GetProfesorMeetings{}, err
+		}
 	}
 
 	for _, meet := range meetings {
