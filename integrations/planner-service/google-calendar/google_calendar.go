@@ -57,12 +57,12 @@ func (c *GoogleCalendar) GetAuthLink(redirectURI string, accountId int, returnUR
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// encode as JSON!
 	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
-	url := c.api.GetAuthLink(redirectURI, statestr)
+	url, _ := c.api.GetAuthLink(redirectURI, statestr)
 	return url, nil
 }
 
 func (c *GoogleCalendar) GetToken(code string) (*oauth2.Token, error) {
-	token := c.api.GetToken(code)
+	token, _ := c.api.GetToken(code)
 	return token, nil
 }
 
