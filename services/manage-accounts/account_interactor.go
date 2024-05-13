@@ -263,7 +263,7 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 				Id:   drive.Type,
 				Name: drive.GetTypeAsString(),
 			},
-			BaseFolderId: drive.BaseFolderId, ///////////////////////////////////////change
+			BaseFolderId: drive.BaseFolderId,
 		}
 	}
 

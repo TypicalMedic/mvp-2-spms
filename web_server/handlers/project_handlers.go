@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"mvp-2-spms/internal"
+	mngInterfaces "mvp-2-spms/services/interfaces"
 	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/models"
@@ -32,71 +34,208 @@ func InitProjectHandler(projInteractor interfaces.IProjetInteractor, acc interfa
 }
 
 func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	input := inputdata.GetProfessorProjects{
 		ProfessorId: uint(id),
 	}
-	result, _ := h.projectInteractor.GetProfessorProjects(input)
+
+	result, err := h.projectInteractor.GetProfessorProjects(input)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
 func (h *ProjectHandler) GetProjectCommits(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
-	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
-	from, _ := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	from, err := time.Parse("2006-01-02T15:04:05.000Z", r.URL.Query().Get("from"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	integInput := ainputdata.GetRepoHubIntegration{
 		AccountId: uint(id),
 	}
-	hubInfo, _ := h.accountInteractor.GetRepoHubIntegration(integInput)
+
+	found := true
+	hubInfo, err := h.accountInteractor.GetRepoHubIntegration(integInput)
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountRepoHubDataNotFound) {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		found = false
+	}
+
+	if !found {
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	input := inputdata.GetProjectCommits{
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 		From:        from,
 	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	result, _ := h.projectInteractor.GetProjectCommits(input, h.repoHubs[models.GetRepoHubName(hubInfo.Type)])
+	result, err := h.projectInteractor.GetProjectCommits(input, h.repoHubs[models.GetRepoHubName(hubInfo.Type)])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
 func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
-	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	input := inputdata.GetProjectById{
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
-	result, _ := h.projectInteractor.GetProjectById(input)
+
+	result, err := h.projectInteractor.GetProjectById(input)
+	if err != nil {
+		if errors.Is(err, models.ErrProjectNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
 func (h *ProjectHandler) GetProjectStatistics(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
-	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	input := inputdata.GetProjectStatsById{
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
-	result, _ := h.projectInteractor.GetProjectStatsById(input)
+
+	result, err := h.projectInteractor.GetProjectStatsById(input)
+	if err != nil {
+		if errors.Is(err, models.ErrProjectNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
 func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -109,15 +248,32 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 	var reqB requestbodies.AddProject
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&reqB)
+
+	err = decoder.Decode(&reqB)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	integInput := ainputdata.GetDriveIntegration{
 		AccountId: uint(id),
 	}
-	driveInfo, _ := h.accountInteractor.GetDriveIntegration(integInput)
+
+	found := true
+	driveInfo, err := h.accountInteractor.GetDriveIntegration(integInput)
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountDriveDataNotFound) {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		found = false
+	}
+
+	var drive mngInterfaces.ICloudDrive
+	if found {
+		drive = h.cloudDrives[models.CloudDriveName(driveInfo.Type)]
+	}
 
 	input := inputdata.AddProject{
 		ProfessorId:         uint(id),
@@ -130,7 +286,13 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	student_id, _ := h.projectInteractor.AddProject(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
+	student_id, err := h.projectInteractor.AddProject(input, drive)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)
