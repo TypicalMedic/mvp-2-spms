@@ -30,31 +30,34 @@ func InitGithubAPI() githubAPI {
 	return githubAPI{Context: ctx, config: config}
 }
 
-func (g *githubAPI) GetAuthLink(redirectURI string, state string) string {
+func (g *githubAPI) GetAuthLink(redirectURI string, state string) (string, error) {
 	// work with oauth state!!!
 	g.config.RedirectURL = redirectURI
 	authURL := g.config.AuthCodeURL(state, oauth2.AccessTypeOffline)
-	return authURL
+	return authURL, nil
 }
 
-func (g *githubAPI) GetToken(authCode string) *oauth2.Token {
+func (g *githubAPI) GetToken(authCode string) (*oauth2.Token, error) {
 	tok, err := g.config.Exchange(context.TODO(), authCode)
 	if err != nil {
-		log.Fatalf("Unable to retrieve token from web: %v", err)
+		return nil, err
 	}
-	return tok
+	return tok, nil
 }
 
-func (g *githubAPI) SetupClient(token *oauth2.Token) {
+func (g *githubAPI) SetupClient(token *oauth2.Token) error {
 	tokenSource := g.config.TokenSource(context.Background(), token)
+
 	newToken, err := tokenSource.Token()
 	if err != nil {
-		log.Fatalf("Unable to retrieve token: %v", err)
+		return err
 	}
+
 	client := oauth2.NewClient(context.Background(), tokenSource)
 	g.api = github.NewClient(client)
 
 	*token = *newToken
+	return nil
 }
 
 func (g *githubAPI) GetRepoBranchCommitsFromTime(owner, repoName string, fromTime time.Time, branch string) ([]*github.RepositoryCommit, error) {
@@ -80,6 +83,7 @@ func readConfigFromJSON(filename string) (*oauth2.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	type cred struct {
 		ClientID     string   `json:"client_id"`
 		ClientSecret string   `json:"client_secret"`
@@ -91,9 +95,11 @@ func readConfigFromJSON(filename string) (*oauth2.Config, error) {
 		Web       *cred `json:"web"`
 		Installed *cred `json:"installed"`
 	}
+
 	if err := json.Unmarshal(b, &j); err != nil {
 		return nil, err
 	}
+
 	var c *cred
 	switch {
 	case j.Web != nil:
@@ -103,9 +109,11 @@ func readConfigFromJSON(filename string) (*oauth2.Config, error) {
 	default:
 		return nil, fmt.Errorf("no credentials found")
 	}
+
 	if len(c.RedirectURIs) < 1 {
 		return nil, errors.New(" missing redirect URL in the client_credentials.json")
 	}
+
 	return &oauth2.Config{
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
