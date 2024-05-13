@@ -48,7 +48,7 @@ func (c *GoogleCalendar) GetAllPlanners() ([]models.PlannerData, error) {
 	return result, nil
 }
 
-func (c *GoogleCalendar) GetScheduleMeetinIds(from time.Time, plannerInfo models.PlannerIntegration) ([]string, error) {
+func (c *GoogleCalendar) GetScheduleMeetingIds(from time.Time, plannerInfo models.PlannerIntegration) ([]string, error) {
 	events, err := c.api.GetSchedule(from, plannerInfo.PlannerData.Id)
 	if err != nil {
 		return []string{}, err
