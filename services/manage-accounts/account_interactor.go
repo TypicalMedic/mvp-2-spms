@@ -243,8 +243,8 @@ func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubInte
 
 func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountIntegrations) (outputdata.GetAccountIntegrations, error) {
 	var (
-		outputDrive   *outputdata.GetAccountIntegrationsDrive
-		outputPlanner *outputdata.GetAccountIntegrationsPlanner
+		outputDrive   *outputdata.GetAccountIntegrationsDrive   = nil
+		outputPlanner *outputdata.GetAccountIntegrationsPlanner = nil
 		outputRepos   []outputdata.GetAccountIntegrationsIntegr = []outputdata.GetAccountIntegrationsIntegr{}
 	)
 

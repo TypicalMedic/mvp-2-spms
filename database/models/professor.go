@@ -29,7 +29,7 @@ func (p *Professor) MapToEntity() entities.Professor {
 			Middlename: p.Middlename,
 		},
 		ScienceDegree: p.ScienceDegree,
-		UniversityId:  fmt.Sprint(p.UniversityId),
+		UniversityId:  fmt.Sprint(p.UniversityId.Value()),
 	}
 }
 

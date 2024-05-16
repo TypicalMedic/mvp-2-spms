@@ -50,7 +50,7 @@ func (h *AccountHandler) GetAccountIntegrations(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if result.CloudDrive != nil {
+	if result.CloudDrive != nil && result.CloudDrive.BaseFolderId != "" {
 		result.CloudDrive.BaseFolderName, err = h.accountInteractor.GetDriveBaseFolderName(
 			result.CloudDrive.BaseFolderId, fmt.Sprint(id), h.cloudDrives[models.CloudDriveName(result.CloudDrive.Type.Id)])
 		if err != nil {

@@ -2,6 +2,7 @@ package googlecalendar
 
 import (
 	googleapi "mvp-2-spms/integrations/google-api"
+	"strings"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -37,17 +38,17 @@ func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) error {
 
 // startTime should be UTC+0!!!
 func (c *googleCalendarApi) AddEvent(startTime time.Time, summary string, desc string, calendarId string) (*calendar.Event, error) {
-	endTime := startTime.Add(EVENT_DURATION_HOURS * time.Hour).Format(time.RFC3339)
+	endTime := strings.Split(startTime.Add(EVENT_DURATION_HOURS*time.Hour).Format(time.RFC3339), "Z")[0]
 	event := &calendar.Event{
 		Summary:     summary,
 		Description: desc,
 		Start: &calendar.EventDateTime{
-			DateTime: startTime.Format(time.RFC3339),
-			TimeZone: "Asia/Yekaterinburg",
+			TimeZone: "Etc/GMT-5",
+			DateTime: strings.Split(startTime.Format(time.RFC3339), "Z")[0],
 		},
 		End: &calendar.EventDateTime{
+			TimeZone: "Etc/GMT-5", //////////////////////////////////////?????????????????????????????????????
 			DateTime: endTime,
-			TimeZone: "Asia/Yekaterinburg", //////////////////////////////////////?????????????????????????????????????
 		},
 		Recurrence: []string{"RRULE:FREQ=DAILY;COUNT=1"},
 	}

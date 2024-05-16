@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"mvp-2-spms/web_server/session"
 	"net/http"
-	"strconv"
 )
 
 func BotAuthentificator(next http.Handler) http.Handler {
@@ -57,27 +56,20 @@ func GetSessionUser(r *http.Request) (session.UserInfo, error) {
 
 // ///////////////////////////////////////////////////////////////////////////??
 func GetCredentials(r *http.Request) (Credntials, error) {
-	professorId, err := strconv.ParseUint(r.Header.Get("Professor-Id"), 10, 32)
-	if err != nil {
-		return Credntials{}, err
-	}
-
 	session := r.Header.Get("Session-Id")
 	gcTok := r.Header.Get("Google-Calendar-Token")
 	gdTok := r.Header.Get("Google-Drive-Token")
 	ghTok := r.Header.Get("GitHub-Token")
 
 	return Credntials{
-		ProfessorId:         uint(professorId),
 		Session:             session,
 		GoogleCalendarToken: gcTok,
 		GoogleDriveToken:    gdTok,
 		GitHubToken:         ghTok,
-	}, err
+	}, nil
 }
 
 type Credntials struct {
-	ProfessorId         uint
 	Session             string
 	GoogleCalendarToken string
 	GoogleDriveToken    string
