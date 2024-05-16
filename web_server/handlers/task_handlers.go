@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"mvp-2-spms/internal"
+	mngInterfaces "mvp-2-spms/services/interfaces"
 	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
 	"mvp-2-spms/services/manage-tasks/inputdata"
 	"mvp-2-spms/services/models"
@@ -29,9 +31,26 @@ func InitTaskHandler(taskInteractor interfaces.ITaskInteractor, acc interfaces.I
 }
 
 func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
-	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -44,7 +63,8 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	var reqB requestbodies.AddTask
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&reqB)
+
+	err = decoder.Decode(&reqB)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -53,7 +73,23 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 	integInput := ainputdata.GetDriveIntegration{
 		AccountId: uint(id),
 	}
-	driveInfo, _ := h.accountInteractor.GetDriveIntegration(integInput)
+
+	found := true
+	driveInfo, err := h.accountInteractor.GetDriveIntegration(integInput)
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountDriveDataNotFound) {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		found = false
+	}
+
+	var drive mngInterfaces.ICloudDrive
+	if found {
+		drive = h.cloudDrives[models.CloudDriveName(driveInfo.Type)]
+	}
+
 	input := inputdata.AddTask{
 		ProfessorId: uint(id),
 		Name:        reqB.Name,
@@ -64,21 +100,51 @@ func (h *TaskHandler) AddTask(w http.ResponseWriter, r *http.Request) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO: pass api key/clone with new key///////////////////////////////////////////////////////////////////////////////
-	task_id, _ := h.taskInteractor.AddTask(input, h.cloudDrives[models.CloudDriveName(driveInfo.Type)])
+	task_id, err := h.taskInteractor.AddTask(input, drive)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(task_id)
 }
 
 func (h *TaskHandler) GetAllProjectTasks(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
-	projectId, _ := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	input := inputdata.GetProjectTasks{
 		ProfessorId: uint(id),
 		ProjectId:   uint(projectId),
 	}
-	result, _ := h.taskInteractor.GetProjectTasks(input)
+
+	result, err := h.taskInteractor.GetProjectTasks(input)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)

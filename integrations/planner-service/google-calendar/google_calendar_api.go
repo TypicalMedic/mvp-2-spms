@@ -1,8 +1,8 @@
 package googlecalendar
 
 import (
-	"log"
 	googleapi "mvp-2-spms/integrations/google-api"
+	"strings"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -24,28 +24,31 @@ func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {
 	return c
 }
 
-func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) {
+func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) error {
 	c.Authentificate(token)
+
 	api, err := calendar.NewService(c.GetContext(), option.WithHTTPClient(c.GetClient()))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		return err
 	}
+
 	c.api = api
+	return nil
 }
 
 // startTime should be UTC+0!!!
 func (c *googleCalendarApi) AddEvent(startTime time.Time, summary string, desc string, calendarId string) (*calendar.Event, error) {
-	endTime := startTime.Add(EVENT_DURATION_HOURS * time.Hour).Format(time.RFC3339)
+	endTime := strings.Split(startTime.Add(EVENT_DURATION_HOURS*time.Hour).Format(time.RFC3339), "Z")[0]
 	event := &calendar.Event{
 		Summary:     summary,
 		Description: desc,
 		Start: &calendar.EventDateTime{
-			DateTime: startTime.Format(time.RFC3339),
-			TimeZone: "Asia/Yekaterinburg",
+			TimeZone: "Etc/GMT-5",
+			DateTime: strings.Split(startTime.Format(time.RFC3339), "Z")[0],
 		},
 		End: &calendar.EventDateTime{
+			TimeZone: "Etc/GMT-5", //////////////////////////////////////?????????????????????????????????????
 			DateTime: endTime,
-			TimeZone: "Asia/Yekaterinburg", //////////////////////////////////////?????????????????????????????????????
 		},
 		Recurrence: []string{"RRULE:FREQ=DAILY;COUNT=1"},
 	}

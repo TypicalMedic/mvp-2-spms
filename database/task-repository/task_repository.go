@@ -1,6 +1,7 @@
 package taskrepository
 
 import (
+	"errors"
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
@@ -29,6 +30,17 @@ func (r *TaskRepository) CreateTask(task entities.Task) (entities.Task, error) {
 	}
 
 	return dbtask.MapToEntity(), nil
+}
+
+func (r *TaskRepository) DeleteTask(taskId int) error {
+	dbtask := models.Task{Id: uint(taskId)}
+
+	result := r.dbContext.DB.Delete(&dbtask)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func (r *TaskRepository) AssignDriveTask(task usecasemodels.DriveTask) error {
@@ -74,6 +86,20 @@ func (r *TaskRepository) GetProjectTasks(projId string) ([]entities.Task, error)
 	}
 
 	return tasks, nil
+}
+
+func (r *TaskRepository) GetTaskById(taskId string) (entities.Task, error) {
+	var dbTask models.Task
+
+	result := r.dbContext.DB.Select("*").Where("id = ?", taskId).Take(&dbTask)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return entities.Task{}, usecasemodels.ErrStudentHasNoCurrentProject
+		}
+		return entities.Task{}, result.Error
+	}
+
+	return dbTask.MapToEntity(), nil
 }
 
 func (r *TaskRepository) GetProjectTasksWithCloud(projId string) ([]usecasemodels.DriveTask, error) {

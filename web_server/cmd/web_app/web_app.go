@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"mvp-2-spms/database"
 	accountepository "mvp-2-spms/database/account-repository"
 	meetingrepository "mvp-2-spms/database/meeting-repository"
@@ -34,11 +35,16 @@ import (
 func main() {
 	session.SetBotTokenFromJson("credentials_bot.json")
 	dsn := "root:root@tcp(127.0.0.1:3306)/student_project_management?parseTime=true"
-	gdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{
+
+	gdb, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true, // use singular table name, table for `User` would be `user` with this option enabled
 		},
 	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	db := database.InitDatabade(gdb)
 	repos := internal.Repositories{
 		Projects:     projectrepository.InitProjectRepository(*db),

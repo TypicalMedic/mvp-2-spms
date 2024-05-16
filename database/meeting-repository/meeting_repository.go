@@ -31,6 +31,17 @@ func (r *MeetingRepository) CreateMeeting(meeting entities.Meeting) (entities.Me
 	return dbmeeting.MapToEntity(), nil
 }
 
+func (r *MeetingRepository) DeleteMeeting(id int) error {
+	dbmeeting := models.Meeting{Id: uint(id)}
+
+	result := r.dbContext.DB.Delete(&dbmeeting)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (r *MeetingRepository) AssignPlannerMeeting(meeting usecasemodels.PlannerMeeting) error {
 	err := r.dbContext.DB.Transaction(func(tx *gorm.DB) error {
 		result := r.dbContext.DB.Model(&models.Meeting{}).Where("id = ?", meeting.Meeting.Id).Update("planner_id", meeting.MeetingPlannerId)
@@ -68,6 +79,20 @@ func (r *MeetingRepository) GetProfessorMeetings(profId string, from time.Time, 
 		meetings = append(meetings, m.MapToEntity())
 	}
 	return meetings, nil
+}
+
+func (r *MeetingRepository) GetMeetingById(meetId string) (entities.Meeting, error) {
+	var dbMeeting models.Meeting
+
+	result := r.dbContext.DB.Select("*").Where("id = ?", meetId).Take(&dbMeeting)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return entities.Meeting{}, usecasemodels.ErrMeetingNotFound
+		}
+		return entities.Meeting{}, result.Error
+	}
+
+	return dbMeeting.MapToEntity(), nil
 }
 
 func (r *MeetingRepository) GetMeetingPlannerId(meetId string) (string, error) {

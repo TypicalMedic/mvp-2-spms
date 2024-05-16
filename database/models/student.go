@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"strconv"
@@ -8,12 +9,12 @@ import (
 )
 
 type Student struct {
-	Id                     uint   `gorm:"column:id"`
-	Name                   string `gorm:"column:name"`
-	Surname                string `gorm:"column:surname"`
-	Middlename             string `gorm:"column:middlename"`
-	EnrollmentYear         uint   `gorm:"column:enrollment_year"`
-	EducationalProgrammeId uint   `gorm:"column:educational_programme_id;default:null"`
+	Id                     uint          `gorm:"column:id"`
+	Name                   string        `gorm:"column:name"`
+	Surname                string        `gorm:"column:surname"`
+	Middlename             string        `gorm:"column:middlename"`
+	EnrollmentYear         uint          `gorm:"column:enrollment_year"`
+	EducationalProgrammeId sql.NullInt64 `gorm:"column:educational_programme_id;default:null"`
 }
 
 func (*Student) TableName() string {
@@ -28,7 +29,7 @@ func (s *Student) MapToEntity() entities.Student {
 			Surname:    s.Surname,
 			Middlename: s.Middlename,
 		},
-		EducationalProgrammeId: fmt.Sprint(s.EducationalProgrammeId),
+		EducationalProgrammeId: fmt.Sprint(s.EducationalProgrammeId.Int64),
 		Cource:                 s.GetCource(),
 		//EnrollmentYear: s.EnrollmentYear,
 	}
@@ -42,7 +43,9 @@ func (s *Student) MapEntityToThis(entity entities.Student) {
 	s.Surname = entity.Surname
 	s.Middlename = entity.Middlename
 	s.EnrollmentYear = getStudentEnrollmentYear(entity.Cource)
-	s.EducationalProgrammeId = uint(epId)
+	if epId != 0 {
+		s.EducationalProgrammeId = sql.NullInt64{Int64: int64(epId), Valid: true}
+	}
 }
 
 func (s *Student) GetCource() uint {

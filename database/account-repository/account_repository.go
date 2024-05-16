@@ -151,6 +151,39 @@ func (r *AccountRepository) GetAccountRepoHubData(id string) (usecasemodels.Base
 	return dbRHub.MapToUseCaseModel(), nil
 }
 
+// func (r *AccountRepository) DeleteAccountPlannerData(id int) error {
+// 	dbPl := models.PlannerIntegration{AccountId: uint(id)}
+
+// 	result := r.dbContext.DB.Where("account_id = ?", id).Delete(&dbPl)
+// 	if result.Error != nil {
+// 		return result.Error
+// 	}
+
+// 	return nil
+// }
+
+// func (r *AccountRepository) DeleteAccountDriveData(id int) error {
+// 	dbDrive := models.DriveIntegration{AccountId: uint(id)}
+
+// 	result := r.dbContext.DB.Where("account_id = ?", id).Delete(&dbDrive)
+// 	if result.Error != nil {
+// 		return result.Error
+// 	}
+
+// 	return nil
+// }
+
+// func (r *AccountRepository) DeleteAccountRepoHubData(id int) error {
+// 	dbRepo := models.GitRepositoryIntegration{AccountId: uint(id)}
+
+// 	result := r.dbContext.DB.Where("account_id = ?", id).Delete(&dbRepo)
+// 	if result.Error != nil {
+// 		return result.Error
+// 	}
+
+// 	return nil
+// }
+
 func (r *AccountRepository) AddAccountPlannerIntegration(integr usecasemodels.PlannerIntegration) error {
 	dbPlanner := models.PlannerIntegration{}
 	dbPlanner.MapUseCaseModelToThis(integr)

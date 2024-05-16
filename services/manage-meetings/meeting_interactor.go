@@ -1,10 +1,13 @@
 package managemeetings
 
 import (
+	"errors"
 	"fmt"
+	domainaggregate "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-meetings/inputdata"
 	"mvp-2-spms/services/manage-meetings/outputdata"
+	"mvp-2-spms/services/models"
 	"slices"
 
 	"golang.org/x/oauth2"
@@ -29,19 +32,47 @@ func InitMeetingInteractor(mtRepo interfaces.IMeetingRepository, accRepo interfa
 
 func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner interfaces.IPlannerService) (outputdata.AddMeeting, error) {
 	// adding meeting to db, returns created meeting (with id)
-	meeting, _ := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
-	// getting calendar info, should be checked for existance later
-	plannerInfo, _ := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// check for access token first????????????????????????????????????????????
-	token := &oauth2.Token{
-		RefreshToken: plannerInfo.ApiKey,
+	meeting, err := m.meetingRepo.CreateMeeting(input.MapToMeetingEntity())
+	if err != nil {
+		return outputdata.AddMeeting{}, err
 	}
-	planner.Authentificate(token)
-	// add meeting to calendar
-	meeitngPlanner, _ := planner.AddMeeting(meeting, plannerInfo)
+
+	// getting calendar info, should be checked for existance later
+	plannerFound := true
+	plannerInfo, err := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountPlannerDataNotFound) {
+			return outputdata.AddMeeting{}, err
+		}
+		plannerFound = false
+	}
+
+	meeitngPlanner := models.PlannerMeeting{Meeting: meeting}
+	if plannerFound {
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// check for access token first????????????????????????????????????????????
+		token := &oauth2.Token{
+			RefreshToken: plannerInfo.ApiKey,
+		}
+
+		err = planner.Authentificate(token)
+		if err != nil {
+			return outputdata.AddMeeting{}, err
+		}
+
+		// add meeting to calendar
+		meeitngPlanner, err = planner.AddMeeting(meeting, plannerInfo)
+		if err != nil {
+			return outputdata.AddMeeting{}, err
+		}
+	}
+
 	// add meeting id from planner
-	m.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
+	err = m.meetingRepo.AssignPlannerMeeting(meeitngPlanner)
+	if err != nil {
+		return outputdata.AddMeeting{}, err
+	}
+
 	// returning id
 	output := outputdata.MapToAddMeeting(meeting)
 	return output, nil
@@ -49,22 +80,61 @@ func (m *MeetingInteractor) AddMeeting(input inputdata.AddMeeting, planner inter
 
 func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMeetings, planner interfaces.IPlannerService) (outputdata.GetProfesorMeetings, error) {
 	// get from db
-	meetings, _ := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
+	meetings, err := m.meetingRepo.GetProfessorMeetings(fmt.Sprint(input.ProfessorId), input.From, input.To)
+	if err != nil {
+		return outputdata.GetProfesorMeetings{}, err
+	}
+
 	meetEntities := []outputdata.GetProfesorMeetingsEntities{}
 	// getting calendar info, should be checked for existance later
-	plannerInfo, _ := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// check for access token first????????????????????????????????????????????
-	token := &oauth2.Token{
-		RefreshToken: plannerInfo.ApiKey,
+	plannerFound := true
+	plannerInfo, err := m.accountRepo.GetAccountPlannerData(fmt.Sprint(input.ProfessorId))
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountPlannerDataNotFound) {
+			return outputdata.GetProfesorMeetings{}, err
+		}
+		plannerFound = false
 	}
-	planner.Authentificate(token)
-	plannerMetingsIds, _ := planner.GetScheduleMeetinIds(input.From, plannerInfo)
+
+	plannerMetingsIds := []string{}
+	if plannerFound {
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// check for access token first????????????????????????????????????????????
+		token := &oauth2.Token{
+			RefreshToken: plannerInfo.ApiKey,
+		}
+
+		err = planner.Authentificate(token)
+		if err != nil {
+			return outputdata.GetProfesorMeetings{}, err
+		}
+
+		plannerMetingsIds, err = planner.GetScheduleMeetingIds(input.From, plannerInfo)
+		if err != nil {
+			return outputdata.GetProfesorMeetings{}, err
+		}
+	}
+
 	for _, meet := range meetings {
-		student, _ := m.studentRepo.GetStudentById(meet.ParticipantId)
-		proj, _ := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
+		student, err := m.studentRepo.GetStudentById(meet.ParticipantId)
+		if err != nil {
+			return outputdata.GetProfesorMeetings{}, err
+		}
+
+		proj, err := m.projectRepo.GetStudentCurrentProject(meet.ParticipantId)
+		if err != nil {
+			if !errors.Is(err, models.ErrStudentHasNoCurrentProject) {
+				return outputdata.GetProfesorMeetings{}, err
+			}
+			proj = domainaggregate.Project{} // change to nil
+		}
+
 		// getting planner meeting id
-		plannerId, _ := m.meetingRepo.GetMeetingPlannerId(meet.Id)
+		plannerId, err := m.meetingRepo.GetMeetingPlannerId(meet.Id)
+		if err != nil {
+			return outputdata.GetProfesorMeetings{}, err
+		}
+
 		// check if meeting exists in planner
 		hasPlanner := slices.Contains(plannerMetingsIds, plannerId)
 		meetEntities = append(meetEntities, outputdata.GetProfesorMeetingsEntities{
@@ -74,6 +144,7 @@ func (m *MeetingInteractor) GetProfessorMeetings(input inputdata.GetProfessorMee
 			HasPlannerMeeting: hasPlanner,
 		})
 	}
+
 	output := outputdata.MapToGetProfesorMeetings(meetEntities)
 	return output, nil
 }

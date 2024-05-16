@@ -256,7 +256,7 @@ func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecasemod
 	result := r.dbContext.DB.Raw(`
 	SELECT COUNT(id) as count
 	FROM meeting
-	WHERE project_id = ? and status = 2`, projId).Scan(&meetCount)
+	WHERE project_id = ? and status = 1`, projId).Scan(&meetCount)
 	if result.Error != nil {
 		return usecasemodels.MeetingInfo{}, result.Error
 	}
