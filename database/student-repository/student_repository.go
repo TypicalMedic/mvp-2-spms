@@ -46,6 +46,17 @@ func (r *StudentRepository) CreateStudent(student entities.Student) (entities.St
 	return dbstudent.MapToEntity(), nil
 }
 
+func (r *StudentRepository) DeleteStudent(id int) error {
+	dbStudent := models.Student{Id: uint(id)}
+
+	result := r.dbContext.DB.Delete(&dbStudent)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (r *StudentRepository) GetStudents() ([]entities.Student, error) {
 	var studentsDb []models.Student
 
