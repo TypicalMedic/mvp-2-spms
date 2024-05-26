@@ -36,7 +36,7 @@ func InitGoogleAPI(scope ...string) GoogleAPI {
 func (g *GoogleAPI) GetAuthLink(redirectURI string, state string) (string, error) {
 	// work with oauth state!!!
 	g.config.RedirectURL = redirectURI
-	authURL := g.config.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	authURL := g.config.AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	return authURL, nil
 }
 
