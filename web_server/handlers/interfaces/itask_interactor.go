@@ -9,4 +9,5 @@ import (
 type ITaskInteractor interface {
 	AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) (outputdata.AddTask, error)
 	GetProjectTasks(input inputdata.GetProjectTasks) (outputdata.GetProjectTasks, error)
+	UpdateTask(input inputdata.UpdateTask, cloudDrive interfaces.ICloudDrive) error
 }

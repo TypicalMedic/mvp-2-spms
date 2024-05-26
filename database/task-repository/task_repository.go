@@ -125,3 +125,19 @@ func (r *TaskRepository) GetProjectTasksWithCloud(projId string) ([]usecasemodel
 
 	return driveTasks, nil
 }
+
+func (r *TaskRepository) UpdateTask(task entities.Task) error {
+	taskDb := models.Task{}
+	result := r.dbContext.DB.Where("id = ?", task.Id).Take(&taskDb)
+	if result.Error != nil {
+		return result.Error
+	}
+	taskDb.MapEntityToThis(task)
+
+	result = r.dbContext.DB.Where("id = ?", task.Id).Save(&taskDb)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

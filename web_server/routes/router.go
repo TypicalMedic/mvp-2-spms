@@ -55,6 +55,7 @@ func (r *Router) SetupRoutes() {
 	r.setupMeetingRoutes()
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
+	r.setupTaskRoutes()
 	r.setupUniversityRoutes()
 	r.setupAccountRoutes()
 	r.setupAuthenRoutes()
@@ -66,22 +67,36 @@ func (r *Router) setupProjectRoutes() {
 
 	// setup middleware for checking if professor is authorized and it's his projects?
 	r.router.With(handlers.Authentificator).Route("/api/v1/projects", func(r chi.Router) {
-		r.With().Get("/", projH.GetAllProfProjects) // GET /projects with middleware (currently empty)
-		r.Get("/filter", dummyHandler)              // GET /projects/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
-		r.Post("/add", projH.AddProject)            // POST /projects/add
+		r.Get("/", projH.GetAllProfProjects)             // GET /projects
+		r.Get("/statuslist", projH.GetProjectStatusList) // GET /projects/statuslist
+		r.Get("/stagelist", projH.GetProjectStageList)   // GET /projects/stagelist
+		r.Get("/filter", dummyHandler)                   // GET /projects/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
+		r.Post("/add", projH.AddProject)                 // POST /projects/add
 		// Subrouters:
 		r.Route("/{projectID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)
 			r.Get("/", projH.GetProject)                     // GET /projects/123
 			r.Get("/statistics", projH.GetProjectStatistics) // GET /projects/123/statistics
-			r.Put("/", dummyHandler)                         // PUT /projects/123
+			r.Put("/", projH.UpdateProject)                  // PUT /projects/123
 			r.Delete("/", dummyHandler)                      // DELETE /projects/123
 			r.Get("/commits", projH.GetProjectCommits)       // GET /projects/123/commits?from=2006-01-02T15:04:05.000Z
 			r.Route("/tasks", func(r chi.Router) {
 				r.Get("/", taskH.GetAllProjectTasks) // GET /projects/123/tasks
 				r.Post("/add", taskH.AddTask)        // POST /projects/123/tasks/add
+				r.Route("/{taskID}", func(r chi.Router) {
+					r.Put("/", taskH.UpdateTask)
+				})
 			})
 		})
+	})
+}
+
+func (r *Router) setupTaskRoutes() {
+	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager, r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
+
+	// setup middleware for checking if professor is authorized and it's his projects?
+	r.router.With(handlers.Authentificator).Route("/api/v1/tasks", func(r chi.Router) {
+		r.Get("/statuslist", taskH.GetTaskStatusList) // GET /tasks/statuslist
 	})
 }
 
@@ -157,9 +172,10 @@ func (r *Router) setupMeetingRoutes() {
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
 	r.router.With(handlers.Authentificator).Route("/api/v1/meetings", func(r chi.Router) {
-		r.With().Get("/", meetH.GetProfessorMeetings) // GET /meetings?from=2006-01-02T15:04:05.000Z with middleware (currently empty)
-		r.Get("/filter", dummyHandler)                // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
-		r.Post("/add", meetH.AddMeeting)              // POST /meetings/add
+		r.Get("/", meetH.GetProfessorMeetings)           // GET /meetings?from=2006-01-02T15:04:05.000Z
+		r.Get("/statuslist", meetH.GetMeetingStatusList) // GET /meetings/statuslist
+		r.Get("/filter", dummyHandler)                   // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
+		r.Post("/add", meetH.AddMeeting)                 // POST /meetings/add
 		// Subrouters:
 		r.Route("/{meetingID}", func(r chi.Router) {
 			// r.Use(///) --> context (for handling not found errors for example)

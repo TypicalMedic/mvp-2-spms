@@ -28,6 +28,7 @@ type IProjetRepository interface {
 	GetProjectGradingById(projId string) (entities.ProjectGrading, error)
 	GetProjectTaskInfoById(projId string) (models.TasksInfo, error)
 	GetProjectMeetingInfoById(projId string) (models.MeetingInfo, error)
+	UpdateProject(proj entities.Project) error
 }
 
 // transfers data in domain entities
@@ -73,7 +74,9 @@ type IAccountRepository interface {
 
 type ITaskRepository interface {
 	CreateTask(entities.Task) (entities.Task, error)
+	UpdateTask(entities.Task) error
 	AssignDriveTask(models.DriveTask) error
 	GetProjectTasks(projId string) ([]entities.Task, error)
+	GetTaskById(id string) (entities.Task, error)
 	GetProjectTasksWithCloud(projId string) ([]models.DriveTask, error)
 }

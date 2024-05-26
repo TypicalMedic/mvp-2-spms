@@ -265,3 +265,15 @@ func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecasemod
 		PassedCount: meetCount,
 	}, nil
 }
+
+func (r *ProjectRepository) UpdateProject(proj entities.Project) error {
+	projDb := models.Project{}
+	projDb.MapEntityToThis(proj)
+
+	result := r.dbContext.DB.Where("id = ?", proj.Id).Save(&projDb)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

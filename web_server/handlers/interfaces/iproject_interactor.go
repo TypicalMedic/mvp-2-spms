@@ -11,5 +11,6 @@ type IProjetInteractor interface {
 	GetProjectCommits(input inputdata.GetProjectCommits, gitRepositoryHub interfaces.IGitRepositoryHub) (outputdata.GetProjectCommits, error)
 	GetProjectById(input inputdata.GetProjectById) (outputdata.GetProjectById, error)
 	AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) (outputdata.AddProject, error)
+	UpdateProject(input inputdata.UpdateProject, cloudDrive interfaces.ICloudDrive) error
 	GetProjectStatsById(input inputdata.GetProjectStatsById) (outputdata.GetProjectStatsById, error)
 }
