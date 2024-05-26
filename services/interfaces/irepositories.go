@@ -9,6 +9,7 @@ import (
 // transfers data in domain entities
 type IProjetRepository interface {
 	GetProfessorProjects(profId string) ([]entities.Project, error)
+	GetProfessorProjectsWithFilters(profId string, statusFilter int) ([]entities.Project, error)
 	// возвращать вообще все здесь??? а что делать если там нет чего-то в дб? как понять?
 	// писать что будет возвращено в структуре
 	// но тогда будет неявное раскрытие деталей реализации

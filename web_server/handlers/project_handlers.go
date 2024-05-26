@@ -53,6 +53,32 @@ func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Reque
 	input := inputdata.GetProfessorProjects{
 		ProfessorId: uint(id),
 	}
+	filter := r.URL.Query().Get("filter")
+
+	var filterStatus int = -1
+	switch filter {
+	case domainaggregate.ProjectNotConfirmed.String():
+		{
+			filterStatus = int(domainaggregate.ProjectNotConfirmed)
+		}
+	case domainaggregate.ProjectCancelled.String():
+		{
+			filterStatus = int(domainaggregate.ProjectCancelled)
+		}
+	case domainaggregate.ProjectInProgress.String():
+		{
+			filterStatus = int(domainaggregate.ProjectInProgress)
+		}
+
+	case domainaggregate.ProjectFinished.String():
+		{
+			filterStatus = int(domainaggregate.ProjectFinished)
+		}
+	}
+
+	if filterStatus != -1 {
+		input.FilterStatus = &filterStatus
+	}
 
 	result, err := h.projectInteractor.GetProfessorProjects(input)
 	if err != nil {
