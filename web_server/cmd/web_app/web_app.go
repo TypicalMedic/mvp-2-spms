@@ -34,11 +34,14 @@ import (
 
 func main() {
 	session.SetBotTokenFromJson("credentials_bot.json")
-	dsn := "root:root@tcp(127.0.0.1:3306)/student_project_management?parseTime=true"
+	dbConfig, err := database.ReadDBConfigFromFile("db_config.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
-	gdb, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	gdb, err := gorm.Open(mysql.Open(dbConfig.ConnString), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true, // use singular table name, table for `User` would be `user` with this option enabled
+			SingularTable: dbConfig.SingularTable, // use singular table name, table for `User` would be `user` with this option enabled
 		},
 	})
 	if err != nil {
