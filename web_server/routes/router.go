@@ -39,7 +39,7 @@ func (r *Router) SetupMiddleware() {
 	r.router.Use(middleware.Logger)
 	r.router.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://127.0.0.1:3000", "http://127.0.0.1:3000", "https://localhost:3000", "http://localhost:3000", "http://localhost:3000"},
+		AllowedOrigins: []string{"https://127.0.0.1:3000", "http://127.0.0.1:3000", "https://localhost:3000", "http://localhost:3000", "http://localhost:3000", "https://spams-site.ru/"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Session-Id"},
@@ -50,8 +50,8 @@ func (r *Router) SetupMiddleware() {
 }
 
 func (r *Router) SetupRoutes() {
-	r.router.Get("/ping", handlers.Ping)
-	r.router.With(handlers.Authentificator).Get("/pingauth", handlers.Ping)
+	r.router.Get("/api/v1/ping", handlers.Ping)
+	r.router.With(handlers.Authentificator).Get("/api/v1/pingauth", handlers.Ping)
 	r.setupMeetingRoutes()
 	r.setupProjectRoutes()
 	r.setupStudentRoutes()
@@ -65,7 +65,7 @@ func (r *Router) setupProjectRoutes() {
 	taskH := handlers.InitTaskHandler(r.app.Intercators.TaskManager, r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
-	r.router.With(handlers.Authentificator).Route("/projects", func(r chi.Router) {
+	r.router.With(handlers.Authentificator).Route("/api/v1/projects", func(r chi.Router) {
 		r.With().Get("/", projH.GetAllProfProjects) // GET /projects with middleware (currently empty)
 		r.Get("/filter", dummyHandler)              // GET /projects/filter?student_id=1 query params are accessed with r.URL.Query().Get("student_id")
 		r.Post("/add", projH.AddProject)            // POST /projects/add
@@ -89,7 +89,7 @@ func (r *Router) setupStudentRoutes() {
 	studH := handlers.InitStudentHandler(r.app.Intercators.StudentManager)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
-	r.router.With(handlers.Authentificator).Route("/students", func(r chi.Router) {
+	r.router.With(handlers.Authentificator).Route("/api/v1/students", func(r chi.Router) {
 		r.With().Get("/", studH.GetStudents) // GET /students with middleware (currently empty)
 		r.Post("/add", studH.AddStudent)     // POST /students/add
 	})
@@ -98,7 +98,7 @@ func (r *Router) setupAccountRoutes() {
 	accH := handlers.InitAccountHandler(r.app.Intercators.AccountManager, r.app.Integrations.CloudDrives)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
-	r.router.With(handlers.Authentificator).Route("/account", func(r chi.Router) {
+	r.router.With(handlers.Authentificator).Route("/api/v1/account", func(r chi.Router) {
 		r.Get("/", accH.GetAccountInfo)                     // GET /account/
 		r.Get("/integrations", accH.GetAccountIntegrations) // GET /account/integrations
 	})
@@ -108,7 +108,7 @@ func (r *Router) setupUniversityRoutes() {
 	uniH := handlers.InitUniversityHandler(r.app.Intercators.UnversityManager)
 
 	// setup middleware for checking if professor is authorized and it's his projects?
-	r.router.With(handlers.Authentificator).Route("/universities", func(r chi.Router) {
+	r.router.With(handlers.Authentificator).Route("/api/v1/universities", func(r chi.Router) {
 		r.With().Get("/", dummyHandler) // GET /universities with middleware (currently empty)
 		r.Route("/{uniID}", func(r chi.Router) {
 			r.Get("/", dummyHandler) // GET /universities/123
@@ -126,7 +126,7 @@ func (r *Router) setupAuthenRoutes() {
 	repoHubH := handlers.InitGitRepoHandler(r.app.Integrations.GitRepositoryHubs, r.app.Intercators.AccountManager)
 	authH := handlers.InitAuthHandler(r.app.Intercators.AccountManager)
 
-	r.router.Route("/auth", func(r chi.Router) {
+	r.router.Route("/api/v1/auth", func(r chi.Router) {
 		r.With(handlers.BotAuthentificator).Route("/bot", func(r chi.Router) {
 			r.Post("/signinuser", authH.SignInBot)
 			r.Post("/signupuser", authH.SignUp)
@@ -156,7 +156,7 @@ func (r *Router) setupMeetingRoutes() {
 	meetH := handlers.InitMeetingHandler(r.app.Intercators.MeetingManager, r.app.Intercators.AccountManager, r.app.Integrations.Planners)
 	// RESTy routes for "meetings" resource
 	// setup middleware for checking professor?
-	r.router.With(handlers.Authentificator).Route("/meetings", func(r chi.Router) {
+	r.router.With(handlers.Authentificator).Route("/api/v1/meetings", func(r chi.Router) {
 		r.With().Get("/", meetH.GetProfessorMeetings) // GET /meetings?from=2006-01-02T15:04:05.000Z with middleware (currently empty)
 		r.Get("/filter", dummyHandler)                // GET /meetings/filter?student_id=1&status=planned query params are accessed with r.URL.Query().Get("student_id")
 		r.Post("/add", meetH.AddMeeting)              // POST /meetings/add
