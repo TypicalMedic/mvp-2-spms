@@ -6,5 +6,5 @@ import (
 )
 
 type IUniversityInteractor interface {
-	GetUniEdProgrammes(input inputdata.GetUniEducationalProgrammes) outputdata.GetUniEducationalProgrammes
+	GetUniEdProgrammes(input inputdata.GetUniEducationalProgrammes) (outputdata.GetUniEducationalProgrammes, error)
 }

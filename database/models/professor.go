@@ -1,18 +1,19 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"strconv"
 )
 
 type Professor struct {
-	Id            uint   `gorm:"column:id"`
-	Name          string `gorm:"column:name"`
-	Surname       string `gorm:"column:surname"`
-	Middlename    string `gorm:"column:middlename"`
-	ScienceDegree string `gorm:"column:science_degree"`
-	UniversityId  uint   `gorm:"column:university_id"`
+	Id            uint          `gorm:"column:id"`
+	Name          string        `gorm:"column:name"`
+	Surname       string        `gorm:"column:surname"`
+	Middlename    string        `gorm:"column:middlename"`
+	ScienceDegree string        `gorm:"column:science_degree"`
+	UniversityId  sql.NullInt64 `gorm:"column:university_id"`
 }
 
 func (*Professor) TableName() string {
@@ -28,7 +29,7 @@ func (p *Professor) MapToEntity() entities.Professor {
 			Middlename: p.Middlename,
 		},
 		ScienceDegree: p.ScienceDegree,
-		UniversityId:  fmt.Sprint(p.UniversityId),
+		UniversityId:  fmt.Sprint(p.UniversityId.Value()),
 	}
 }
 
@@ -40,5 +41,10 @@ func (p *Professor) MapEntityToThis(entity entities.Professor) {
 	p.Surname = entity.Surname
 	p.Middlename = entity.Middlename
 	p.ScienceDegree = entity.ScienceDegree
-	p.UniversityId = uint(uId)
+	if uId != 0 {
+		p.UniversityId = sql.NullInt64{
+			Int64: int64(uId),
+			Valid: true,
+		}
+	}
 }

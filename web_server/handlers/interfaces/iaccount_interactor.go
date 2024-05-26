@@ -7,19 +7,19 @@ import (
 )
 
 type IAccountInteractor interface {
-	GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) string
-	GetPlannerIntegration(input inputdata.GetPlannerIntegration) outputdata.GetPlannerIntegration
-	GetDriveIntegration(input inputdata.GetDriveIntegration) outputdata.GetDriveIntegration
-	GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) outputdata.GetRepoHubIntegration
-	SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) outputdata.SetPlannerIntegration
-	SetDriveIntegration(input inputdata.SetDriveIntegration, planner interfaces.ICloudDrive) outputdata.SetDriveIntegration
-	SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) outputdata.SetRepoHubIntegration
-	GetAccountIntegrations(input inputdata.GetAccountIntegrations) outputdata.GetAccountIntegrations
-	GetProfessorInfo(input inputdata.GetProfessorInfo) outputdata.GetProfessorInfo
-	CheckCredsValidity(input inputdata.CheckCredsValidity) bool
-	CheckUsernameExists(input inputdata.CheckUsernameExists) bool
-	SignUp(input inputdata.SignUp) outputdata.SignUp
-	GetAccountProfessorId(login string) string
-	SetProfessorPlanner(plannerId, profId string)
-	GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) outputdata.GetProfessorIntegrPlanners
+	GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) (string, error)
+	GetPlannerIntegration(input inputdata.GetPlannerIntegration) (outputdata.GetPlannerIntegration, error)
+	GetDriveIntegration(input inputdata.GetDriveIntegration) (outputdata.GetDriveIntegration, error)
+	GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) (outputdata.GetRepoHubIntegration, error)
+	SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) (outputdata.SetPlannerIntegration, error)
+	SetDriveIntegration(input inputdata.SetDriveIntegration, planner interfaces.ICloudDrive) (outputdata.SetDriveIntegration, error)
+	SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) (outputdata.SetRepoHubIntegration, error)
+	GetAccountIntegrations(input inputdata.GetAccountIntegrations) (outputdata.GetAccountIntegrations, error)
+	GetProfessorInfo(input inputdata.GetProfessorInfo) (outputdata.GetProfessorInfo, error)
+	CheckCredsValidity(input inputdata.CheckCredsValidity) (bool, error)
+	CheckUsernameExists(input inputdata.CheckUsernameExists) (bool, error)
+	SignUp(input inputdata.SignUp) (outputdata.SignUp, error)
+	GetAccountProfessorId(login string) (string, error)
+	SetProfessorPlanner(plannerId, profId string) error
+	GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) (outputdata.GetProfessorIntegrPlanners, error)
 }

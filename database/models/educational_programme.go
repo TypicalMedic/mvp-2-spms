@@ -9,7 +9,7 @@ type EducationalProgramme struct {
 	Id        uint   `gorm:"column:id"`
 	Name      string `gorm:"column:name"`
 	FacultyId uint   `gorm:"column:faculty_id"`
-	EdLevel   uint   `gorm:"column:educational_level"`
+	EdLevel   uint   `gorm:"column:ed_level"`
 }
 
 func (EducationalProgramme) TableName() string {

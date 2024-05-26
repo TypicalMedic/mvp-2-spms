@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"mvp-2-spms/services/manage-accounts/inputdata"
+	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
-	responsebodies "mvp-2-spms/web_server/handlers/response_bodies"
+	responsebodies "mvp-2-spms/web_server/handlers/response-bodies"
 	"mvp-2-spms/web_server/session"
 	"net/http"
 	"time"
@@ -35,6 +37,7 @@ func (h *AuthHandler) SignInBot(w http.ResponseWriter, r *http.Request) {
 	var creds requestbodies.CredentialsBot
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
+
 	err := decoder.Decode(&creds)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -44,7 +47,14 @@ func (h *AuthHandler) SignInBot(w http.ResponseWriter, r *http.Request) {
 	inp := inputdata.CheckUsernameExists{
 		Login: creds.Phone,
 	}
-	found := h.accountInteractor.CheckUsernameExists(inp)
+
+	found, err := h.accountInteractor.CheckUsernameExists(inp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	if !found {
 		w.WriteHeader(http.StatusConflict)
 		json.NewEncoder(w).Encode("account with phone is not found")
@@ -55,7 +65,13 @@ func (h *AuthHandler) SignInBot(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString() + "/" + creds.Phone
 	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
-	profId := h.accountInteractor.GetAccountProfessorId(creds.Phone)
+	profId, err := h.accountInteractor.GetAccountProfessorId(creds.Phone)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	user := session.InitUserInfo(creds.Phone, profId)
 	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
@@ -81,6 +97,7 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	var creds requestbodies.Credentials
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
+
 	err := decoder.Decode(&creds)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -91,7 +108,18 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		Login:    creds.Username,
 		Password: creds.Password,
 	}
-	valid := h.accountInteractor.CheckCredsValidity(input)
+
+	valid, err := h.accountInteractor.CheckCredsValidity(input)
+	if err != nil {
+		if errors.Is(err, models.ErrAccountNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	if !valid {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -102,7 +130,18 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString() + "/" + creds.Username
 	expiresAt := time.Now().Add(session.SessionDefaultExpTime)
 
-	profId := h.accountInteractor.GetAccountProfessorId(creds.Username)
+	profId, err := h.accountInteractor.GetAccountProfessorId(creds.Username)
+	if err != nil {
+		if errors.Is(err, models.ErrAccountNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	user := session.InitUserInfo(creds.Username, profId)
 	session.Sessions[sessionToken] = session.InitSession(user, expiresAt)
 
@@ -128,6 +167,7 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	var creds requestbodies.SignUp
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
+
 	err := decoder.Decode(&creds)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -137,7 +177,14 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	input := inputdata.CheckUsernameExists{
 		Login: creds.Username,
 	}
-	usernameExists := h.accountInteractor.CheckUsernameExists(input)
+
+	usernameExists, err := h.accountInteractor.CheckUsernameExists(input)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	if usernameExists {
 		w.WriteHeader(http.StatusConflict)
 		json.NewEncoder(w).Encode("username already exists")
@@ -154,7 +201,12 @@ func (h *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		ScienceDegree: creds.ScienceDegree,
 	}
 
-	account := h.accountInteractor.SignUp(signupInput)
+	account, err := h.accountInteractor.SignUp(signupInput)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	// Create a new random session token
 	sessionToken := uuid.NewString() + "/" + creds.Username

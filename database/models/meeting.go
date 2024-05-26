@@ -9,16 +9,16 @@ import (
 )
 
 type Meeting struct {
-	Id                   uint          `gorm:"column:id"`
-	Name                 string        `gorm:"column:name"`
-	Description          string        `gorm:"column:description"`
-	MeetingTime          time.Time     `gorm:"column:meeting_time"`
-	StudentParticipantId uint          `gorm:"column:student_id"`
-	ProfessorId          uint          `gorm:"column:professor_id"`
-	ProjectId            sql.NullInt64 `gorm:"column:project_id"`
-	IsOnline             bool          `gorm:"column:is_online"`
-	Status               uint          `gorm:"column:status"`
-	PlannerId            string        `gorm:"column:planner_id;default:null"`
+	Id                   uint           `gorm:"column:id"`
+	Name                 string         `gorm:"column:name"`
+	Description          string         `gorm:"column:description"`
+	MeetingTime          time.Time      `gorm:"column:meeting_time"`
+	StudentParticipantId uint           `gorm:"column:student_id"`
+	ProfessorId          uint           `gorm:"column:professor_id"`
+	ProjectId            sql.NullInt64  `gorm:"column:project_id"`
+	IsOnline             bool           `gorm:"column:is_online"`
+	Status               uint           `gorm:"column:status"`
+	PlannerId            sql.NullString `gorm:"column:planner_id;default:null"`
 }
 
 func (*Meeting) TableName() string {

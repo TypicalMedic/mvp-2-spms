@@ -2,7 +2,6 @@ package clouddrive
 
 import (
 	"fmt"
-	"log"
 	googleapi "mvp-2-spms/integrations/google-api"
 	"strings"
 
@@ -27,13 +26,16 @@ func InitDriveApi(googleAPI googleapi.GoogleAPI) googleDriveApi {
 	return d
 }
 
-func (d *googleDriveApi) AuthentificateService(token *oauth2.Token) {
+func (d *googleDriveApi) AuthentificateService(token *oauth2.Token) error {
 	d.Authentificate(token)
+
 	api, err := drive.NewService(d.GetContext(), option.WithHTTPClient(d.GetClient()))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		return err
 	}
+
 	d.api = api
+	return nil
 }
 
 func (d *googleDriveApi) CreateFolder(folderName string, parentFolder ...string) (*drive.File, error) {

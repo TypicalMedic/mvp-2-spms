@@ -3,7 +3,6 @@ package github
 import (
 	"encoding/base64"
 	"fmt"
-	"log"
 	"sort"
 	"time"
 
@@ -21,11 +20,11 @@ func InitGithub(api githubAPI) *Github {
 	return &Github{api: api}
 }
 
-func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit {
+func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) ([]models.Commit, error) {
 	// to get all commits we need to check all the branches
 	ghbranches, err := g.api.GetRepoBranches(repo.OwnerName, repo.RepoId)
 	if err != nil {
-		log.Fatal(err)
+		return []models.Commit{}, err
 	}
 
 	// finding all branches commits
@@ -33,7 +32,7 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 	for _, branch := range ghbranches {
 		ghbrcommits, err := g.api.GetRepoBranchCommitsFromTime(repo.OwnerName, repo.RepoId, fromTime, *branch.Name)
 		if err != nil {
-			log.Fatal(err)
+			return []models.Commit{}, err
 		}
 		ghAllBranchesCommits = append(ghAllBranchesCommits, ghbrcommits...)
 	}
@@ -56,24 +55,36 @@ func (g *Github) GetRepositoryCommitsFromTime(repo models.Repository, fromTime t
 		return commits[i].Date.Unix() > commits[j].Date.Unix()
 	})
 
-	return commits
+	return commits, nil
 }
 
-func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) string {
+func (g *Github) GetAuthLink(redirectURI string, accountId int, returnURL string) (string, error) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// encode as JSON!
 	statestr := base64.URLEncoding.EncodeToString([]byte(fmt.Sprint(accountId, ",", returnURL)))
-	url := g.api.GetAuthLink(redirectURI, statestr)
-	return url
+
+	url, err := g.api.GetAuthLink(redirectURI, statestr)
+	if err != nil {
+		return "", err
+	}
+
+	return url, nil
 }
 
-func (g *Github) Authentificate(token *oauth2.Token) {
-	g.api.SetupClient(token)
+func (g *Github) Authentificate(token *oauth2.Token) error {
+	err := g.api.SetupClient(token)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (g *Github) GetToken(code string) *oauth2.Token {
-	token := g.api.GetToken(code)
-	return token
+func (g *Github) GetToken(code string) (*oauth2.Token, error) {
+	token, err := g.api.GetToken(code)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
 }
 
 func mapCommitToEntity(commit github.RepositoryCommit) models.Commit {

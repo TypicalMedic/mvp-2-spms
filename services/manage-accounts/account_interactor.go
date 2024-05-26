@@ -3,6 +3,7 @@ package managestudents
 import (
 	"bytes"
 	"crypto/sha512"
+	"errors"
 	"fmt"
 	entities "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/interfaces"
@@ -30,69 +31,130 @@ func InitAccountInteractor(accRepo interfaces.IAccountRepository, uniRepo interf
 	}
 }
 
-func (a *AccountInteractor) GetAccountProfessorId(login string) string {
-	return a.accountRepo.GetAccountByLogin(login).Id
+func (a *AccountInteractor) GetAccountProfessorId(login string) (string, error) {
+	res, err := a.accountRepo.GetAccountByLogin(login)
+	if err != nil {
+		return "", err
+	}
+	return res.Id, nil
 }
 
-func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) outputdata.GetProfessorInfo {
-	profInfo := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
-	uni := a.uniRepo.GetUniversityById(profInfo.UniversityId)
+func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) (outputdata.GetProfessorInfo, error) {
+	profInfo, err := a.accountRepo.GetProfessorById(fmt.Sprint(input.AccountId))
+	if err != nil {
+		return outputdata.GetProfessorInfo{}, err
+	}
+
+	uni, err := a.uniRepo.GetUniversityById(profInfo.UniversityId)
+	if err != nil {
+		return outputdata.GetProfessorInfo{}, err
+	}
+
 	// add get account login
 	output := outputdata.MapToGetAccountInfo(profInfo, uni)
-	return output
+	return output, nil
 }
 
-func (a *AccountInteractor) GetPlannerIntegration(input inputdata.GetPlannerIntegration) outputdata.GetPlannerIntegration {
-	planner := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
+func (a *AccountInteractor) GetPlannerIntegration(input inputdata.GetPlannerIntegration) (outputdata.GetPlannerIntegration, error) {
+	planner, err := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
+	if err != nil {
+		return outputdata.GetPlannerIntegration{}, err
+	}
+
 	output := outputdata.MapToGetPlannerIntegration(planner)
-	return output
+	return output, nil
 }
 
-func (a *AccountInteractor) GetDriveIntegration(input inputdata.GetDriveIntegration) outputdata.GetDriveIntegration {
-	drive := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
+func (a *AccountInteractor) GetDriveIntegration(input inputdata.GetDriveIntegration) (outputdata.GetDriveIntegration, error) {
+	drive, err := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
+	if err != nil {
+		return outputdata.GetDriveIntegration{}, err
+	}
+
 	output := outputdata.MapToGetDriveIntegration(drive)
-	return output
-}
-func (a *AccountInteractor) SetProfessorPlanner(plannerId, profId string) {
-	plannerInfo := a.accountRepo.GetAccountPlannerData(profId)
-	plannerInfo.PlannerData.Id = plannerId
-	a.accountRepo.UpdateAccountPlannerIntegration(plannerInfo)
+	return output, nil
 }
 
-func (a *AccountInteractor) GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) outputdata.GetProfessorIntegrPlanners {
-	plannerInfo := a.accountRepo.GetAccountPlannerData(profId)
+func (a *AccountInteractor) SetProfessorPlanner(plannerId, profId string) error {
+	plannerInfo, err := a.accountRepo.GetAccountPlannerData(profId)
+	if err != nil {
+		return err
+	}
+
+	plannerInfo.PlannerData.Id = plannerId
+
+	err = a.accountRepo.UpdateAccountPlannerIntegration(plannerInfo)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *AccountInteractor) GetProfessorIntegrPlanners(profId string, planner interfaces.IPlannerService) (outputdata.GetProfessorIntegrPlanners, error) {
+	plannerInfo, err := a.accountRepo.GetAccountPlannerData(profId)
+	if err != nil {
+		return outputdata.GetProfessorIntegrPlanners{}, err
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
 	token := &oauth2.Token{
 		RefreshToken: plannerInfo.ApiKey,
 	}
-	planner.Authentificate(token)
+	err = planner.Authentificate(token)
+	if err != nil {
+		return outputdata.GetProfessorIntegrPlanners{}, err
+	}
 
-	planners := planner.GetAllPlanners()
-	return outputdata.MapToGetProfessorIntegrPlanners(planners)
+	planners, err := planner.GetAllPlanners()
+	if err != nil {
+		return outputdata.GetProfessorIntegrPlanners{}, err
+	}
+
+	return outputdata.MapToGetProfessorIntegrPlanners(planners), nil
 }
 
-func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) string {
-	driveInfo := a.accountRepo.GetAccountDriveData(fmt.Sprint(profId))
+func (a *AccountInteractor) GetDriveBaseFolderName(folderId, profId string, cloudDrive interfaces.ICloudDrive) (string, error) {
+	driveInfo, err := a.accountRepo.GetAccountDriveData(fmt.Sprint(profId))
+	if err != nil {
+		return "", err
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	// check for access token first????????????????????????????????????????????
 	token := &oauth2.Token{
 		RefreshToken: driveInfo.ApiKey,
 	}
-	cloudDrive.Authentificate(token)
-	folderName := cloudDrive.GetFolderNameById(folderId)
-	return folderName
+	err = cloudDrive.Authentificate(token)
+	if err != nil {
+		return "", err
+	}
+
+	folderName, err := cloudDrive.GetFolderNameById(folderId)
+	if err != nil {
+		return "", err
+	}
+
+	return folderName, nil
 }
 
-func (a *AccountInteractor) GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) outputdata.GetRepoHubIntegration {
-	repoHub := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
+func (a *AccountInteractor) GetRepoHubIntegration(input inputdata.GetRepoHubIntegration) (outputdata.GetRepoHubIntegration, error) {
+	repoHub, err := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
+	if err != nil {
+		return outputdata.GetRepoHubIntegration{}, err
+	}
+
 	output := outputdata.MapToGetRepoHubIntegration(repoHub)
-	return output
+	return output, nil
 }
 
-func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) outputdata.SetPlannerIntegration {
-	token := planner.GetToken(input.AuthCode)
+func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerIntegration, planner interfaces.IPlannerService) (outputdata.SetPlannerIntegration, error) {
+	token, err := planner.GetToken(input.AuthCode)
+	if err != nil {
+		return outputdata.SetPlannerIntegration{}, err
+	}
+
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
@@ -105,22 +167,33 @@ func (a *AccountInteractor) SetPlannerIntegration(input inputdata.SetPlannerInte
 		},
 		PlannerData: models.PlannerData{},
 	}
-	a.accountRepo.AddAccountPlannerIntegration(integr)
+
+	err = a.accountRepo.AddAccountPlannerIntegration(integr)
+	if err != nil {
+		return outputdata.SetPlannerIntegration{}, err
+	}
 
 	return outputdata.SetPlannerIntegration{
 		AccessToken: accessTok,
 		Expiry:      expires,
-	}
+	}, nil
 }
 
-func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegration, drive interfaces.ICloudDrive) outputdata.SetDriveIntegration {
-	token := drive.GetToken(input.AuthCode)
+func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegration, drive interfaces.ICloudDrive) (outputdata.SetDriveIntegration, error) {
+	token, _ := drive.GetToken(input.AuthCode)
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
 
-	drive.Authentificate(token)
-	baseFolder := drive.AddProfessorBaseFolder()
+	err := drive.Authentificate(token)
+	if err != nil {
+		return outputdata.SetDriveIntegration{}, err
+	}
+
+	baseFolder, err := drive.AddProfessorBaseFolder()
+	if err != nil {
+		return outputdata.SetDriveIntegration{}, err
+	}
 
 	integr := models.CloudDriveIntegration{
 		BaseIntegration: models.BaseIntegration{
@@ -130,16 +203,24 @@ func (a *AccountInteractor) SetDriveIntegration(input inputdata.SetDriveIntegrat
 		},
 		DriveData: baseFolder,
 	}
-	a.accountRepo.AddAccountDriveIntegration(integr)
+
+	err = a.accountRepo.AddAccountDriveIntegration(integr)
+	if err != nil {
+		return outputdata.SetDriveIntegration{}, err
+	}
 
 	return outputdata.SetDriveIntegration{
 		AccessToken: accessTok,
 		Expiry:      expires,
-	}
+	}, nil
 }
 
-func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) outputdata.SetRepoHubIntegration {
-	token := planner.GetToken(input.AuthCode)
+func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubIntegration, planner interfaces.IGitRepositoryHub) (outputdata.SetRepoHubIntegration, error) {
+	token, err := planner.GetToken(input.AuthCode)
+	if err != nil {
+		return outputdata.SetRepoHubIntegration{}, err
+	}
+
 	refreshTok := token.RefreshToken
 	accessTok := token.AccessToken
 	expires := token.Expiry
@@ -148,34 +229,54 @@ func (a *AccountInteractor) SetRepoHubIntegration(input inputdata.SetRepoHubInte
 		ApiKey:    refreshTok,
 		Type:      input.Type,
 	}
-	a.accountRepo.AddAccountRepoHubIntegration(integr)
+
+	err = a.accountRepo.AddAccountRepoHubIntegration(integr)
+	if err != nil {
+		return outputdata.SetRepoHubIntegration{}, err
+	}
 
 	return outputdata.SetRepoHubIntegration{
 		AccessToken: accessTok,
 		Expiry:      expires,
-	}
+	}, nil
 }
 
-func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountIntegrations) outputdata.GetAccountIntegrations {
-	drive := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
-	planner := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
-	repohub := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
-
+func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountIntegrations) (outputdata.GetAccountIntegrations, error) {
 	var (
-		outputDrive   *outputdata.GetAccountIntegrationsDrive
-		outputPlanner *outputdata.GetAccountIntegrationsPlanner
+		outputDrive   *outputdata.GetAccountIntegrationsDrive   = nil
+		outputPlanner *outputdata.GetAccountIntegrationsPlanner = nil
 		outputRepos   []outputdata.GetAccountIntegrationsIntegr = []outputdata.GetAccountIntegrationsIntegr{}
 	)
-	if drive.AccountId != "0" {
+
+	found := true
+	drive, err := a.accountRepo.GetAccountDriveData(fmt.Sprint(input.AccountId))
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountDriveDataNotFound) {
+			return outputdata.GetAccountIntegrations{}, err
+		}
+		found = false
+	}
+
+	if found {
 		outputDrive = &outputdata.GetAccountIntegrationsDrive{
 			Type: outputdata.GetAccountIntegrationsIntegr{
 				Id:   drive.Type,
 				Name: drive.GetTypeAsString(),
 			},
-			BaseFolderId: drive.BaseFolderId, ///////////////////////////////////////change
+			BaseFolderId: drive.BaseFolderId,
 		}
 	}
-	if planner.AccountId != "0" {
+
+	found = true
+	planner, err := a.accountRepo.GetAccountPlannerData(fmt.Sprint(input.AccountId))
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountPlannerDataNotFound) {
+			return outputdata.GetAccountIntegrations{}, err
+		}
+		found = false
+	}
+
+	if found {
 		outputPlanner = &outputdata.GetAccountIntegrationsPlanner{
 			Type: outputdata.GetAccountIntegrationsIntegr{
 				Id:   planner.Type,
@@ -184,26 +285,49 @@ func (a *AccountInteractor) GetAccountIntegrations(input inputdata.GetAccountInt
 			PlannerName: planner.PlannerData.Id, ///////////////////////////////////////change
 		}
 	}
-	if repohub.AccountId != "0" {
+
+	found = true
+	repohub, err := a.accountRepo.GetAccountRepoHubData(fmt.Sprint(input.AccountId))
+	if err != nil {
+		if !errors.Is(err, models.ErrAccountRepoHubDataNotFound) {
+			return outputdata.GetAccountIntegrations{}, err
+		}
+		found = false
+	}
+
+	if found {
 		outputRepos = append(outputRepos, outputdata.GetAccountIntegrationsIntegr{
 			Id:   repohub.Type,
 			Name: repohub.GetRepoHubTypeAsString(),
 		})
 	}
-	return outputdata.MapToGetAccountIntegrations(outputDrive, outputPlanner, outputRepos)
+
+	return outputdata.MapToGetAccountIntegrations(outputDrive, outputPlanner, outputRepos), nil
 }
 
-func (a *AccountInteractor) CheckCredsValidity(input inputdata.CheckCredsValidity) bool {
-	account := a.accountRepo.GetAccountByLogin(input.Login)
+func (a *AccountInteractor) CheckCredsValidity(input inputdata.CheckCredsValidity) (bool, error) {
+	account, err := a.accountRepo.GetAccountByLogin(input.Login)
+	if err != nil {
+		return false, err
+	}
+
 	key := pbkdf2.Key([]byte(input.Password), []byte(account.Salt), pbkdf2Iterations, pbkdf2HashSize, sha512.New)
 
-	return bytes.Equal(key, account.Hash)
+	return bytes.Equal(key, account.Hash), nil
 }
-func (a *AccountInteractor) CheckUsernameExists(input inputdata.CheckUsernameExists) bool {
-	account := a.accountRepo.GetAccountByLogin(input.Login)
-	return account.Login == input.Login
+
+func (a *AccountInteractor) CheckUsernameExists(input inputdata.CheckUsernameExists) (bool, error) {
+	_, err := a.accountRepo.GetAccountByLogin(input.Login)
+	if err != nil {
+		if errors.Is(err, models.ErrAccountNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
-func (a *AccountInteractor) SignUp(input inputdata.SignUp) outputdata.SignUp {
+
+func (a *AccountInteractor) SignUp(input inputdata.SignUp) (outputdata.SignUp, error) {
 	salt := uuid.NewString()
 	passHash := pbkdf2.Key([]byte(input.Password), []byte(salt), pbkdf2Iterations, pbkdf2HashSize, sha512.New)
 
@@ -216,16 +340,26 @@ func (a *AccountInteractor) SignUp(input inputdata.SignUp) outputdata.SignUp {
 		ScienceDegree: input.ScienceDegree,
 		UniversityId:  fmt.Sprint(input.UniId),
 	}
-	prof = a.accountRepo.AddProfessor(prof)
+
+	prof, err := a.accountRepo.AddProfessor(prof)
+	if err != nil {
+		return outputdata.SignUp{}, err
+	}
+
 	account := models.Account{
 		Login: input.Login,
 		Hash:  passHash,
 		Salt:  salt,
 		Id:    prof.Id,
 	}
-	a.accountRepo.AddAccount(account)
+
+	err = a.accountRepo.AddAccount(account)
+	if err != nil {
+		return outputdata.SignUp{}, err
+	}
+
 	return outputdata.SignUp{
 		Id:    account.Id,
 		Login: account.Login,
-	}
+	}, nil
 }

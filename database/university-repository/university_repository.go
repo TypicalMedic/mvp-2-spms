@@ -1,9 +1,13 @@
 package universityrepository
 
 import (
+	"errors"
 	"mvp-2-spms/database"
 	"mvp-2-spms/database/models"
 	entities "mvp-2-spms/domain-aggregate"
+	usecasemodels "mvp-2-spms/services/models"
+
+	"gorm.io/gorm"
 )
 
 type UniversityRepository struct {
@@ -16,22 +20,38 @@ func InitUniversityRepository(dbcxt database.Database) *UniversityRepository {
 	}
 }
 
-func (u *UniversityRepository) GetEducationalProgrammeById(epId string) entities.EducationalProgramme {
+func (u *UniversityRepository) GetEducationalProgrammeById(epId string) (entities.EducationalProgramme, error) {
 	var edProg models.EducationalProgramme
-	u.dbContext.DB.Select("*").Where("id = ?", epId).Find(&edProg)
-	return edProg.MapToEntity()
+
+	result := u.dbContext.DB.Select("*").Where("id = ?", epId).Take(&edProg)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return entities.EducationalProgramme{}, usecasemodels.ErrEdProgrammmeNotFound
+		}
+		return entities.EducationalProgramme{}, result.Error
+	}
+
+	return edProg.MapToEntity(), nil
 }
 
-func (u *UniversityRepository) GetUniversityById(uId string) entities.University {
+func (u *UniversityRepository) GetUniversityById(uId string) (entities.University, error) {
 	var uni models.University
-	u.dbContext.DB.Select("*").Where("id = ?", uId).Find(&uni)
-	return uni.MapToEntity()
+
+	result := u.dbContext.DB.Select("*").Where("id = ?", uId).Take(&uni)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return entities.University{}, usecasemodels.ErrUniNoFound
+		}
+		return entities.University{}, result.Error
+	}
+
+	return uni.MapToEntity(), nil
 }
 
-func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) []entities.EducationalProgramme {
+func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) ([]entities.EducationalProgramme, error) {
 	var edProgs []models.EducationalProgramme
 
-	u.dbContext.DB.Raw(
+	result := u.dbContext.DB.Raw(
 		`SELECT educational_programme.* 
 		FROM (SELECT * 
 		FROM department
@@ -40,9 +60,13 @@ func (u *UniversityRepository) GetUniversityEducationalProgrammes(uniId string) 
 		LEFT JOIN educational_programme ON educational_programme.faculty_id = faculty.id;`,
 		uniId).Scan(&edProgs)
 
-	result := []entities.EducationalProgramme{}
-	for _, p := range edProgs {
-		result = append(result, p.MapToEntity())
+	if result.Error != nil {
+		return []entities.EducationalProgramme{}, result.Error
 	}
-	return result
+
+	edProgrammes := []entities.EducationalProgramme{}
+	for _, p := range edProgs {
+		edProgrammes = append(edProgrammes, p.MapToEntity())
+	}
+	return edProgrammes, nil
 }

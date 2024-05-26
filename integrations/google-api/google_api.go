@@ -19,10 +19,12 @@ type GoogleAPI struct {
 
 func InitGoogleAPI(scope ...string) GoogleAPI {
 	ctx := context.Background()
+
 	b, err := os.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
-	} // If modifying these scopes, delete your previously saved token.json.
+	}
+
 	config, err := google.ConfigFromJSON(b, scope...)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
@@ -31,21 +33,22 @@ func InitGoogleAPI(scope ...string) GoogleAPI {
 	return GoogleAPI{Context: ctx, config: config}
 }
 
-func (g *GoogleAPI) GetAuthLink(redirectURI string, state string) string {
+func (g *GoogleAPI) GetAuthLink(redirectURI string, state string) (string, error) {
 	// work with oauth state!!!
 	g.config.RedirectURL = redirectURI
-	authURL := g.config.AuthCodeURL(state, oauth2.AccessTypeOffline)
-	return authURL
+	authURL := g.config.AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	return authURL, nil
 }
 
-func (g *GoogleAPI) GetToken(authCode string) *oauth2.Token {
+func (g *GoogleAPI) GetToken(authCode string) (*oauth2.Token, error) {
 	tok, err := g.config.Exchange(context.TODO(), authCode)
 	if err != nil {
-		log.Fatalf("Unable to retrieve token from web: %v", err)
+		return nil, err
 	}
-	return tok
+	return tok, nil
 }
 
-func (g *GoogleAPI) SetupClient(token *oauth2.Token) {
+func (g *GoogleAPI) SetupClient(token *oauth2.Token) error {
 	g.Client = g.config.Client(context.Background(), token)
+	return nil
 }

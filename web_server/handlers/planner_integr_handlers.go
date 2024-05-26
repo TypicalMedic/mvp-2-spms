@@ -27,23 +27,56 @@ func InitPlannerIntegrationHandler(planners internal.Planners, acc interfaces.IA
 }
 
 func (h *PlannerIntegrationHandler) GetProfessorPlanners(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	integInput := ainputdata.GetPlannerIntegration{
 		AccountId: uint(id),
 	}
-	calendarInfo := h.accountInteractor.GetPlannerIntegration(integInput)
 
-	result := h.accountInteractor.GetProfessorIntegrPlanners(fmt.Sprint(id), h.planners[models.PlannerName(calendarInfo.Type)])
+	calendarInfo, err := h.accountInteractor.GetPlannerIntegration(integInput)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	result, err := h.accountInteractor.GetProfessorIntegrPlanners(fmt.Sprint(id), h.planners[models.PlannerName(calendarInfo.Type)])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
 func (h *PlannerIntegrationHandler) SetProfessorPlanner(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -56,22 +89,47 @@ func (h *PlannerIntegrationHandler) SetProfessorPlanner(w http.ResponseWriter, r
 	var reqB requestbodies.SetProfessorPlanner
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&reqB)
+	err = decoder.Decode(&reqB)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	h.accountInteractor.SetProfessorPlanner(reqB.Id, fmt.Sprint(id))
+	err = h.accountInteractor.SetProfessorPlanner(reqB.Id, fmt.Sprint(id))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
 
 func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter, r *http.Request) {
-	user := GetSessionUser(r)
-	id, _ := strconv.Atoi(user.GetProfId())
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	returnURL := r.URL.Query().Get("redirect")
 	redirectURI := "http://127.0.0.1:8080/auth/integration/access/googlecalendar"
-	result := (h.planners[models.GoogleCalendar]).GetAuthLink(redirectURI, int(uint(id)), returnURL)
+
+	result, err := (h.planners[models.GoogleCalendar]).GetAuthLink(redirectURI, int(uint(id)), returnURL)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(result))
@@ -80,11 +138,24 @@ func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter,
 func (h *PlannerIntegrationHandler) OAuthCallbackGoogleCalendar(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	state := r.URL.Query().Get("state")
-	decodedState, _ := base64.URLEncoding.DecodeString(state)
+
+	decodedState, err := base64.URLEncoding.DecodeString(state)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	// needs further update
 	params := strings.Split(string(decodedState), ",")
-	accountId, _ := strconv.Atoi(params[0])
+
+	accountId, err := strconv.Atoi(params[0])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	redirect := params[1]
 
 	input := ainputdata.SetPlannerIntegration{
@@ -92,7 +163,14 @@ func (h *PlannerIntegrationHandler) OAuthCallbackGoogleCalendar(w http.ResponseW
 		AuthCode:  code,
 		Type:      int(models.GoogleCalendar),
 	}
-	result := h.accountInteractor.SetPlannerIntegration(input, h.planners[models.GoogleCalendar])
+
+	result, err := h.accountInteractor.SetPlannerIntegration(input, h.planners[models.GoogleCalendar])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Google-Calendar-Token", result.AccessToken)
 	w.Header().Add("Google-Calendar-Token-Exp", result.Expiry.String())
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)
