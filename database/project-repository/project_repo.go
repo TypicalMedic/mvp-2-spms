@@ -22,6 +22,20 @@ func InitProjectRepository(dbcxt database.Database) *ProjectRepository {
 	}
 }
 
+func (r *ProjectRepository) GetProfessorProjectsWithFilters(profId string, statusFilter int) ([]entities.Project, error) {
+	var projectsDb []models.Project
+	result := r.dbContext.DB.Select("*").Where("supervisor_id = ? and status_id = ?", profId, statusFilter).Find(&projectsDb)
+	if result.Error != nil {
+		return []entities.Project{}, result.Error
+	}
+	projects := []entities.Project{}
+	for _, pj := range projectsDb {
+		// вынести в маппер
+		projects = append(projects, pj.MapToEntity())
+	}
+	return projects, nil
+}
+
 func (r *ProjectRepository) GetProfessorProjects(profId string) ([]entities.Project, error) {
 	var projectsDb []models.Project
 	result := r.dbContext.DB.Select("*").Where("supervisor_id = ?", profId).Find(&projectsDb)

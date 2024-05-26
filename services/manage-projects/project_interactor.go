@@ -3,6 +3,7 @@ package manageprojects
 import (
 	"errors"
 	"fmt"
+	domainaggregate "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/manage-projects/outputdata"
@@ -34,7 +35,15 @@ func (p *ProjectInteractor) GetProfessorProjects(input inputdata.GetProfessorPro
 	// get from database
 	projEntities := []outputdata.GetProfessorProjectsEntities{}
 
-	projects, err := p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))
+	var projects []domainaggregate.Project
+	var err error
+	if input.FilterStatus != nil {
+		projects, err = p.projectRepo.GetProfessorProjectsWithFilters(fmt.Sprint(input.ProfessorId), *input.FilterStatus)
+
+	} else {
+		projects, err = p.projectRepo.GetProfessorProjects(fmt.Sprint(input.ProfessorId))
+	}
+
 	if err != nil {
 		return outputdata.GetProfessorProjects{}, err
 	}

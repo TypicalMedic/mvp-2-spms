@@ -8,7 +8,8 @@ import (
 )
 
 type GetProfessorProjects struct {
-	ProfessorId uint
+	ProfessorId  uint
+	FilterStatus *int
 }
 
 type GetProjectCommits struct {
