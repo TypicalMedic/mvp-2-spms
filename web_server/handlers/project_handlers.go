@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	domainaggregate "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/internal"
 	mngInterfaces "mvp-2-spms/services/interfaces"
 	ainputdata "mvp-2-spms/services/manage-accounts/inputdata"
@@ -10,6 +11,7 @@ import (
 	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	requestbodies "mvp-2-spms/web_server/handlers/request-bodies"
+	responsebodies "mvp-2-spms/web_server/handlers/response-bodies"
 	"net/http"
 	"strconv"
 	"time"
@@ -57,6 +59,64 @@ func (h *ProjectHandler) GetAllProfProjects(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err.Error())
 		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
+func (h *ProjectHandler) GetProjectStatusList(w http.ResponseWriter, r *http.Request) {
+	result := responsebodies.ProjectStatuses{
+		Statuses: []responsebodies.Status{
+			{
+				Name:  domainaggregate.ProjectNotConfirmed.String(),
+				Value: int(domainaggregate.ProjectNotConfirmed),
+			},
+			{
+				Name:  domainaggregate.ProjectInProgress.String(),
+				Value: int(domainaggregate.ProjectInProgress),
+			},
+			{
+				Name:  domainaggregate.ProjectFinished.String(),
+				Value: int(domainaggregate.ProjectFinished),
+			},
+			{
+				Name:  domainaggregate.ProjectCancelled.String(),
+				Value: int(domainaggregate.ProjectCancelled),
+			},
+		},
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
+func (h *ProjectHandler) GetProjectStageList(w http.ResponseWriter, r *http.Request) {
+	result := responsebodies.ProjectStages{
+		Stages: []responsebodies.Status{
+			{
+				Name:  domainaggregate.Analysis.String(),
+				Value: int(domainaggregate.Analysis),
+			},
+			{
+				Name:  domainaggregate.Design.String(),
+				Value: int(domainaggregate.Design),
+			},
+			{
+				Name:  domainaggregate.Development.String(),
+				Value: int(domainaggregate.Development),
+			},
+			{
+				Name:  domainaggregate.Testing.String(),
+				Value: int(domainaggregate.Testing),
+			},
+			{
+				Name:  domainaggregate.Deployment.String(),
+				Value: int(domainaggregate.Deployment),
+			},
+		},
 	}
 
 	w.Header().Add("Content-Type", "application/json")
