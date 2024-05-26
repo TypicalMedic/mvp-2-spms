@@ -47,7 +47,14 @@ func (a *AccountInteractor) GetProfessorInfo(input inputdata.GetProfessorInfo) (
 
 	uni, err := a.uniRepo.GetUniversityById(profInfo.UniversityId)
 	if err != nil {
-		return outputdata.GetProfessorInfo{}, err
+		if !errors.Is(err, models.ErrUniNoFound) {
+			return outputdata.GetProfessorInfo{}, err
+		}
+		uni = entities.University{
+			Id:   "-1",
+			Name: "Университет неизвестен",
+			City: "-",
+		}
 	}
 
 	// add get account login

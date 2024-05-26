@@ -21,9 +21,11 @@ import (
 	managetasks "mvp-2-spms/services/manage-tasks"
 	manageuniversities "mvp-2-spms/services/manage-universities"
 	"mvp-2-spms/services/models"
+	"mvp-2-spms/web_server/config"
 	"mvp-2-spms/web_server/routes"
 	"mvp-2-spms/web_server/session"
 	"net/http"
+	"os"
 
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/drive/v3"
@@ -33,6 +35,16 @@ import (
 )
 
 func main() {
+	serverConfig, err := config.ReadConfigFromFile("server_config.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = config.SetConfigEnvVars(serverConfig)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	session.SetBotTokenFromJson("credentials_bot.json")
 	dbConfig, err := database.ReadDBConfigFromFile("db_config.json")
 	if err != nil {
@@ -91,5 +103,5 @@ func main() {
 		Integrations: integrations,
 	}
 	router := routes.SetupRouter(&app)
-	http.ListenAndServe(":8080", router.Router())
+	http.ListenAndServe(os.Getenv("SERVER_PORT"), router.Router())
 }

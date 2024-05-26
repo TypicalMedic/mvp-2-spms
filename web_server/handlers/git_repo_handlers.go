@@ -8,6 +8,7 @@ import (
 	"mvp-2-spms/services/models"
 	"mvp-2-spms/web_server/handlers/interfaces"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -40,7 +41,7 @@ func (h *GitRepoHandler) GetGitHubLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	returnURL := r.URL.Query().Get("redirect")
-	redirectURI := "http://127.0.0.1:8080/auth/integration/access/github"
+	redirectURI := os.Getenv("SERVER_ADDRESS") + os.Getenv("SERVER_PORT") + "/api/v1/auth/integration/access/github"
 
 	result, err := h.repos[models.GitHub].GetAuthLink(redirectURI, int(uint(id)), returnURL)
 	if err != nil {
