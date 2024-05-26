@@ -83,6 +83,9 @@ func (r *Router) setupProjectRoutes() {
 			r.Route("/tasks", func(r chi.Router) {
 				r.Get("/", taskH.GetAllProjectTasks) // GET /projects/123/tasks
 				r.Post("/add", taskH.AddTask)        // POST /projects/123/tasks/add
+				r.Route("/{taskID}", func(r chi.Router) {
+					r.Put("/", taskH.UpdateTask)
+				})
 			})
 		})
 	})

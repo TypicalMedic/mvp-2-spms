@@ -7,6 +7,7 @@ import (
 	"mvp-2-spms/services/manage-tasks/inputdata"
 	"mvp-2-spms/services/manage-tasks/outputdata"
 	"mvp-2-spms/services/models"
+	"strconv"
 
 	"golang.org/x/oauth2"
 )
@@ -25,6 +26,36 @@ func InitTaskInteractor(projRepo interfaces.IProjetRepository, taskRepo interfac
 	}
 }
 
+func (p *TaskInteractor) UpdateTask(input inputdata.UpdateTask, cloudDrive interfaces.ICloudDrive) error {
+	task, err := p.taskRepo.GetTaskById(fmt.Sprint(input.Id))
+	if err != nil {
+		return err
+	}
+	proj, err := p.projectRepo.GetProjectById(task.ProjectId)
+	if err != nil {
+		return err
+	}
+
+	supId, err := strconv.Atoi(proj.SupervisorId)
+	if err != nil {
+		return err
+	}
+	if supId != input.ProfId {
+		return models.ErrProjectNotProfessors
+	}
+
+	taskPointer := &task
+	err = input.UpdateTaskEntity(taskPointer)
+	if err != nil {
+		return err
+	}
+
+	err = p.taskRepo.UpdateTask(*taskPointer)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (p *TaskInteractor) AddTask(input inputdata.AddTask, cloudDrive interfaces.ICloudDrive) (outputdata.AddTask, error) {
 	// add to db
 	task, err := p.taskRepo.CreateTask(input.MapToTaskEntity())
