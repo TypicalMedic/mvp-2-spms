@@ -36,6 +36,40 @@ type AddProject struct {
 	RepositoryName      string
 }
 
+type UpdateProject struct {
+	Id                  int
+	ProfessorId         *int
+	Theme               *string
+	StudentId           *int
+	Year                *int
+	RepositoryOwnerName *string
+	RepositoryName      *string
+	Status              *int
+	Stage               *int
+}
+
+func (as UpdateProject) UpdateProjectEntity(p *entities.Project) error {
+	if as.ProfessorId != nil {
+		p.SupervisorId = fmt.Sprint(*as.ProfessorId)
+	}
+	if as.Stage != nil {
+		p.Stage = entities.ProjectStage(*as.Stage)
+	}
+	if as.Status != nil {
+		p.Status = entities.ProjectStatus(*as.Status)
+	}
+	if as.StudentId != nil {
+		p.StudentId = fmt.Sprint(*as.StudentId)
+	}
+	if as.Theme != nil {
+		p.Theme = *as.Theme
+	}
+	if as.Year != nil {
+		p.Year = uint(*as.Year)
+	}
+	return nil
+}
+
 func (as AddProject) MapToProjectEntity() entities.Project {
 	return entities.Project{
 		Theme:        as.Theme,

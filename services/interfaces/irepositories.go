@@ -28,6 +28,7 @@ type IProjetRepository interface {
 	GetProjectGradingById(projId string) (entities.ProjectGrading, error)
 	GetProjectTaskInfoById(projId string) (models.TasksInfo, error)
 	GetProjectMeetingInfoById(projId string) (models.MeetingInfo, error)
+	UpdateProject(proj entities.Project) error
 }
 
 // transfers data in domain entities

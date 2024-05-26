@@ -49,6 +49,16 @@ type AddProject struct {
 	RepositoryName string `json:"repository_name"`
 }
 
+type UpdateProject struct {
+	Theme          *string `json:"theme,omitempty"`
+	StudentId      *int    `json:"student_id,omitempty"`
+	Year           *int    `json:"year,omitempty"`
+	RepoOwner      *string `json:"repository_owner_login,omitempty"`
+	RepositoryName *string `json:"repository_name,omitempty"`
+	Status         *int    `json:"status,omitempty"`
+	Stage          *int    `json:"stage,omitempty"`
+}
+
 type AddTask struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`

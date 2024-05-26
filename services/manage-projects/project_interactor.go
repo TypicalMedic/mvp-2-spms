@@ -7,6 +7,7 @@ import (
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/manage-projects/outputdata"
 	"mvp-2-spms/services/models"
+	"strconv"
 
 	"golang.org/x/oauth2"
 )
@@ -150,6 +151,33 @@ func (p *ProjectInteractor) GetProjectStatsById(input inputdata.GetProjectStatsB
 
 	output := outputdata.MapToGetProjectStatsById(stats)
 	return output, nil
+}
+
+func (p *ProjectInteractor) UpdateProject(input inputdata.UpdateProject, cloudDrive interfaces.ICloudDrive) error {
+	project, err := p.projectRepo.GetProjectById(fmt.Sprint(input.Id))
+	if err != nil {
+		return err
+	}
+
+	supId, err := strconv.Atoi(project.SupervisorId)
+	if err != nil {
+		return err
+	}
+	if supId != *input.ProfessorId {
+		return models.ErrProjectNotProfessors
+	}
+
+	projPointer := &project
+	err = input.UpdateProjectEntity(projPointer)
+	if err != nil {
+		return err
+	}
+
+	err = p.projectRepo.UpdateProject(*projPointer)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) (outputdata.AddProject, error) {

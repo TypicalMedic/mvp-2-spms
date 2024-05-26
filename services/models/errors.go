@@ -13,6 +13,7 @@ var (
 	ErrMeetingPlannerIdNotFound = errors.New("meeting planner id not found")
 
 	ErrProjectNotFound                = errors.New("project not found")
+	ErrProjectNotProfessors           = errors.New("project is not assigned to this professor")
 	ErrProjectCloudFolderNotFound     = errors.New("project cloud folder not found")
 	ErrProjectCloudFolderLinkNotFound = errors.New("project cloud folder link not found")
 	ErrProjectRepoNotFound            = errors.New("project repository not found")

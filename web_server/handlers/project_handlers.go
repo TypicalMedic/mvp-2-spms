@@ -357,3 +357,70 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)
 }
+
+func (h *ProjectHandler) UpdateProject(w http.ResponseWriter, r *http.Request) {
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	headerContentTtype := r.Header.Get("Content-Type")
+	// проверяем соответсвтвие типа содержимого запроса
+	if headerContentTtype != "application/json" {
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return
+	}
+
+	// декодируем тело запроса
+	var reqB requestbodies.UpdateProject
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	err = decoder.Decode(&reqB)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	input := inputdata.UpdateProject{
+		Id:                  int(projectId),
+		ProfessorId:         &id,
+		Theme:               reqB.Theme,
+		StudentId:           reqB.StudentId,
+		Year:                reqB.Year,
+		RepositoryOwnerName: reqB.RepoOwner,
+		RepositoryName:      reqB.RepositoryName,
+		Status:              reqB.Status,
+		Stage:               reqB.Stage,
+	}
+
+	err = h.projectInteractor.UpdateProject(input, nil)
+	if err != nil {
+		if errors.Is(err, models.ErrProjectNotProfessors) {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
