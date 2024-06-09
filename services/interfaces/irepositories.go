@@ -30,6 +30,8 @@ type IProjetRepository interface {
 	GetProjectTaskInfoById(projId string) (models.TasksInfo, error)
 	GetProjectMeetingInfoById(projId string) (models.MeetingInfo, error)
 	UpdateProject(proj entities.Project) error
+	UpdateProjectDefenceGrade(projId string, grade float32) error
+	UpdateProjectSupRew(projId string, sr entities.SupervisorReview) error
 }
 
 // transfers data in domain entities
