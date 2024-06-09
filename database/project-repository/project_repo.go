@@ -282,12 +282,64 @@ func (r *ProjectRepository) GetProjectMeetingInfoById(projId string) (usecasemod
 
 func (r *ProjectRepository) UpdateProject(proj entities.Project) error {
 	projDb := models.Project{}
+	result := r.dbContext.DB.Where("id = ?", proj.Id).Find(&projDb)
+	if result.Error != nil {
+		return result.Error
+	}
 	projDb.MapEntityToThis(proj)
 
-	result := r.dbContext.DB.Where("id = ?", proj.Id).Save(&projDb)
+	result = r.dbContext.DB.Where("id = ?", proj.Id).Save(&projDb)
 	if result.Error != nil {
 		return result.Error
 	}
 
+	return nil
+}
+
+func (r *ProjectRepository) UpdateProjectDefenceGrade(projId string, grade float32) error {
+	result := r.dbContext.DB.Model(&models.Project{}).Where("id = ?", projId).Update("defence_grade", grade)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *ProjectRepository) UpdateProjectSupRew(projId string, sr entities.SupervisorReview) error {
+	srDb := models.SupervisorReview{}
+	srDb.MapEntityToThis(sr)
+
+	err := r.dbContext.DB.Transaction(func(tx *gorm.DB) error {
+		result := tx.Save(&srDb)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		result = tx.Where("supervisor_review_id = ?", srDb.Id.Int64).Delete(&models.ReviewCriteria{})
+		if result.Error != nil {
+			return result.Error
+		}
+
+		for _, c := range sr.Criterias {
+			cDb := models.ReviewCriteria{}
+			cDb.MapEntityToThis(c)
+			cDb.SupervieorReviewId = uint(srDb.Id.Int64)
+
+			result = tx.Create(&cDb)
+			if result.Error != nil {
+				return result.Error
+			}
+		}
+
+		result = tx.Model(&models.Project{}).Where("id = ?", projId).Update("supervisor_review_id", srDb.Id.Int64)
+		if result.Error != nil {
+			return result.Error
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
 	return nil
 }

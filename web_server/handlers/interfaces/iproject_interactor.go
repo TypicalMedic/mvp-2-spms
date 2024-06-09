@@ -12,5 +12,6 @@ type IProjetInteractor interface {
 	GetProjectById(input inputdata.GetProjectById) (outputdata.GetProjectById, error)
 	AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) (outputdata.AddProject, error)
 	UpdateProject(input inputdata.UpdateProject, cloudDrive interfaces.ICloudDrive) error
+	UpdateProjectGrading(input inputdata.UpdateProjectGrading) error
 	GetProjectStatsById(input inputdata.GetProjectStatsById) (outputdata.GetProjectStatsById, error)
 }

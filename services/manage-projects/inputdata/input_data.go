@@ -88,3 +88,50 @@ func (as AddProject) MapToRepositoryEntity() models.Repository {
 		OwnerName: as.RepositoryOwnerName,
 	}
 }
+
+type UpdateProjectGrading struct {
+	ProjId           int
+	ProfessorId      *int
+	DefenctGrade     *float32 `json:"defence_grade,omitempty"`
+	SupervisorReview *SupRew  `json:"supervisor_review,omitempty"`
+}
+
+type SupRew struct {
+	Id           *int      `json:"id,omitempty"`
+	Criterias    *[]Crit   `json:"criterias,omitempty"`
+	CreationDate time.Time `json:"created"`
+}
+
+type Crit struct {
+	Criteria string   `json:"criteria"`
+	Grade    *float32 `json:"grade,omitempty"`
+	Weight   float32  `json:"weight"`
+}
+
+func (as UpdateProjectGrading) MapToProjectGrading() entities.ProjectGrading {
+	result := entities.ProjectGrading{}
+	if as.DefenctGrade != nil {
+		result.DefenceGrade = *as.DefenctGrade
+	}
+	if as.SupervisorReview != nil {
+		result.SupervisorReview = entities.SupervisorReview{}
+		if as.SupervisorReview.Id != nil {
+			result.SupervisorReview.Id = uint(*as.SupervisorReview.Id)
+		}
+		if as.SupervisorReview.Criterias != nil {
+			result.SupervisorReview.Criterias = []entities.Criteria{}
+			for _, c := range *as.SupervisorReview.Criterias {
+				cr := entities.Criteria{
+					Description: c.Criteria,
+					Weight:      c.Weight,
+				}
+				if c.Grade != nil {
+					cr.Grade = *c.Grade
+				}
+				result.SupervisorReview.Criterias = append(result.SupervisorReview.Criterias, cr)
+			}
+		}
+		result.SupervisorReview.CreationDate = as.SupervisorReview.CreationDate
+	}
+	return result
+}

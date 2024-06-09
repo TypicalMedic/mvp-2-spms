@@ -189,6 +189,55 @@ func (p *ProjectInteractor) UpdateProject(input inputdata.UpdateProject, cloudDr
 	return nil
 }
 
+func (p *ProjectInteractor) UpdateProjectGrading(input inputdata.UpdateProjectGrading) error {
+	project, err := p.projectRepo.GetProjectById(fmt.Sprint(input.ProjId))
+	if err != nil {
+		return err
+	}
+
+	supId, err := strconv.Atoi(project.SupervisorId)
+	if err != nil {
+		return err
+	}
+	if supId != *input.ProfessorId {
+		return models.ErrProjectNotProfessors
+	}
+
+	if input.DefenctGrade != nil {
+		err = p.projectRepo.UpdateProjectDefenceGrade(fmt.Sprint(input.ProjId), *input.DefenctGrade)
+		if err != nil {
+			return err
+		}
+	}
+
+	if input.SupervisorReview != nil {
+		sr := domainaggregate.SupervisorReview{}
+		if input.SupervisorReview.Id != nil {
+			sr.Id = uint(*input.SupervisorReview.Id)
+		}
+		if input.SupervisorReview.Criterias != nil {
+			sr.Criterias = []domainaggregate.Criteria{}
+			for _, c := range *input.SupervisorReview.Criterias {
+				cr := domainaggregate.Criteria{
+					Description: c.Criteria,
+					Weight:      c.Weight,
+				}
+				if c.Grade != nil {
+					cr.Grade = *c.Grade
+				}
+				sr.Criterias = append(sr.Criterias, cr)
+			}
+		}
+		sr.CreationDate = input.SupervisorReview.CreationDate
+
+		err = p.projectRepo.UpdateProjectSupRew(fmt.Sprint(input.ProjId), sr)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (p *ProjectInteractor) AddProject(input inputdata.AddProject, cloudDrive interfaces.ICloudDrive) (outputdata.AddProject, error) {
 	// add to db with repository
 	proj, err := p.projectRepo.CreateProjectWithRepository(input.MapToProjectEntity(), input.MapToRepositoryEntity())
