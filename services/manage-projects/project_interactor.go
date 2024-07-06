@@ -3,11 +3,13 @@ package manageprojects
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	domainaggregate "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/services/interfaces"
 	"mvp-2-spms/services/manage-projects/inputdata"
 	"mvp-2-spms/services/manage-projects/outputdata"
 	"mvp-2-spms/services/models"
+	"os"
 	"strconv"
 
 	"golang.org/x/oauth2"
@@ -138,6 +140,75 @@ func (p *ProjectInteractor) GetProjectById(input inputdata.GetProjectById) (outp
 }
 
 // returns project statistics
+func (p *ProjectInteractor) GetProjectSupReport(input inputdata.GetProjectSupReport) (string, error) {
+	report := models.SupReport{}
+	report.Comment = input.Comment
+	projId := fmt.Sprint(input.ProjectId)
+
+	project, err := p.projectRepo.GetProjectById(projId)
+	if err != nil {
+		return "", err
+	}
+	report.Theme = project.Theme
+
+	projectGrading, err := p.projectRepo.GetProjectGradingById(projId)
+	if err != nil {
+		return "", err
+	}
+	report.Date = projectGrading.SupervisorReview.CreationDate.Format("02.01.2006")
+	for i, c := range projectGrading.SupervisorReview.Criterias {
+		report.Items = append(report.Items, models.Ctiteria{
+			Num:   fmt.Sprint(i + 1),
+			Name:  c.Description,
+			Grade: fmt.Sprint(c.Grade),
+		})
+	}
+	report.SupRewGrade = fmt.Sprint(projectGrading.SupervisorReview.GetGrade())
+
+	student, err := p.studentRepo.GetStudentById(project.StudentId)
+	if err != nil {
+		return "", err
+	}
+	report.StudentName = student.FullNameToString()
+	report.Course = fmt.Sprint(student.Cource)
+
+	sup, err := p.accountRepo.GetProfessorById(fmt.Sprint(input.ProfessorId))
+	if err != nil {
+		return "", err
+	}
+	report.ProfName = fmt.Sprint([]rune(sup.Name)[0], ".", []rune(sup.Middlename)[0], ". ", sup.Surname)
+	report.ScienceDegree = sup.ScienceDegree
+
+	ep, err := p.uniRepo.GetEducationalProgrammeFullById(fmt.Sprint(student.EducationalProgrammeId))
+	if err != nil {
+		return "", err
+	}
+	report.EdProgramme = ep.Name
+	report.Dept = ep.Dept
+	report.Faculty = ep.Faculty
+
+	template, err := template.New("./report.docx").ParseFiles("./report.docx")
+	if err != nil {
+		return "", err
+	}
+
+	// filename := fmt.Sprint("", time.Now().UTC().Format(time.RFC3339Nano), "-", input.ProfessorId, "-", input.ProjectId, ".docx")
+	filename := fmt.Sprint("abc", ".docx")
+	var f *os.File
+	f, err = os.Create(filename)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	if err := template.Execute(f, report); err != nil {
+		return "", err
+	}
+
+	return filename, nil
+}
+
+// returns project statistics
 func (p *ProjectInteractor) GetProjectStatsById(input inputdata.GetProjectStatsById) (outputdata.GetProjectStatsById, error) {
 	stats := models.ProjectStats{}
 	projId := fmt.Sprint(input.ProjectId)
@@ -205,6 +276,11 @@ func (p *ProjectInteractor) UpdateProjectGrading(input inputdata.UpdateProjectGr
 
 	if input.DefenctGrade != nil {
 		err = p.projectRepo.UpdateProjectDefenceGrade(fmt.Sprint(input.ProjId), *input.DefenctGrade)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = p.projectRepo.UpdateProjectDefenceGrade(fmt.Sprint(input.ProjId), 0)
 		if err != nil {
 			return err
 		}

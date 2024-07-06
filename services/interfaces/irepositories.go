@@ -43,6 +43,7 @@ type IStudentRepository interface {
 
 type IUniversityRepository interface {
 	GetEducationalProgrammeById(epId string) (entities.EducationalProgramme, error)
+	GetEducationalProgrammeFullById(epId string) (models.EdProg, error)
 	GetUniversityById(uId string) (entities.University, error)
 	GetUniversityEducationalProgrammes(uniId string) ([]entities.EducationalProgramme, error)
 }

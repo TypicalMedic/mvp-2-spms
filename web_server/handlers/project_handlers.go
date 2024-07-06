@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	domainaggregate "mvp-2-spms/domain-aggregate"
 	"mvp-2-spms/internal"
 	mngInterfaces "mvp-2-spms/services/interfaces"
@@ -262,6 +263,53 @@ func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
+}
+
+func (h *ProjectHandler) GetProjectSupReport(w http.ResponseWriter, r *http.Request) {
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	projectId, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	var reqB inputdata.GetProjectSupReport
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	err = decoder.Decode(&reqB)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	reqB.ProfessorId = uint(id)
+	reqB.ProjectId = uint(projectId)
+
+	result, err := h.projectInteractor.GetProjectSupReport(reqB)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	w.Header().Add("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, result)
 }
 
 func (h *ProjectHandler) GetProjectStatistics(w http.ResponseWriter, r *http.Request) {

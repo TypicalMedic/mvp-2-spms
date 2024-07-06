@@ -42,7 +42,7 @@ func (h *CloudDriveHandler) GetGoogleDriveLink(w http.ResponseWriter, r *http.Re
 	}
 
 	returnURL := r.URL.Query().Get("redirect")
-	redirectURI := os.Getenv("SERVER_ADDRESS") + os.Getenv("SERVER_PORT") + "/api/v1/auth/integration/access/googledrive"
+	redirectURI := os.Getenv("RETURN_URL") + "/api/v1/auth/integration/access/googledrive"
 
 	result, err := h.drives[models.GoogleDrive].GetAuthLink(redirectURI, int(uint(id)), returnURL)
 	if err != nil {

@@ -7,8 +7,9 @@ import (
 )
 
 type ServerConfiguration struct {
-	Address string `json:"addr" env:"SERVER_ADDRESS"`
-	Port    string `json:"port" env:"SERVER_PORT"`
+	Address   string `json:"addr" env:"SERVER_ADDRESS"`
+	Port      string `json:"port" env:"SERVER_PORT"`
+	ReturnUrl string `json:"return_url" env:"RETURN_URL"`
 }
 
 func ReadConfigFromFile(filename string) (ServerConfiguration, error) {

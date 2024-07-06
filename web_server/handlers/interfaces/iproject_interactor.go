@@ -14,4 +14,5 @@ type IProjetInteractor interface {
 	UpdateProject(input inputdata.UpdateProject, cloudDrive interfaces.ICloudDrive) error
 	UpdateProjectGrading(input inputdata.UpdateProjectGrading) error
 	GetProjectStatsById(input inputdata.GetProjectStatsById) (outputdata.GetProjectStatsById, error)
+	GetProjectSupReport(input inputdata.GetProjectSupReport) (string, error)
 }

@@ -23,6 +23,12 @@ type GetProjectById struct {
 	ProjectId   uint
 }
 
+type GetProjectSupReport struct {
+	ProfessorId uint
+	ProjectId   uint
+	Comment     string `json:"comment"`
+}
+
 type GetProjectStatsById struct {
 	ProfessorId uint
 	ProjectId   uint

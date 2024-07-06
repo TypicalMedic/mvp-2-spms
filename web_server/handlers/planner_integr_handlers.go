@@ -122,7 +122,7 @@ func (h *PlannerIntegrationHandler) GetGoogleCalendarLink(w http.ResponseWriter,
 	}
 
 	returnURL := r.URL.Query().Get("redirect")
-	redirectURI := os.Getenv("SERVER_ADDRESS") + os.Getenv("SERVER_PORT") + "/api/v1/auth/integration/access/googlecalendar"
+	redirectURI := os.Getenv("RETURN_URL") + "/api/v1/auth/integration/access/googlecalendar"
 
 	result, err := (h.planners[models.GoogleCalendar]).GetAuthLink(redirectURI, int(uint(id)), returnURL)
 	if err != nil {

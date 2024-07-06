@@ -34,6 +34,36 @@ func (u *UniversityRepository) GetEducationalProgrammeById(epId string) (entitie
 	return edProg.MapToEntity(), nil
 }
 
+func (u *UniversityRepository) GetEducationalProgrammeFullById(epId string) (usecasemodels.EdProg, error) {
+	var edProg models.EducationalProgramme
+
+	result := u.dbContext.DB.Select("*").Where("id = ?", epId).Take(&edProg)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return usecasemodels.EdProg{}, usecasemodels.ErrEdProgrammmeNotFound
+		}
+		return usecasemodels.EdProg{}, result.Error
+	}
+
+	var f models.Faculty
+	result = u.dbContext.DB.Select("*").Where("id = ?", edProg.FacultyId).Take(&f)
+	if result.Error != nil {
+		return usecasemodels.EdProg{}, result.Error
+	}
+
+	var d models.Department
+	result = u.dbContext.DB.Select("*").Where("id = ?", f.DeptId).Take(&d)
+	if result.Error != nil {
+		return usecasemodels.EdProg{}, result.Error
+	}
+
+	return usecasemodels.EdProg{
+		EducationalProgramme: edProg.MapToEntity(),
+		Dept:                 d.Name,
+		Faculty:              f.Name,
+	}, nil
+}
+
 func (u *UniversityRepository) GetUniversityById(uId string) (entities.University, error) {
 	var uni models.University
 

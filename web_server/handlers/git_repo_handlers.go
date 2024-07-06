@@ -41,7 +41,7 @@ func (h *GitRepoHandler) GetGitHubLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	returnURL := r.URL.Query().Get("redirect")
-	redirectURI := os.Getenv("SERVER_ADDRESS") + os.Getenv("SERVER_PORT") + "/api/v1/auth/integration/access/github"
+	redirectURI := os.Getenv("RETURN_URL") + "/api/v1/auth/integration/access/github"
 
 	result, err := h.repos[models.GitHub].GetAuthLink(redirectURI, int(uint(id)), returnURL)
 	if err != nil {
