@@ -6,5 +6,6 @@ import (
 )
 
 type IStudentInteractor interface {
-	AddStudent(input inputdata.AddStudent) outputdata.AddStudent
+	AddStudent(input inputdata.AddStudent) (outputdata.AddStudent, error)
+	GetStudents(input inputdata.GetStudents) (outputdata.GetStudents, error)
 }

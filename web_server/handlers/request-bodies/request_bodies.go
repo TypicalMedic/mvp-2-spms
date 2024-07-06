@@ -2,6 +2,28 @@ package requestbodies
 
 import "time"
 
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type CredentialsBot struct {
+	Phone string `json:"phone_number"`
+}
+
+type SignUp struct {
+	Credentials
+	Name          string `json:"name"`
+	Surname       string `json:"surname"`
+	Middlename    string `json:"middlename"`
+	ScienceDegree string `json:"science_degree"`
+	UniversityId  int    `json:"university_id"`
+}
+
+type SetProfessorPlanner struct {
+	Id string `json:"planner_id"`
+}
+
 type AddStudent struct {
 	Name                   string `json:"name"`
 	Surname                string `json:"surname"`
@@ -15,6 +37,7 @@ type AddMeeting struct {
 	Description string    `json:"description"`
 	MeetingTime time.Time `json:"meeting_time"`
 	StudentId   int       `json:"student_participant_id"`
+	ProjectId   int       `json:"project_id,omitempty"`
 	IsOnline    bool      `json:"is_online"`
 }
 
@@ -24,6 +47,16 @@ type AddProject struct {
 	Year           int    `json:"year"`
 	RepoOwner      string `json:"repository_owner_login"`
 	RepositoryName string `json:"repository_name"`
+}
+
+type UpdateProject struct {
+	Theme          *string `json:"theme,omitempty"`
+	StudentId      *int    `json:"student_id,omitempty"`
+	Year           *int    `json:"year,omitempty"`
+	RepoOwner      *string `json:"repository_owner_login,omitempty"`
+	RepositoryName *string `json:"repository_name,omitempty"`
+	Status         *int    `json:"status,omitempty"`
+	Stage          *int    `json:"stage,omitempty"`
 }
 
 type AddTask struct {

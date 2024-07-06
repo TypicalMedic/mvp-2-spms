@@ -11,6 +11,7 @@ type Meeting struct {
 	Description   string
 	OrganizerId   string
 	ParticipantId string
+	ProjectId     string
 	Time          time.Time
 	IsOnline      bool
 	Status        MeetingStatus

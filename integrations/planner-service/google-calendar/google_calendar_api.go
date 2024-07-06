@@ -1,10 +1,11 @@
 package googlecalendar
 
 import (
-	"log"
 	googleapi "mvp-2-spms/integrations/google-api"
+	"strings"
 	"time"
 
+	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 )
@@ -14,31 +15,40 @@ const HOURS_IN_DAY = 24
 const EVENT_DURATION_HOURS = 1
 
 type googleCalendarApi struct {
+	googleapi.Google
 	api *calendar.Service
 }
 
 func InitCalendarApi(googleAPI googleapi.GoogleAPI) googleCalendarApi {
-	api, err := calendar.NewService(googleAPI.Context, option.WithHTTPClient(googleAPI.Client))
-	c := googleCalendarApi{api}
-	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
-	}
+	c := googleCalendarApi{Google: googleapi.InintGoogle(googleAPI)}
 	return c
+}
+
+func (c *googleCalendarApi) AuthentificateService(token *oauth2.Token) error {
+	c.Authentificate(token)
+
+	api, err := calendar.NewService(c.GetContext(), option.WithHTTPClient(c.GetClient()))
+	if err != nil {
+		return err
+	}
+
+	c.api = api
+	return nil
 }
 
 // startTime should be UTC+0!!!
 func (c *googleCalendarApi) AddEvent(startTime time.Time, summary string, desc string, calendarId string) (*calendar.Event, error) {
-	endTime := startTime.Add(EVENT_DURATION_HOURS * time.Hour).Format(time.RFC3339)
+	endTime := strings.Split(startTime.Add(EVENT_DURATION_HOURS*time.Hour).Format(time.RFC3339), "Z")[0]
 	event := &calendar.Event{
 		Summary:     summary,
 		Description: desc,
 		Start: &calendar.EventDateTime{
-			DateTime: startTime.Format(time.RFC3339),
-			TimeZone: "Asia/Yekaterinburg",
+			TimeZone: "Etc/GMT-5",
+			DateTime: strings.Split(startTime.Format(time.RFC3339), "Z")[0],
 		},
 		End: &calendar.EventDateTime{
+			TimeZone: "Etc/GMT-5", //////////////////////////////////////?????????????????????????????????????
 			DateTime: endTime,
-			TimeZone: "Asia/Yekaterinburg", //////////////////////////////////////?????????????????????????????????????
 		},
 		Recurrence: []string{"RRULE:FREQ=DAILY;COUNT=1"},
 	}
@@ -58,9 +68,17 @@ func (c *googleCalendarApi) GetEventById(eventId string, calendarId string) (*ca
 }
 
 func (c *googleCalendarApi) GetSchedule(startTime time.Time, calendarId string) (*calendar.Events, error) {
-	events, err := c.api.Events.List("marusya.pletneva2012@gmail.com").ShowDeleted(false).SingleEvents(true).TimeMin(startTime.Format(time.RFC3339)).OrderBy("startTime").Do()
+	events, err := c.api.Events.List(calendarId).ShowDeleted(false).SingleEvents(true).TimeMin(startTime.Format(time.RFC3339)).OrderBy("startTime").Do()
 	if err == nil {
 		return events, nil
+	}
+	return nil, err
+}
+
+func (c *googleCalendarApi) GetAllCalendars() (*calendar.CalendarList, error) {
+	calendars, err := c.api.CalendarList.List().Do()
+	if err == nil {
+		return calendars, nil
 	}
 	return nil, err
 }

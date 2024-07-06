@@ -20,8 +20,19 @@ func InitStudentHandler(studInteractor interfaces.IStudentInteractor) StudentHan
 }
 
 func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
-	professorIdCookie, _ := r.Cookie("professor_id")
-	professorId, _ := strconv.ParseUint(professorIdCookie.Value, 10, 32)
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	headerContentTtype := r.Header.Get("Content-Type")
 	// проверяем соответсвтвие типа содержимого запроса
@@ -34,14 +45,15 @@ func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 	var reqB requestbodies.AddStudent
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&reqB)
+
+	err = decoder.Decode(&reqB)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	input := inputdata.AddStudent{
-		ProfessorId:            uint(professorId),
+		ProfessorId:            uint(id),
 		Name:                   reqB.Name,
 		Surname:                reqB.Surname,
 		Middlename:             reqB.Middlename,
@@ -49,8 +61,45 @@ func (h *StudentHandler) AddStudent(w http.ResponseWriter, r *http.Request) {
 		Cource:                 uint(reqB.Cource),
 	}
 
-	student_id := h.studentInteractor.AddStudent(input)
+	student_id, err := h.studentInteractor.AddStudent(input)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(student_id)
+}
+
+func (h *StudentHandler) GetStudents(w http.ResponseWriter, r *http.Request) {
+	user, err := GetSessionUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(user.GetProfId())
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	input := inputdata.GetStudents{
+		ProfessorId: uint(id),
+	}
+
+	result, err := h.studentInteractor.GetStudents(input)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
 }

@@ -19,6 +19,32 @@ type AddTask struct {
 	Deadline    time.Time
 }
 
+type UpdateTask struct {
+	Id          int
+	ProfId      int
+	Name        *string    `json:"name,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Deadline    *time.Time `json:"deadline,omitempty"`
+	Status      *int       `json:"status,omitempty"`
+}
+
+func (at UpdateTask) UpdateTaskEntity(task *entities.Task) error {
+	task.Id = fmt.Sprint(at.Id)
+	if at.Deadline != nil {
+		task.Deadline = *at.Deadline
+	}
+	if at.Description != nil {
+		task.Description = *at.Description
+	}
+	if at.Name != nil {
+		task.Name = *at.Name
+	}
+	if at.Status != nil {
+		task.Status = entities.TaskStatus(*at.Status)
+	}
+	return nil
+}
+
 func (at AddTask) MapToTaskEntity() entities.Task {
 	return entities.Task{
 		ProjectId:   fmt.Sprint(at.ProjectId),

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"mvp-2-spms/database"
 	accountepository "mvp-2-spms/database/account-repository"
 	meetingrepository "mvp-2-spms/database/meeting-repository"
@@ -13,12 +14,18 @@ import (
 	googleapi "mvp-2-spms/integrations/google-api"
 	googleCalendar "mvp-2-spms/integrations/planner-service/google-calendar"
 	"mvp-2-spms/internal"
+	manageaccounts "mvp-2-spms/services/manage-accounts"
 	managemeetings "mvp-2-spms/services/manage-meetings"
 	manageprojects "mvp-2-spms/services/manage-projects"
 	managestudents "mvp-2-spms/services/manage-students"
 	managetasks "mvp-2-spms/services/manage-tasks"
+	manageuniversities "mvp-2-spms/services/manage-universities"
+	"mvp-2-spms/services/models"
+	"mvp-2-spms/web_server/config"
 	"mvp-2-spms/web_server/routes"
+	"mvp-2-spms/web_server/session"
 	"net/http"
+	"os"
 
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/drive/v3"
@@ -28,12 +35,31 @@ import (
 )
 
 func main() {
-	dsn := "root:root@tcp(127.0.0.1:3306)/student_project_management?parseTime=true"
-	gdb, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	serverConfig, err := config.ReadConfigFromFile("server_config.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = config.SetConfigEnvVars(serverConfig)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	session.SetBotTokenFromJson("credentials_bot.json")
+	dbConfig, err := database.ReadDBConfigFromFile("db_config.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	gdb, err := gorm.Open(mysql.Open(dbConfig.ConnString), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true, // use singular table name, table for `User` would be `user` with this option enabled
+			SingularTable: dbConfig.SingularTable, // use singular table name, table for `User` would be `user` with this option enabled
 		},
 	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	db := database.InitDatabade(gdb)
 	repos := internal.Repositories{
 		Projects:     projectrepository.InitProjectRepository(*db),
@@ -46,22 +72,36 @@ func main() {
 
 	repoHub := github.InitGithub(github.InitGithubAPI())
 
-	scopes := []string{calendar.CalendarScope, drive.DriveScope}
+	// scopes := []string{calendar.CalendarScope, drive.DriveScope}
 
-	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(scopes...))
+	gCalendarApi := googleCalendar.InitCalendarApi(googleapi.InitGoogleAPI(calendar.CalendarScope))
 	gCalendar := googleCalendar.InitGoogleCalendar(gCalendarApi)
-	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(scopes...))
+	gDriveApi := googleDrive.InitDriveApi(googleapi.InitGoogleAPI(drive.DriveScope))
 	gDrive := googleDrive.InitGoogleDrive(gDriveApi)
 
 	interactors := internal.Intercators{
-		ProjectManager: manageprojects.InitProjectInteractor(repos.Projects, repos.Students, &repoHub, repos.Universities, &gDrive, repos.Accounts),
-		StudentManager: managestudents.InitStudentInteractor(repos.Students),
-		MeetingManager: managemeetings.InitMeetingInteractor(repos.Meetings, &gCalendar, repos.Accounts, repos.Students, repos.Projects),
-		TaskManager:    managetasks.InitTaskInteractor(repos.Projects, &gDrive, repos.Tasks),
+		AccountManager:   manageaccounts.InitAccountInteractor(repos.Accounts, repos.Universities),
+		ProjectManager:   manageprojects.InitProjectInteractor(repos.Projects, repos.Students, repos.Universities, repos.Accounts),
+		StudentManager:   managestudents.InitStudentInteractor(repos.Students, repos.Projects, repos.Universities),
+		MeetingManager:   managemeetings.InitMeetingInteractor(repos.Meetings, repos.Accounts, repos.Students, repos.Projects),
+		TaskManager:      managetasks.InitTaskInteractor(repos.Projects, repos.Tasks, repos.Accounts),
+		UnversityManager: manageuniversities.InitUniversityInteractor(repos.Universities),
 	}
+
+	integrations := internal.Integrations{
+		GitRepositoryHubs: make(internal.GitRepositoryHubs),
+		CloudDrives:       make(internal.CloudDrives),
+		Planners:          make(internal.Planners),
+	}
+
+	integrations.Planners[models.GoogleCalendar] = gCalendar
+	integrations.CloudDrives[models.GoogleDrive] = gDrive
+	integrations.GitRepositoryHubs[models.GitHub] = repoHub
+
 	app := internal.StudentsProjectsManagementApp{
-		Intercators: interactors,
+		Intercators:  interactors,
+		Integrations: integrations,
 	}
 	router := routes.SetupRouter(&app)
-	http.ListenAndServe(":8080", router.Router())
+	http.ListenAndServe(os.Getenv("SERVER_PORT"), router.Router())
 }

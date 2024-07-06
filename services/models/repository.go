@@ -10,6 +10,7 @@ type Repository struct {
 	OwnerName string
 	Commits   []Commit
 	Branches  []branch
+	RepoType  int
 }
 
 type branch struct {

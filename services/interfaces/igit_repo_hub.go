@@ -6,5 +6,6 @@ import (
 )
 
 type IGitRepositoryHub interface {
-	GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) []models.Commit
+	IIntegration
+	GetRepositoryCommitsFromTime(repo models.Repository, fromTime time.Time) ([]models.Commit, error)
 }

@@ -1,2 +1,4 @@
 *.exe
 *.json
+*.puml
+web_app

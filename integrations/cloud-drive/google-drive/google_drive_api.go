@@ -1,10 +1,11 @@
 package clouddrive
 
 import (
-	"log"
+	"fmt"
 	googleapi "mvp-2-spms/integrations/google-api"
 	"strings"
 
+	"golang.org/x/oauth2"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 )
@@ -14,32 +15,59 @@ const HOURS_IN_DAY = 24
 const EVENT_DURATION_HOURS = 1
 
 type googleDriveApi struct {
+	googleapi.Google
 	api *drive.Service
 }
 
 func InitDriveApi(googleAPI googleapi.GoogleAPI) googleDriveApi {
-	api, err := drive.NewService(googleAPI.Context, option.WithHTTPClient(googleAPI.Client))
-	c := googleDriveApi{api}
-	if err != nil {
-		log.Fatalf("Unable to retrieve Drive client: %v", err)
+	d := googleDriveApi{
+		Google: googleapi.InintGoogle(googleAPI),
 	}
-	return c
+	return d
 }
 
-func (d *googleDriveApi) CreateFolder(folderName string, parentFolder string) (*drive.File, error) {
+func (d *googleDriveApi) AuthentificateService(token *oauth2.Token) error {
+	d.Authentificate(token)
+
+	api, err := drive.NewService(d.GetContext(), option.WithHTTPClient(d.GetClient()))
+	if err != nil {
+		return err
+	}
+
+	d.api = api
+	return nil
+}
+
+func (d *googleDriveApi) CreateFolder(folderName string, parentFolder ...string) (*drive.File, error) {
 	fileMetadata := &drive.File{
 		Name:     folderName,
 		MimeType: "application/vnd.google-apps.folder",
-		Parents:  []string{parentFolder},
+		Parents:  parentFolder,
 	}
-	file, err := d.api.Files.Create(fileMetadata).Fields("id").Do()
+	file, err := d.api.Files.Create(fileMetadata).Fields("id", "webViewLink").Do()
 	if err == nil {
 		return file, nil
 	}
 	return nil, err
 }
 
-func (d *googleDriveApi) AddTextFileToFOlder(fileName string, fileText string, parentFolderId string) (*drive.File, error) {
+func (d *googleDriveApi) GetFolderById(folderId string) (*drive.File, error) {
+	file, err := d.api.Files.Get(folderId).Fields("id", "webViewLink", "name").Do()
+	if err == nil {
+		return file, nil
+	}
+	return nil, err
+}
+
+func (d *googleDriveApi) GetFoldersByName(folderName string) (*drive.FileList, error) {
+	file, err := d.api.Files.List().Q(fmt.Sprint("name='", folderName, "'")).Do()
+	if err == nil {
+		return file, nil
+	}
+	return nil, err
+}
+
+func (d *googleDriveApi) AddTextFileToFolder(fileName string, fileText string, parentFolderId string) (*drive.File, error) {
 	fileMetadata := &drive.File{
 		Name:     fileName,
 		MimeType: "application/vnd.google-apps.document", // google document type
