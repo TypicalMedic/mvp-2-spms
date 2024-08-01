@@ -178,7 +178,7 @@
         "token_uri": "https://github.com/login/oauth/access_token",
         "client_secret": "???",
         "redirect_uris": [
-            "http://localhost:8080/auth/integration/access/github"
+            "http://localhost:8080/api/v1/auth/integration/access/github"
         ]
     }
 }
